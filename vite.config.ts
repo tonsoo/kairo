@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import inertia from '@inertiajs/vite';
 import { wayfinder } from '@laravel/vite-plugin-wayfinder';
 import tailwindcss from '@tailwindcss/vite';
@@ -5,6 +6,10 @@ import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
 import { defineConfig } from 'vite';
+
+const wayfinderCommand = existsSync('/.dockerenv')
+    ? 'php artisan wayfinder:generate --no-interaction'
+    : 'docker compose exec -T php php artisan wayfinder:generate --no-interaction';
 
 export default defineConfig({
     plugins: [
@@ -28,6 +33,7 @@ export default defineConfig({
             },
         }),
         wayfinder({
+            command: wayfinderCommand,
             formVariants: true,
         }),
     ],
