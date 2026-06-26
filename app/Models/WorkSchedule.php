@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domain\WorkSchedule\Enums\WorkScheduleType;
 use Database\Factories\WorkScheduleFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,7 +15,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $user_id
  * @property int $weekday
- * @property string $type
+ * @property WorkScheduleType $type
  * @property int $expected_minutes
  * @property string|null $starts_at
  * @property string|null $ends_at
@@ -37,6 +38,7 @@ class WorkSchedule extends Model
     {
         return [
             'weekday' => 'integer',
+            'type' => WorkScheduleType::class,
             'expected_minutes' => 'integer',
             'effective_from' => 'date',
         ];
