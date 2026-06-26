@@ -65,14 +65,14 @@ test('authenticated users can fetch the dashboard overview', function () {
         ->assertJsonPath('data.today.expected_minutes', 480)
         ->assertJsonPath('data.today.missing_minutes', 180)
         ->assertJsonCount(6, 'data.semester.items')
-        ->assertJsonPath('data.month.balance_minutes', -180)
+        ->assertJsonPath('data.month.balance_minutes', 0)
         ->assertJsonCount(26, 'data.month.items')
         ->assertJsonFragment([
             'date' => '2026-06-01',
-            'worked_minutes' => 780,
-            'regular_minutes' => 780,
+            'worked_minutes' => 480,
+            'regular_minutes' => 480,
             'extra_minutes' => 0,
-            'missing_minutes' => 180,
+            'missing_minutes' => 0,
         ])
         ->assertJsonFragment([
             'date' => '2026-06-25',
@@ -80,6 +80,13 @@ test('authenticated users can fetch the dashboard overview', function () {
             'regular_minutes' => 480,
             'extra_minutes' => 0,
             'missing_minutes' => 0,
+        ])
+        ->assertJsonFragment([
+            'date' => '2026-06-26',
+            'worked_minutes' => 300,
+            'regular_minutes' => 300,
+            'extra_minutes' => 0,
+            'missing_minutes' => 180,
         ]);
 });
 
