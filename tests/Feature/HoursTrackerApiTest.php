@@ -12,6 +12,83 @@ uses(LazilyRefreshDatabase::class);
 test('guests cannot access the hours tracker api', function () {
     $this->getJson(route('api.me.current-shift-state'))
         ->assertUnauthorized();
+
+    $this->getJson(route('api.me.hours-summary'))
+        ->assertUnauthorized();
+});
+
+test('authenticated users can fetch the dashboard overview', function () {
+    $user = User::factory()->create([
+        'timezone' => 'America/Sao_Paulo',
+    ]);
+
+    foreach (range(1, 5) as $weekday) {
+        WorkSchedule::factory()->for($user)->create([
+            'weekday' => $weekday,
+            'effective_from' => '2026-06-25',
+            'type' => 'total_time',
+            'expected_minutes' => 480,
+        ]);
+    }
+
+    Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-25 12:00:00',
+        'ended_at' => '2026-06-25 15:00:00',
+    ]);
+    Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-25 16:00:00',
+        'ended_at' => '2026-06-25 21:00:00',
+    ]);
+    Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-26 12:00:00',
+        'ended_at' => '2026-06-26 15:00:00',
+    ]);
+    Shift::factory()->ongoing()->for($user)->create([
+        'started_at' => '2026-06-26 16:00:00',
+        'ended_at' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->getJson(route('api.me.hours-summary', [
+            'at' => '2026-06-26T15:00:00-03:00',
+        ]))
+        ->assertOk()
+        ->assertJsonPath('data.balance.balance_minutes', -180)
+        ->assertJsonPath('data.balance.positive_minutes', 0)
+        ->assertJsonPath('data.balance.negative_minutes', 180)
+        ->assertJsonPath('data.today.date', '2026-06-26')
+        ->assertJsonPath('data.today.worked_minutes', 300)
+        ->assertJsonPath('data.today.paused_minutes', 60)
+        ->assertJsonPath('data.today.expected_minutes', 480)
+        ->assertJsonPath('data.today.missing_minutes', 180)
+        ->assertJsonCount(6, 'data.semester.items')
+        ->assertJsonPath('data.month.balance_minutes', -180)
+        ->assertJsonCount(26, 'data.month.items')
+        ->assertJsonFragment([
+            'date' => '2026-06-01',
+            'worked_minutes' => 780,
+            'regular_minutes' => 780,
+            'extra_minutes' => 0,
+            'missing_minutes' => 180,
+        ])
+        ->assertJsonFragment([
+            'date' => '2026-06-25',
+            'worked_minutes' => 480,
+            'regular_minutes' => 480,
+            'extra_minutes' => 0,
+            'missing_minutes' => 0,
+        ]);
+});
+
+test('dashboard overview rejects invalid datetime formats', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->getJson(route('api.me.hours-summary', [
+            'at' => '2026-06-26 15:00:00',
+        ]))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('at');
 });
 
 test('authenticated users can fetch the current shift state', function () {

@@ -1,96 +1,169 @@
 <script setup lang="ts">
+import type { ApexOptions } from 'apexcharts';
 import { computed } from 'vue';
+import VueApexCharts from 'vue3-apexcharts';
+import {
+    formatDurationMinutes,
+    resolveChartMaxMinutes,
+} from '@/components/dashboard/dashboardData';
 import type { DashboardBarItem } from '@/components/dashboard/dashboardData';
+import {
+    getDashboardLocale,
+    translateDashboard,
+} from '@/lib/dashboardTranslations';
+
+const locale = getDashboardLocale();
 
 const props = withDefaults(
     defineProps<{
         items: DashboardBarItem[];
         compact?: boolean;
+        maxMinutes?: number;
         stepCount?: number;
     }>(),
     {
         compact: false,
-        stepCount: 4,
+        maxMinutes: undefined,
+        stepCount: 6,
     },
 );
 
-const maxValue = computed(() =>
-    Math.max(
-        ...props.items.map((item) => item.worked + item.extra + item.missing),
-        1,
-    ),
-);
-const steps = computed(() =>
-    Array.from({ length: props.stepCount + 1 }, (_, index) =>
-        Math.round(
-            (maxValue.value * (props.stepCount - index)) / props.stepCount,
-        ),
-    ),
+const chartMaxMinutes = computed(() =>
+    props.maxMinutes ?? resolveChartMaxMinutes(props.items),
 );
 
-function toPercent(value: number): string {
-    return `${Math.max((value / maxValue.value) * 100, value > 0 ? 4 : 0)}%`;
+const chartSeries = computed(() => [
+    {
+        name: translateDashboard('dashboard.hours.legend.worked', locale),
+        data: props.items.map((item) => item.workedMinutes),
+    },
+    {
+        name: translateDashboard('dashboard.hours.legend.extra', locale),
+        data: props.items.map((item) => item.extraMinutes),
+    },
+    {
+        name: translateDashboard('dashboard.hours.legend.missing', locale),
+        data: props.items.map((item) => item.missingMinutes),
+    },
+]);
+
+const chartOptions = computed<ApexOptions>(() => ({
+    chart: {
+        type: 'bar',
+        stacked: true,
+        animations: {
+            enabled: false,
+        },
+        toolbar: {
+            show: false,
+        },
+        zoom: {
+            enabled: false,
+        },
+        parentHeightOffset: 0,
+        foreColor: '#94a3b8',
+    },
+    colors: ['#0d9488', '#be123c', '#a8a3c5'],
+    dataLabels: {
+        enabled: false,
+    },
+    legend: {
+        show: false,
+    },
+    plotOptions: {
+        bar: {
+            horizontal: false,
+            columnWidth: props.compact ? '52%' : '62%',
+            borderRadius: 2,
+        },
+    },
+    grid: {
+        borderColor: '#334155',
+        strokeDashArray: 4,
+        xaxis: {
+            lines: {
+                show: true,
+            },
+        },
+        yaxis: {
+            lines: {
+                show: true,
+            },
+        },
+        padding: {
+            top: 0,
+            right: 8,
+            bottom: 0,
+            left: 0,
+        },
+    },
+    stroke: {
+        show: false,
+    },
+    tooltip: {
+        enabled: true,
+        shared: true,
+        intersect: false,
+        theme: 'dark',
+        y: {
+            formatter(value: number): string {
+                return formatDurationMinutes(Math.round(value));
+            },
+        },
+    },
+    xaxis: {
+        categories: props.items.map((item) => item.label),
+        axisBorder: {
+            show: false,
+        },
+        axisTicks: {
+            show: false,
+        },
+        labels: {
+            style: {
+                colors: '#94a3b8',
+                fontSize: props.compact ? '10px' : '12px',
+            },
+        },
+    },
+    yaxis: {
+        min: 0,
+        max: chartMaxMinutes.value,
+        tickAmount: props.stepCount,
+        forceNiceScale: false,
+        labels: {
+            formatter(value: number): string {
+                return formatAxisMinutes(value);
+            },
+            style: {
+                colors: '#94a3b8',
+                fontSize: '11px',
+            },
+        },
+    },
+}));
+
+function formatAxisMinutes(value: number): string {
+    const roundedMinutes = Math.max(Math.round(value), 0);
+    const hours = Math.floor(roundedMinutes / 60);
+    const minutes = roundedMinutes % 60;
+
+    if (minutes === 0) {
+        return `${hours}H`;
+    }
+
+    return `${hours}H${String(minutes).padStart(2, '0')}`;
 }
 </script>
 
 <template>
-    <div class="grid h-full grid-cols-[auto_minmax(0,1fr)] gap-4">
-        <div
-            class="flex h-full flex-col justify-between text-[11px] text-slate-500"
-        >
-            <span v-for="step in steps" :key="step">{{ step }}H</span>
-        </div>
-
-        <div class="relative">
-            <div
-                class="pointer-events-none absolute inset-0 flex flex-col justify-between"
-            >
-                <div
-                    v-for="step in steps"
-                    :key="`line-${step}`"
-                    class="border-t border-dashed border-[#334155]"
-                />
-            </div>
-
-            <div
-                :class="[
-                    'relative flex h-full items-end',
-                    compact ? 'gap-1' : 'gap-3',
-                ]"
-            >
-                <div
-                    v-for="item in items"
-                    :key="item.label"
-                    class="flex min-w-0 flex-1 flex-col items-center gap-3"
-                >
-                    <div
-                        :class="[
-                            'flex h-full w-full flex-col justify-end overflow-hidden rounded-t-md bg-[#18191a]',
-                            compact ? 'max-w-3' : 'max-w-8',
-                        ]"
-                    >
-                        <div
-                            class="bg-slate-600"
-                            :style="{ height: toPercent(item.missing) }"
-                        />
-                        <div
-                            class="bg-rose-700"
-                            :style="{ height: toPercent(item.extra) }"
-                        />
-                        <div
-                            class="bg-teal-600"
-                            :style="{ height: toPercent(item.worked) }"
-                        />
-                    </div>
-                    <span
-                        :class="[
-                            'text-slate-500',
-                            compact ? 'text-[10px]' : 'text-xs',
-                        ]"
-                        >{{ item.label }}</span
-                    >
-                </div>
-            </div>
-        </div>
+    <div class="h-full min-h-0">
+        <VueApexCharts
+            type="bar"
+            width="100%"
+            height="100%"
+            :options="chartOptions"
+            :series="chartSeries"
+        />
     </div>
 </template>

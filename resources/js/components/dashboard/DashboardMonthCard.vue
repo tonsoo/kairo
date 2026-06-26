@@ -1,20 +1,42 @@
 <script setup lang="ts">
 import { ChevronLeft, ChevronRight } from '@lucide/vue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import type {
     DashboardBarItem,
+    DashboardJourneyItem,
     DashboardLegendItem,
 } from '@/components/dashboard/dashboardData';
+import DashboardJourneyChart from '@/components/dashboard/DashboardJourneyChart.vue';
 import DashboardLegend from '@/components/dashboard/DashboardLegend.vue';
 import DashboardPanel from '@/components/dashboard/DashboardPanel.vue';
 import DashboardStackedBarChart from '@/components/dashboard/DashboardStackedBarChart.vue';
+import {
+    getDashboardLocale,
+    translateDashboard,
+} from '@/lib/dashboardTranslations';
+
+const locale = getDashboardLocale();
 
 defineProps<{
+    title: string;
     items: DashboardBarItem[];
+    journeyItems: DashboardJourneyItem[];
     legend: DashboardLegendItem[];
+    maxMinutes: number;
 }>();
 
-const mode = ref<'Resumo' | 'Jornada'>('Resumo');
+const mode = ref<'summary' | 'journey'>('summary');
+
+const views = computed(() => [
+    {
+        value: 'summary' as const,
+        label: translateDashboard('dashboard.hours.month.view.summary', locale),
+    },
+    {
+        value: 'journey' as const,
+        label: translateDashboard('dashboard.hours.month.view.journey', locale),
+    },
+]);
 </script>
 
 <template>
@@ -35,33 +57,41 @@ const mode = ref<'Resumo' | 'Jornada'>('Resumo');
                 </button>
             </div>
             <h2 class="text-lg font-medium text-slate-200">
-                Junho, 2026 • Banco de horas: 00:00h
+                {{ title }}
             </h2>
             <div class="ml-auto flex items-center gap-4 text-sm text-slate-400">
                 <button
-                    v-for="view in ['Resumo', 'Jornada'] as const"
-                    :key="view"
+                    v-for="view in views"
+                    :key="view.value"
                     type="button"
                     class="flex items-center gap-2"
-                    @click="mode = view"
+                    @click="mode = view.value"
                 >
                     <span
                         :class="[
                             'size-3 rounded-full border',
-                            mode === view
+                            mode === view.value
                                 ? 'border-teal-500 bg-teal-500'
                                 : 'border-slate-500',
                         ]"
                     />
-                    <span>{{ view }}</span>
+                    <span>{{ view.label }}</span>
                 </button>
             </div>
         </div>
 
-        <div class="h-64">
-            <DashboardStackedBarChart :items="items" compact />
+        <div :class="mode === 'journey' ? 'h-[52rem]' : 'h-64'">
+            <DashboardStackedBarChart
+                v-if="mode === 'summary'"
+                :items="items"
+                :max-minutes="maxMinutes"
+                compact
+            />
+            <DashboardJourneyChart v-else :items="journeyItems" />
         </div>
 
-        <div class="mt-4"><DashboardLegend :items="legend" /></div>
+        <div v-if="mode === 'summary'" class="mt-4">
+            <DashboardLegend :items="legend" />
+        </div>
     </DashboardPanel>
 </template>

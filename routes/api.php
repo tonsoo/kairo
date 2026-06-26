@@ -2,15 +2,20 @@
 
 use App\Enums\RateLimiterType;
 use App\Http\Controllers\Api\CurrentShiftStateController;
+use App\Http\Controllers\Api\HoursSummaryController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\WorkScheduleController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified'])
+Route::middleware(['web', 'auth', 'verified'])
     ->prefix('me')
     ->group(function () {
         $readThrottle = 'throttle:'.RateLimiterType::read->value;
         $writeThrottle = 'throttle:'.RateLimiterType::write->value;
+
+        Route::get('hours-summary', HoursSummaryController::class)
+            ->middleware($readThrottle)
+            ->name('api.me.hours-summary');
 
         Route::get('current-shift-state', CurrentShiftStateController::class)
             ->middleware($readThrottle)

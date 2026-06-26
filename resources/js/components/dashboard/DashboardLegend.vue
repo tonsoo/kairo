@@ -1,5 +1,11 @@
 <script setup lang="ts">
 import type { DashboardLegendItem } from '@/components/dashboard/dashboardData';
+import {
+    getDashboardLocale,
+    translateDashboard,
+} from '@/lib/dashboardTranslations';
+
+const locale = getDashboardLocale();
 
 defineProps<{
     items: DashboardLegendItem[];
@@ -16,11 +22,11 @@ defineProps<{
     >
         <div
             v-for="item in items"
-            :key="item.label"
+            :key="item.labelKey"
             class="flex items-center gap-2"
         >
             <span :class="['h-2 w-2 rounded-full', item.colorClass]" />
-            <span>{{ item.label }}</span>
+            <span>{{ translateDashboard(item.labelKey, locale) }}</span>
         </div>
     </div>
 </template>

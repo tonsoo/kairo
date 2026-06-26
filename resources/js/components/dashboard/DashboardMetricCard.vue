@@ -11,8 +11,6 @@ import DashboardPanel from '@/components/dashboard/DashboardPanel.vue';
 withDefaults(
     defineProps<{
         title: string;
-        highlight?: string;
-        highlightClass?: string;
         meterValue: string;
         meterCaption: string;
         segments: DashboardMeterSegment[];
@@ -21,7 +19,6 @@ withDefaults(
         showInfo?: boolean;
     }>(),
     {
-        highlightClass: 'text-teal-400',
         legend: () => [],
     },
 );
@@ -32,9 +29,6 @@ withDefaults(
         <div class="flex items-start justify-between gap-4">
             <h2 class="text-sm font-medium text-slate-200">
                 {{ title }}
-                <span v-if="highlight" :class="['font-bold', highlightClass]">{{
-                    highlight
-                }}</span>
             </h2>
             <Info v-if="showInfo" class="size-4 text-amber-500" />
         </div>

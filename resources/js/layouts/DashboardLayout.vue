@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { Clock3 } from '@lucide/vue';
 import DashboardShiftAction from '@/components/dashboard-layout/DashboardShiftAction.vue';
 import DashboardSidebarNav from '@/components/dashboard-layout/DashboardSidebarNav.vue';
 import DashboardUserMenu from '@/components/dashboard-layout/DashboardUserMenu.vue';
-import { dashboard } from '@/routes';
 </script>
 
 <template>

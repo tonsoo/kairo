@@ -7,6 +7,12 @@ import type {
 import DashboardLegend from '@/components/dashboard/DashboardLegend.vue';
 import DashboardPanel from '@/components/dashboard/DashboardPanel.vue';
 import DashboardStackedBarChart from '@/components/dashboard/DashboardStackedBarChart.vue';
+import {
+    getDashboardLocale,
+    translateDashboard,
+} from '@/lib/dashboardTranslations';
+
+const locale = getDashboardLocale();
 
 defineProps<{
     items: DashboardBarItem[];
@@ -32,7 +38,7 @@ defineProps<{
                 </button>
             </div>
             <h2 class="text-lg font-medium text-slate-200">
-                Resumo do semestre
+                {{ translateDashboard('dashboard.hours.semester.title', locale) }}
             </h2>
             <div class="ml-auto"><DashboardLegend :items="legend" /></div>
         </div>

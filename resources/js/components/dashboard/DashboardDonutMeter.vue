@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import type { ApexOptions } from 'apexcharts';
+import { computed, ref } from 'vue';
+import VueApexCharts from 'vue3-apexcharts';
+import { formatDurationMinutes } from '@/components/dashboard/dashboardData';
 import type { DashboardMeterSegment } from '@/components/dashboard/dashboardData';
+
+const MIN_VISIBLE_FRACTION = 2 / 360;
 
 const props = withDefaults(
     defineProps<{
@@ -14,34 +19,119 @@ const props = withDefaults(
     },
 );
 
-const total = computed(() =>
-    props.segments.reduce((sum, segment) => sum + segment.value, 0),
+const activeSegmentIndex = ref<number | null>(null);
+
+const visibleSegments = computed(() =>
+    props.segments.filter((segment) => segment.value > 0),
 );
 
-const meterStyle = computed(() => {
-    if (total.value === 0) {
-        return {
-            backgroundImage: 'conic-gradient(rgba(71,85,105,0.65) 0deg 360deg)',
-        };
+const total = computed(() =>
+    visibleSegments.value.reduce((sum, segment) => sum + segment.value, 0),
+);
+
+const renderedSegments = computed(() => {
+    if (total.value <= 0) {
+        return [];
     }
 
-    let angle = 0;
-    const stops = props.segments.map((segment) => {
-        const start = angle;
-        angle += (segment.value / total.value) * 360;
+    const minimumFraction = visibleSegments.value.length * MIN_VISIBLE_FRACTION;
+    const scale = minimumFraction >= 1
+        ? 0
+        : (1 - minimumFraction);
 
-        return `${resolveColor(segment.colorClass)} ${start}deg ${angle}deg`;
+    return visibleSegments.value.map((segment) => {
+        const rawFraction = segment.value / total.value;
+
+        return {
+            ...segment,
+            chartValue: MIN_VISIBLE_FRACTION + (rawFraction * scale),
+        };
     });
-
-    return { backgroundImage: `conic-gradient(${stops.join(', ')})` };
 });
+
+const activeSegment = computed(() => {
+    if (activeSegmentIndex.value === null) {
+        return null;
+    }
+
+    return renderedSegments.value[activeSegmentIndex.value] ?? null;
+});
+
+const chartSeries = computed(() =>
+    renderedSegments.value.map((segment) => segment.chartValue),
+);
+
+const chartOptions = computed<ApexOptions>(() => ({
+    chart: {
+        type: 'donut',
+        sparkline: {
+            enabled: false,
+        },
+        animations: {
+            enabled: false,
+        },
+        events: {
+            dataPointMouseEnter: (_event, _chartContext, config) => {
+                const dataPointIndex = config?.dataPointIndex;
+
+                if (dataPointIndex === undefined) {
+                    return;
+                }
+
+                activeSegmentIndex.value = dataPointIndex;
+            },
+            dataPointMouseLeave: () => {
+                activeSegmentIndex.value = null;
+            },
+            mouseLeave: () => {
+                activeSegmentIndex.value = null;
+            },
+        },
+    },
+    colors: renderedSegments.value.map((segment) => resolveColor(segment.colorClass)),
+    labels: renderedSegments.value.map((segment) => segment.labelKey),
+    legend: {
+        show: false,
+    },
+    dataLabels: {
+        enabled: false,
+    },
+    tooltip: {
+        enabled: false,
+    },
+    stroke: {
+        width: 2.5,
+        colors: ['#242526'],
+    },
+    states: {
+        hover: {
+            filter: {
+                type: 'lighten',
+                value: 0.15,
+            },
+        },
+        active: {
+            filter: {
+                type: 'none',
+            },
+        },
+    },
+    plotOptions: {
+        pie: {
+            expandOnClick: false,
+            donut: {
+                size: '80%',
+            },
+        },
+    },
+}));
 
 function resolveColor(colorClass: string): string {
     const colorMap: Record<string, string> = {
         'bg-teal-500': '#0d9488',
-        'bg-amber-500': '#eab308',
+        'bg-amber-500': '#d97706',
         'bg-rose-500': '#be123c',
-        'bg-slate-500/70': '#475569',
+        'bg-slate-500/70': '#a8a3c5',
     };
 
     return colorMap[colorClass] ?? '#64748b';
@@ -51,13 +141,23 @@ function resolveColor(colorClass: string): string {
 <template>
     <div
         :class="[
-            'relative mx-auto grid place-items-center rounded-full p-4',
+            'relative mx-auto grid place-items-center overflow-visible',
             size,
         ]"
-        :style="meterStyle"
+        @mouseleave="activeSegmentIndex = null"
     >
+        <VueApexCharts
+            type="donut"
+            width="100%"
+            height="100%"
+            :options="chartOptions"
+            :series="chartSeries"
+            class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        />
+
         <div
-            class="grid h-full w-full place-items-center rounded-full bg-[#242526] text-center"
+            class="pointer-events-none relative z-10 grid w-[calc(100%-48px)] h-[calc(100%-48px)] place-items-center rounded-full bg-[#242526] text-center ring-1 ring-[#303134]"
+            :class="activeSegment ? 'opacity-30' : 'opacity-100'"
         >
             <div class="space-y-1">
                 <p class="text-3xl font-semibold text-slate-100">{{ value }}</p>
@@ -67,6 +167,13 @@ function resolveColor(colorClass: string): string {
                     {{ caption }}
                 </p>
             </div>
+        </div>
+
+        <div
+            v-if="activeSegment"
+            class="pointer-events-none absolute left-[54%] top-[56%] z-20 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[#3a3b3c] bg-[#1f2023] px-4 py-3 text-sm text-slate-200 shadow-[0_14px_30px_rgba(0,0,0,0.35)]"
+        >
+            {{ formatDurationMinutes(Math.round(activeSegment.value)) }}
         </div>
     </div>
 </template>
