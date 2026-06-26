@@ -35,10 +35,15 @@ Route::middleware(['web', 'auth', 'verified'])
             ->block()
             ->name('api.me.shifts.end');
 
-        Route::post('shifts/continue', [ShiftController::class, 'continue'])
+        Route::post('shifts/continue', [ShiftController::class, 'continueMethod'])
             ->middleware($writeThrottle)
             ->block()
             ->name('api.me.shifts.continue');
+
+        Route::post('shifts/remove-break', [ShiftController::class, 'removeBreak'])
+            ->middleware($writeThrottle)
+            ->block()
+            ->name('api.me.shifts.remove-break');
 
         Route::patch('shifts/{shift}', [ShiftController::class, 'update'])
             ->middleware($writeThrottle)

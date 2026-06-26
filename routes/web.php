@@ -10,6 +10,7 @@ Route::patch('locale/{locale}', LocaleController::class)
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::inertia('history', 'History')->name('history');
     Route::inertia('weekly-schedule', 'WeeklySchedule')->name('weekly-schedule');
 });
 

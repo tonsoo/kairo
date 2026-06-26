@@ -6,10 +6,12 @@ use App\Domain\Shift\Actions\ContinueShift;
 use App\Domain\Shift\Actions\DeleteShift;
 use App\Domain\Shift\Actions\EndShift;
 use App\Domain\Shift\Actions\GetCurrentShiftState;
+use App\Domain\Shift\Actions\RemoveShiftBreak;
 use App\Domain\Shift\Actions\StartShift;
 use App\Domain\Shift\Actions\UpdateShift;
 use App\Domain\Shift\DTOs\ShiftPeriodData;
 use App\Domain\Shift\Enums\CurrentShiftAction;
+use App\Domain\Shift\Exceptions\InvalidShiftBreakRemoval;
 use App\Domain\Shift\Exceptions\NoOngoingShiftFound;
 use App\Domain\Shift\Exceptions\OngoingShiftAlreadyExists;
 use App\Domain\Shift\Exceptions\ShiftOverlapDetected;
@@ -112,6 +114,42 @@ test('update shift prevents overlaps with other shifts', function () {
 
     expect(fn () => app(UpdateShift::class)($user, $shiftToUpdate, $period))
         ->toThrow(ShiftOverlapDetected::class);
+});
+
+test('remove shift break merges the selected shifts', function () {
+    $user = User::factory()->create();
+    $previousShift = Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-25 12:00:00',
+        'ended_at' => '2026-06-25 15:00:00',
+    ]);
+    $nextShift = Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-25 16:00:00',
+        'ended_at' => '2026-06-25 20:00:00',
+    ]);
+
+    $mergedShift = app(RemoveShiftBreak::class)($user, $previousShift, $nextShift);
+
+    expect($mergedShift->id)->toBe($previousShift->id)
+        ->and($mergedShift->started_at->utc()->format('Y-m-d H:i:s'))->toBe('2026-06-25 12:00:00')
+        ->and($mergedShift->ended_at?->utc()->format('Y-m-d H:i:s'))->toBe('2026-06-25 20:00:00');
+
+    $this->assertModelExists($mergedShift);
+    $this->assertModelMissing($nextShift);
+});
+
+test('remove shift break requires the previous shift to be completed', function () {
+    $user = User::factory()->create();
+    $previousShift = Shift::factory()->ongoing()->for($user)->create([
+        'started_at' => '2026-06-25 12:00:00',
+        'ended_at' => null,
+    ]);
+    $nextShift = Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-25 16:00:00',
+        'ended_at' => '2026-06-25 20:00:00',
+    ]);
+
+    expect(fn () => app(RemoveShiftBreak::class)($user, $previousShift, $nextShift))
+        ->toThrow(InvalidShiftBreakRemoval::class);
 });
 
 test('delete shift enforces ownership', function () {

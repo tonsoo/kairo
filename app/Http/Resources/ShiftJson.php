@@ -30,7 +30,9 @@ class ShiftJson extends JsonResource
             'timezone' => $timezone,
             'started_at' => $startedAt->toIso8601String(),
             'ended_at' => $endedAt?->toIso8601String(),
-            'duration_minutes' => $endedAt?->diffInMinutes($startedAt),
+            'duration_minutes' => $endedAt === null
+                ? null
+                : (int) floor($endedAt->diffInSeconds($startedAt) / 60),
         ];
     }
 }

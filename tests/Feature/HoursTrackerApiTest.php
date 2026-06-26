@@ -368,6 +368,46 @@ test('authenticated users can start and end shifts through the api', function ()
     expect($user->shifts()->count())->toBe(1);
 });
 
+test('authenticated users can remove a break between adjacent shifts through the api', function () {
+    $user = User::factory()->create([
+        'timezone' => 'America/Sao_Paulo',
+    ]);
+
+    $previousShift = Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-25 12:00:00',
+        'ended_at' => '2026-06-25 15:00:00',
+    ]);
+    $nextShift = Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-25 16:00:00',
+        'ended_at' => '2026-06-25 21:00:00',
+    ]);
+
+    $this->actingAs($user)
+        ->postJson(route('api.me.shifts.remove-break'), [
+            'previous_shift_id' => $previousShift->id,
+            'next_shift_id' => $nextShift->id,
+        ])
+        ->assertOk()
+        ->assertJsonPath('data.id', $previousShift->id)
+        ->assertJsonPath('data.started_at', '2026-06-25T09:00:00-03:00')
+        ->assertJsonPath('data.ended_at', '2026-06-25T18:00:00-03:00');
+
+    expect(Shift::query()->where('user_id', $user->id)->count())->toBe(1)
+        ->and($previousShift->fresh()?->ended_at?->utc()->format('Y-m-d H:i:s'))->toBe('2026-06-25 21:00:00');
+});
+
+test('authenticated users can delete shifts through the api', function () {
+    $user = User::factory()->create();
+    $shift = Shift::factory()->for($user)->create();
+
+    $this->actingAs($user)
+        ->deleteJson(route('api.me.shifts.destroy', $shift))
+        ->assertOk()
+        ->assertJsonPath('deleted', true);
+
+    $this->assertModelMissing($shift);
+});
+
 test('users cannot manage another users shifts through the api', function () {
     $owner = User::factory()->create();
     $intruder = User::factory()->create();
