@@ -1,5 +1,9 @@
 <?php
 
+use App\Enums\RateLimiterType;
+use App\Http\Controllers\Http\DashboardController;
+use App\Http\Controllers\Http\HistoryController;
+use App\Http\Controllers\Http\ShiftExportController;
 use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
 
@@ -9,8 +13,13 @@ Route::patch('locale/{locale}', LocaleController::class)
     ->name('locale.update');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
-    Route::inertia('history', 'History')->name('history');
+    $readThrottle = 'throttle:'.RateLimiterType::read->value;
+
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
+    Route::get('history', HistoryController::class)->name('history');
+    Route::get('shift-exports/download', ShiftExportController::class)
+        ->middleware($readThrottle)
+        ->name('shift-exports.download');
     Route::inertia('weekly-schedule', 'WeeklySchedule')->name('weekly-schedule');
 });
 

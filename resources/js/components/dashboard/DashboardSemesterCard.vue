@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronLeft, ChevronRight } from '@lucide/vue';
+import { ChevronLeft, ChevronRight, Download } from '@lucide/vue';
 import type {
     DashboardBarItem,
     DashboardLegendItem,
@@ -7,10 +7,18 @@ import type {
 import DashboardLegend from '@/components/dashboard/DashboardLegend.vue';
 import DashboardPanel from '@/components/dashboard/DashboardPanel.vue';
 import DashboardStackedBarChart from '@/components/dashboard/DashboardStackedBarChart.vue';
+import { Button } from '@/components/ui/button';
+import {
+    getDashboardLocale,
+    translateDashboard,
+} from '@/lib/dashboardTranslations';
+
+const locale = getDashboardLocale();
 
 defineEmits<{
     previous: [];
     next: [];
+    export: [];
 }>();
 
 defineProps<{
@@ -19,6 +27,7 @@ defineProps<{
     legend: DashboardLegendItem[];
     canGoPrevious: boolean;
     canGoNext: boolean;
+    canExport: boolean;
 }>();
 </script>
 
@@ -46,7 +55,19 @@ defineProps<{
             <h2 class="text-lg font-medium text-slate-200">
                 {{ title }}
             </h2>
-            <div class="ml-auto"><DashboardLegend :items="legend" /></div>
+            <div class="ml-auto flex flex-wrap items-center gap-4">
+                <Button
+                    type="button"
+                    variant="ghost"
+                    class="rounded-full border border-[#313234] bg-[#18191a] px-4 text-slate-300 hover:bg-[#242526] hover:text-slate-100"
+                    :disabled="!canExport"
+                    @click="$emit('export')"
+                >
+                    <Download class="size-4" />
+                    {{ translateDashboard('exports.button', locale) }}
+                </Button>
+                <DashboardLegend :items="legend" />
+            </div>
         </div>
 
         <div class="h-[19rem] grow">

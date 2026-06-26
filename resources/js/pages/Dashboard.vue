@@ -22,12 +22,18 @@ import {
 import DashboardMetricCard from '@/components/dashboard/DashboardMetricCard.vue';
 import DashboardMonthCard from '@/components/dashboard/DashboardMonthCard.vue';
 import DashboardSemesterCard from '@/components/dashboard/DashboardSemesterCard.vue';
+import ShiftExportDialog from '@/components/shift-export/ShiftExportDialog.vue';
 import { useHoursSummary } from '@/composables/useHoursSummary';
 import { useShiftsInRange } from '@/composables/useShiftsInRange';
 import {
     getDashboardLocale,
     translateDashboard,
 } from '@/lib/dashboardTranslations';
+import type { ShiftExportFormatOption } from '@/lib/shiftExport';
+
+const props = defineProps<{
+    shiftExportFormats: ShiftExportFormatOption[];
+}>();
 
 const locale = getDashboardLocale();
 const { hoursSummaryData, errorMessageKey, isLoading, fetchHoursSummary } = useHoursSummary();
@@ -35,6 +41,7 @@ const { shifts: monthJourneyShifts, fetchShiftsInRange: fetchMonthJourneyShifts 
 const { shifts: todayShifts, fetchShiftsInRange: fetchTodayShifts } = useShiftsInRange();
 const selectedMonthStart = ref<string | null>(null);
 const selectedSemesterStart = ref<string | null>(null);
+const activeExportTarget = ref<'month' | 'semester' | null>(null);
 
 onMounted(() => {
     void fetchDashboardData();
@@ -98,6 +105,8 @@ const todayCard = computed(() => {
     if (hoursSummaryData.value === null) {
         return {
             highlight: '--:--',
+            meterValue: '--:--',
+            meterCaption: '',
             segments: [],
             legend: [],
         };
@@ -111,6 +120,8 @@ const todayCard = computed(() => {
 
     return {
         highlight: formatDurationMinutes(hoursSummaryData.value.today.worked_minutes),
+        meterValue: formatDurationMinutes(hoursSummaryData.value.today.worked_minutes),
+        meterCaption: '',
         segments,
         legend: buildLegendFromSegments(segments),
     };
@@ -202,6 +213,26 @@ const semesterTitle = computed(() => {
     )} • ${translateDashboard('dashboard.hours.semester.title', locale)}`;
 });
 
+const activeExportRange = computed(() => {
+    if (hoursSummaryData.value === null || activeExportTarget.value === null) {
+        return null;
+    }
+
+    if (activeExportTarget.value === 'month') {
+        return {
+            from: hoursSummaryData.value.month.starts_at,
+            to: hoursSummaryData.value.month.ends_at,
+            descriptionKey: 'exports.dialog.description.month',
+        };
+    }
+
+    return {
+        from: hoursSummaryData.value.semester.starts_at,
+        to: hoursSummaryData.value.semester.ends_at,
+        descriptionKey: 'exports.dialog.description.semester',
+    };
+});
+
 async function fetchDashboardData(): Promise<void> {
     await fetchHoursSummary({
         month: selectedMonthStart.value ?? undefined,
@@ -262,15 +293,8 @@ async function showNextSemester(): Promise<void> {
                 {{ translateDashboard(errorMessageKey, locale) }}
             </p>
 
-            <p
-                v-else-if="isLoading && hoursSummaryData === null"
-                class="rounded-md border border-slate-700 bg-[#18191a] px-4 py-3 text-sm text-slate-400"
-            >
-                {{ translateDashboard('dashboard.hours.loading', locale) }}
-            </p>
-
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
-                <div class="space-y-6 lg:col-span-3">
+            <div class="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.25fr)]">
+                <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-1">
                     <DashboardMetricCard
                         :title="translateDashboard('dashboard.hours.balance.title', locale)"
                         :highlight="balanceCard.highlight"
@@ -278,12 +302,12 @@ async function showNextSemester(): Promise<void> {
                         :meter-caption="balanceCard.meterCaption"
                         :segments="balanceCard.segments"
                     />
+
                     <DashboardMetricCard
                         :title="translateDashboard('dashboard.hours.today.title', locale)"
                         :highlight="todayCard.highlight"
-                        highlight-class="text-slate-100"
-                        :meter-value="todayCard.highlight"
-                        :meter-caption="translateDashboard('dashboard.hours.today.title', locale)"
+                        :meter-value="todayCard.meterValue"
+                        :meter-caption="todayCard.meterCaption"
                         :segments="todayCard.segments"
                         :legend="todayCard.legend"
                     />
@@ -293,11 +317,12 @@ async function showNextSemester(): Promise<void> {
                     :title="semesterTitle"
                     :items="semesterItems"
                     :legend="chartLegend"
-                    :can-go-previous="true"
+                    :can-go-previous="selectedSemesterStart !== null"
                     :can-go-next="canGoToNextSemester"
-                    class="lg:col-span-9"
+                    :can-export="hoursSummaryData !== null"
                     @previous="void showPreviousSemester()"
                     @next="void showNextSemester()"
+                    @export="activeExportTarget = 'semester'"
                 />
             </div>
 
@@ -307,11 +332,33 @@ async function showNextSemester(): Promise<void> {
                 :journey-items="monthJourneyItems"
                 :legend="chartLegend"
                 :max-minutes="monthChartMaxMinutes"
-                :can-go-previous="true"
+                :can-go-previous="selectedMonthStart !== null"
                 :can-go-next="canGoToNextMonth"
+                :can-export="hoursSummaryData !== null"
                 @previous="void showPreviousMonth()"
                 @next="void showNextMonth()"
+                @export="activeExportTarget = 'month'"
             />
+
+            <p
+                v-if="isLoading"
+                class="rounded-md border border-[#2f3033] bg-[#18191a] px-4 py-3 text-sm text-slate-400"
+            >
+                {{ translateDashboard('dashboard.hours.loading', locale) }}
+            </p>
         </div>
+
+        <ShiftExportDialog
+            v-if="activeExportRange !== null"
+            :open="activeExportTarget !== null"
+            :locale="locale"
+            title-key="exports.dialog.title"
+            :description-key="activeExportRange.descriptionKey"
+            :formats="props.shiftExportFormats"
+            :initial-from="activeExportRange.from"
+            :initial-to="activeExportRange.to"
+            :editable-range="false"
+            @update:open="activeExportTarget = $event ? activeExportTarget : null"
+        />
     </div>
 </template>

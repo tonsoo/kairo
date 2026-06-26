@@ -1,0 +1,62 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Domain\Shift\Actions;
+
+use App\Domain\Dashboard\Actions\ListDashboardDailyDataForPeriod;
+use App\Domain\Dashboard\DTOs\DashboardDayData;
+use App\Domain\Shift\DTOs\ShiftExportData;
+use App\Domain\Shift\DTOs\ShiftExportDayData;
+use App\Models\User;
+use Carbon\CarbonImmutable;
+
+final readonly class BuildShiftExportData
+{
+    public function __construct(
+        private ListDashboardDailyDataForPeriod $listDashboardDailyDataForPeriod,
+    ) {}
+
+    public function __invoke(
+        User $user,
+        CarbonImmutable $startsAt,
+        CarbonImmutable $endsAt,
+        CarbonImmutable $referenceMoment,
+        string $timezone,
+    ): ShiftExportData {
+        $days = ($this->listDashboardDailyDataForPeriod)(
+            $user,
+            $startsAt,
+            $endsAt,
+            $referenceMoment,
+        )
+            ->map(fn (DashboardDayData $day) => new ShiftExportDayData(
+                date: $day->date,
+                workedMinutes: $day->workedMinutes,
+                expectedMinutes: $day->expectedMinutes,
+                regularMinutes: $day->regularMinutes,
+                extraMinutes: $day->extraMinutes,
+                missingMinutes: $day->missingMinutes,
+            ))
+            ->values();
+
+        return new ShiftExportData(
+            startsAt: $startsAt,
+            endsAt: $endsAt,
+            timezone: $timezone,
+            workedMinutes: $days->sum(
+                fn (ShiftExportDayData $day): int => $day->workedMinutes,
+            ),
+            regularMinutes: $days->sum(
+                fn (ShiftExportDayData $day): int => $day->regularMinutes,
+            ),
+            extraMinutes: $days->sum(
+                fn (ShiftExportDayData $day): int => $day->extraMinutes,
+            ),
+            missingMinutes: $days->sum(
+                fn (ShiftExportDayData $day): int => $day->missingMinutes,
+            ),
+            days: $days,
+        );
+    }
+}

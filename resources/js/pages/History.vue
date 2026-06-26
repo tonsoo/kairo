@@ -5,6 +5,7 @@ import HistoryCalendarView from '@/components/history/HistoryCalendarView.vue';
 import HistoryDayEditorDialog from '@/components/history/HistoryDayEditorDialog.vue';
 import HistoryListView from '@/components/history/HistoryListView.vue';
 import HistoryToolbar from '@/components/history/HistoryToolbar.vue';
+import ShiftExportDialog from '@/components/shift-export/ShiftExportDialog.vue';
 import { useShiftHistory } from '@/composables/useShiftHistory';
 import { getCurrentClientLocalDate } from '@/lib/clientDateTime';
 import {
@@ -16,9 +17,15 @@ import {
     formatHistoryMonthHeading,
 } from '@/lib/history';
 import type { HistoryView } from '@/lib/history';
+import type { ShiftExportFormatOption } from '@/lib/shiftExport';
+
+const props = defineProps<{
+    shiftExportFormats: ShiftExportFormatOption[];
+}>();
 
 const locale = getDashboardLocale();
 const currentView = ref<HistoryView>('list');
+const isExportDialogOpen = ref(false);
 const {
     monthSummary,
     selectedDate,
@@ -50,6 +57,10 @@ const monthHeading = computed(() =>
         ? ''
         : formatHistoryMonthHeading(monthSummary.value.starts_at, locale),
 );
+const exportRange = computed(() => ({
+    from: monthSummary.value?.starts_at ?? '',
+    to: monthSummary.value?.ends_at ?? '',
+}));
 const todayDate = getCurrentClientLocalDate();
 
 onMounted(() => {
@@ -73,8 +84,10 @@ function handleDialogOpenChange(isOpen: boolean): void {
                 :month-heading="monthHeading"
                 :current-view="currentView"
                 :can-go-to-next-month="canGoToNextMonth"
+                :can-export="monthSummary !== null"
                 @previous="void showPreviousMonth()"
                 @next="void showNextMonth()"
+                @export="isExportDialogOpen = true"
                 @update:view="currentView = $event"
             />
 
@@ -124,6 +137,18 @@ function handleDialogOpenChange(isOpen: boolean): void {
             @save-shift="void saveShift($event)"
             @delete-shift="void deleteShift($event)"
             @remove-break="void removeShiftBreak($event)"
+        />
+
+        <ShiftExportDialog
+            :open="isExportDialogOpen"
+            :locale="locale"
+            title-key="exports.dialog.title"
+            description-key="exports.dialog.description.history"
+            :formats="props.shiftExportFormats"
+            :initial-from="exportRange.from"
+            :initial-to="exportRange.to"
+            editable-range
+            @update:open="isExportDialogOpen = $event"
         />
     </div>
 </template>

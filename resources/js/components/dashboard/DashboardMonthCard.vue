@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronLeft, ChevronRight } from '@lucide/vue';
+import { ChevronLeft, ChevronRight, Download } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import type {
     DashboardBarItem,
@@ -10,6 +10,7 @@ import DashboardJourneyChart from '@/components/dashboard/DashboardJourneyChart.
 import DashboardLegend from '@/components/dashboard/DashboardLegend.vue';
 import DashboardPanel from '@/components/dashboard/DashboardPanel.vue';
 import DashboardStackedBarChart from '@/components/dashboard/DashboardStackedBarChart.vue';
+import { Button } from '@/components/ui/button';
 import {
     getDashboardLocale,
     translateDashboard,
@@ -19,6 +20,7 @@ const locale = getDashboardLocale();
 const emit = defineEmits<{
     previous: [];
     next: [];
+    export: [];
 }>();
 
 defineProps<{
@@ -29,6 +31,7 @@ defineProps<{
     maxMinutes: number;
     canGoPrevious: boolean;
     canGoNext: boolean;
+    canExport: boolean;
 }>();
 
 const mode = ref<'summary' | 'journey'>('summary');
@@ -69,7 +72,17 @@ const views = computed(() => [
             <h2 class="text-lg font-medium text-slate-200">
                 {{ title }}
             </h2>
-            <div class="ml-auto flex items-center gap-4 text-sm text-slate-400">
+            <div class="ml-auto flex flex-wrap items-center gap-4 text-sm text-slate-400">
+                <Button
+                    type="button"
+                    variant="ghost"
+                    class="rounded-full border border-[#313234] bg-[#18191a] px-4 text-slate-300 hover:bg-[#242526] hover:text-slate-100"
+                    :disabled="!canExport"
+                    @click="emit('export')"
+                >
+                    <Download class="size-4" />
+                    {{ translateDashboard('exports.button', locale) }}
+                </Button>
                 <button
                     v-for="view in views"
                     :key="view.value"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CalendarDays, ChevronLeft, ChevronRight, List } from '@lucide/vue';
+import { CalendarDays, ChevronLeft, ChevronRight, Download, List } from '@lucide/vue';
 import { Button } from '@/components/ui/button';
 import { translateDashboard } from '@/lib/dashboardTranslations';
 import type { DashboardLocale } from '@/lib/dashboardTranslations';
@@ -10,11 +10,13 @@ const props = defineProps<{
     monthHeading: string;
     currentView: HistoryView;
     canGoToNextMonth: boolean;
+    canExport: boolean;
 }>();
 
 const emit = defineEmits<{
     previous: [];
     next: [];
+    export: [];
     'update:view': [view: HistoryView];
 }>();
 </script>
@@ -57,29 +59,41 @@ const emit = defineEmits<{
             </div>
         </div>
 
-        <div class="inline-flex items-center gap-2 rounded-full border border-[#313234] bg-[#18191a] p-1.5">
-            <button
+        <div class="flex flex-wrap items-center gap-3">
+            <Button
                 type="button"
-                class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors"
-                :class="props.currentView === 'list'
-                    ? 'bg-[#d0ebba] text-[#17230f]'
-                    : 'text-slate-400 hover:text-slate-100'"
-                @click="emit('update:view', 'list')"
+                variant="ghost"
+                class="rounded-full border border-[#313234] bg-[#18191a] px-4 text-slate-300 hover:bg-[#242526] hover:text-slate-100"
+                @click="emit('export')"
             >
-                <List class="size-4" />
-                <span>{{ translateDashboard('history.view.list', props.locale) }}</span>
-            </button>
-            <button
-                type="button"
-                class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors"
-                :class="props.currentView === 'calendar'
-                    ? 'bg-[#d0ebba] text-[#17230f]'
-                    : 'text-slate-400 hover:text-slate-100'"
-                @click="emit('update:view', 'calendar')"
-            >
-                <CalendarDays class="size-4" />
-                <span>{{ translateDashboard('history.view.calendar', props.locale) }}</span>
-            </button>
+                <Download class="size-4" />
+                {{ translateDashboard('exports.button', props.locale) }}
+            </Button>
+
+            <div class="inline-flex items-center gap-2 rounded-full border border-[#313234] bg-[#18191a] p-1.5">
+                <button
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors"
+                    :class="props.currentView === 'list'
+                        ? 'bg-[#d0ebba] text-[#17230f]'
+                        : 'text-slate-400 hover:text-slate-100'"
+                    @click="emit('update:view', 'list')"
+                >
+                    <List class="size-4" />
+                    <span>{{ translateDashboard('history.view.list', props.locale) }}</span>
+                </button>
+                <button
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors"
+                    :class="props.currentView === 'calendar'
+                        ? 'bg-[#d0ebba] text-[#17230f]'
+                        : 'text-slate-400 hover:text-slate-100'"
+                    @click="emit('update:view', 'calendar')"
+                >
+                    <CalendarDays class="size-4" />
+                    <span>{{ translateDashboard('history.view.calendar', props.locale) }}</span>
+                </button>
+            </div>
         </div>
     </section>
 </template>

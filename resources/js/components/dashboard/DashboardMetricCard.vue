@@ -11,6 +11,7 @@ import DashboardPanel from '@/components/dashboard/DashboardPanel.vue';
 withDefaults(
     defineProps<{
         title: string;
+        highlight: string;
         meterValue: string;
         meterCaption: string;
         segments: DashboardMeterSegment[];
@@ -27,9 +28,14 @@ withDefaults(
 <template>
     <DashboardPanel class="p-5">
         <div class="flex items-start justify-between gap-4">
-            <h2 class="text-sm font-medium text-slate-200">
-                {{ title }}
-            </h2>
+            <div class="flex flex-wrap items-center gap-2">
+                <h2 class="text-sm font-medium text-slate-200">
+                    {{ title }}
+                </h2>
+                <span class="text-sm font-semibold text-slate-100">
+                    {{ highlight }}
+                </span>
+            </div>
             <Info v-if="showInfo" class="size-4 text-amber-500" />
         </div>
 
