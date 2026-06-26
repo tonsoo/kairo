@@ -29,6 +29,7 @@ final class HoursSummaryRequest extends FormRequest
             'at' => ['nullable', Rule::date()->format(DateTimeInterface::ATOM)],
             'month' => ['nullable', Rule::date()->format(DateParser::localDateFormat)],
             'semester_start' => ['nullable', Rule::date()->format(DateParser::localDateFormat)],
+            'timezone' => ['nullable', 'timezone:all'],
         ];
     }
 
@@ -46,10 +47,11 @@ final class HoursSummaryRequest extends FormRequest
                     return;
                 }
 
-                /** @var array{at?: string|null, month?: string|null, semester_start?: string|null} $validated */
+                /** @var array{at?: string|null, month?: string|null, semester_start?: string|null, timezone?: string|null} $validated */
                 $validated = $validator->safe()->all();
+                $timezone = $validated['timezone'] ?? $user->timezone;
                 $referenceMoment = ($validated['at'] ?? null) === null
-                    ? DateParser::nowInTimezone($user->timezone)
+                    ? DateParser::nowInTimezone($timezone)
                     : DateParser::parseAtomDateTime($validated['at'], 'at');
                 $currentMonthStart = $referenceMoment->startOfMonth();
                 $currentSemesterStart = $currentMonthStart->subMonths(5);
@@ -58,7 +60,7 @@ final class HoursSummaryRequest extends FormRequest
                     $validator,
                     $validated['month'] ?? null,
                     'month',
-                    $user->timezone,
+                    $timezone,
                     $currentMonthStart,
                     'Month must be the first day of a month and cannot be in the future.',
                 );
@@ -66,7 +68,7 @@ final class HoursSummaryRequest extends FormRequest
                     $validator,
                     $validated['semester_start'] ?? null,
                     'semester_start',
-                    $user->timezone,
+                    $timezone,
                     $currentSemesterStart,
                     'Semester start must be the first day of a month and cannot be in the future.',
                 );

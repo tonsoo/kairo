@@ -23,6 +23,7 @@ final class EndShiftRequest extends FormRequest
     {
         return [
             'at' => ['nullable', Rule::date()->format(DateTimeInterface::ATOM)],
+            'timezone' => ['nullable', 'timezone:all'],
         ];
     }
 }

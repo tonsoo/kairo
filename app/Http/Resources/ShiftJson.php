@@ -17,7 +17,9 @@ class ShiftJson extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $timezone = $request->user()?->timezone ?? 'UTC';
+        $timezone = is_string($request->input('timezone'))
+            ? $request->input('timezone')
+            : ($request->user()?->timezone ?? 'UTC');
         $startedAt = CarbonImmutable::instance($this->started_at)->setTimezone($timezone);
         $endedAt = $this->ended_at === null
             ? null

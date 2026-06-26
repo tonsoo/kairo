@@ -20,15 +20,16 @@ final class CurrentShiftStateController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        /** @var array{at?: string|null} $validated */
+        /** @var array{at?: string|null, timezone?: string|null} $validated */
         $validated = $request->validated();
         $at = $validated['at'] ?? null;
+        $timezone = $validated['timezone'] ?? $user->timezone;
 
         return new CurrentShiftStateJson(
             ($getCurrentShiftState)(
                 $user,
                 $at === null
-                    ? DateParser::nowInTimezone($user->timezone)
+                    ? DateParser::nowInTimezone($timezone)
                     : DateParser::parseAtomDateTime($at, 'at'),
             ),
         );

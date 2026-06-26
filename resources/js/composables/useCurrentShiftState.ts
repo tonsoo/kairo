@@ -3,6 +3,10 @@ import type { ComputedRef } from 'vue';
 import { computed, ref } from 'vue';
 import { continueMethod, end, start } from '@/actions/App/Http/Controllers/Api/ShiftController';
 import { useHoursSummary } from '@/composables/useHoursSummary';
+import {
+    getCurrentClientDateTimeAtom,
+    getCurrentClientTimezone,
+} from '@/lib/clientDateTime';
 import { currentShiftState } from '@/routes/api/me';
 
 export type CurrentShiftAction = 'start' | 'end' | 'continue';
@@ -48,7 +52,11 @@ const isLoading = ref(false);
 const isSubmitting = ref(false);
 
 export const useCurrentShiftState = (): UseCurrentShiftStateReturn => {
-    const http = useHttp();
+    const readHttp = useHttp();
+    const actionHttp = useHttp<{ at: string; timezone: string }>({
+        at: '',
+        timezone: '',
+    });
     const { fetchHoursSummary } = useHoursSummary();
 
     const buttonLabelKey = computed<string>(() => {
@@ -67,8 +75,13 @@ export const useCurrentShiftState = (): UseCurrentShiftStateReturn => {
         errorMessageKey.value = null;
 
         try {
-            const response = (await http.submit(
-                currentShiftState(),
+            const response = (await readHttp.submit(
+                currentShiftState({
+                    query: {
+                        at: getCurrentClientDateTimeAtom(),
+                        timezone: getCurrentClientTimezone(),
+                    },
+                }),
             )) as CurrentShiftStateResponse;
 
             currentShiftStateData.value = response.data;
@@ -84,7 +97,10 @@ export const useCurrentShiftState = (): UseCurrentShiftStateReturn => {
         isSubmitting.value = true;
 
         try {
-            await http.submit(resolveActionRequest());
+            actionHttp.at = getCurrentClientDateTimeAtom();
+            actionHttp.timezone = getCurrentClientTimezone();
+
+            await actionHttp.submit(resolveActionRequest());
             await refreshDashboardState();
         } catch {
             await refreshDashboardState();

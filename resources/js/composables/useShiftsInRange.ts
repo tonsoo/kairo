@@ -2,6 +2,7 @@ import { useHttp } from '@inertiajs/vue3';
 import type { Ref } from 'vue';
 import { ref } from 'vue';
 import { index as listShifts } from '@/actions/App/Http/Controllers/Api/ShiftController';
+import { getCurrentClientTimezone } from '@/lib/clientDateTime';
 
 export type ShiftInRange = {
     id: number;
@@ -34,7 +35,13 @@ export const useShiftsInRange = (): UseShiftsInRangeReturn => {
 
         try {
             const response = (await http.submit(
-                listShifts({ query: { from, to } }),
+                listShifts({
+                    query: {
+                        from,
+                        to,
+                        timezone: getCurrentClientTimezone(),
+                    },
+                }),
             )) as ShiftsInRangeResponse;
 
             shifts.value = response.data;

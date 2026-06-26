@@ -24,6 +24,7 @@ final class ListShiftsRequest extends FormRequest
         return [
             'from' => ['nullable', Rule::date()->format(DateParser::localDateFormat)],
             'to' => ['nullable', Rule::date()->format(DateParser::localDateFormat), 'after_or_equal:from'],
+            'timezone' => ['nullable', 'timezone:all'],
         ];
     }
 }

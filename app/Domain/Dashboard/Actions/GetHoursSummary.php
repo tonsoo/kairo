@@ -26,6 +26,7 @@ final readonly class GetHoursSummary
         CarbonImmutable $referenceMoment,
         CarbonImmutable $monthStart,
         CarbonImmutable $semesterStart,
+        string $timezone,
     ): HoursSummaryData {
         $referenceDate = $referenceMoment->startOfDay();
         $currentMonthStart = $referenceMoment->startOfMonth();
@@ -33,6 +34,7 @@ final readonly class GetHoursSummary
         $balanceStartsAt = ($this->resolveDashboardBalanceStartsAt)(
             $user,
             $referenceMoment,
+            $timezone,
         );
         $monthEndsAt = $monthStart->equalTo($currentMonthStart)
             ? $referenceDate
@@ -88,7 +90,7 @@ final readonly class GetHoursSummary
 
         return new HoursSummaryData(
             generatedAt: $referenceMoment,
-            timezone: $user->timezone,
+            timezone: $timezone,
             balance: ($this->buildDashboardBalanceData)($balanceDays),
             today: ($this->buildDashboardTodayData)($user, $today, $referenceMoment),
             semesterStartsAt: $semesterStart,

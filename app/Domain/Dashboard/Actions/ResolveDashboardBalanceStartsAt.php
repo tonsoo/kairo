@@ -14,16 +14,16 @@ final readonly class ResolveDashboardBalanceStartsAt
         private GetDashboardEarliestWorkScheduleDate $getDashboardEarliestWorkScheduleDate,
     ) {}
 
-    public function __invoke(User $user, CarbonImmutable $referenceMoment): CarbonImmutable
+    public function __invoke(User $user, CarbonImmutable $referenceMoment, string $timezone): CarbonImmutable
     {
         $referenceDate = $referenceMoment->startOfDay();
         $earliestShiftDate = ($this->getDashboardEarliestShiftDate)(
             $user,
-            $user->timezone,
+            $timezone,
         );
         $earliestWorkScheduleDate = ($this->getDashboardEarliestWorkScheduleDate)(
             $user,
-            $user->timezone,
+            $timezone,
         );
         $startsAt = $referenceDate;
 

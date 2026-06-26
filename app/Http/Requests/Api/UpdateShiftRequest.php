@@ -24,6 +24,7 @@ final class UpdateShiftRequest extends FormRequest
         return [
             'started_at' => ['required', Rule::date()->format(DateTimeInterface::ATOM)],
             'ended_at' => ['nullable', Rule::date()->format(DateTimeInterface::ATOM), 'after:started_at'],
+            'timezone' => ['nullable', 'timezone:all'],
         ];
     }
 }

@@ -1,5 +1,9 @@
 import { useHttp } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import {
+    getCurrentClientDateTimeAtom,
+    getCurrentClientTimezone,
+} from '@/lib/clientDateTime';
 import { hoursSummary } from '@/routes/api/me';
 
 export type HoursSummaryItem = {
@@ -68,7 +72,10 @@ export const useHoursSummary = (): UseHoursSummaryReturn => {
         errorMessageKey.value = null;
 
         try {
-            const query: Record<string, string> = {};
+            const query: Record<string, string> = {
+                at: getCurrentClientDateTimeAtom(),
+                timezone: getCurrentClientTimezone(),
+            };
 
             if (options.month !== undefined) {
                 query.month = options.month;

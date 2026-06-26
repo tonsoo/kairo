@@ -20,17 +20,18 @@ final class HoursSummaryController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        /** @var array{at?: string|null, month?: string|null, semester_start?: string|null} $validated */
+        /** @var array{at?: string|null, month?: string|null, semester_start?: string|null, timezone?: string|null} $validated */
         $validated = $request->validated();
+        $timezone = $this->resolveTimezone($validated['timezone'] ?? null, $user);
         $referenceMoment = ($validated['at'] ?? null) === null
-            ? DateParser::nowInTimezone($user->timezone)
+            ? DateParser::nowInTimezone($timezone)
             : DateParser::parseAtomDateTime($validated['at'], 'at');
         $monthStart = ($validated['month'] ?? null) === null
             ? $referenceMoment->startOfMonth()
-            : DateParser::parseLocalDate($validated['month'], $user->timezone, 'month');
+            : DateParser::parseLocalDate($validated['month'], $timezone, 'month');
         $semesterStart = ($validated['semester_start'] ?? null) === null
             ? $referenceMoment->startOfMonth()->subMonths(5)
-            : DateParser::parseLocalDate($validated['semester_start'], $user->timezone, 'semester_start');
+            : DateParser::parseLocalDate($validated['semester_start'], $timezone, 'semester_start');
 
         return new HoursSummaryJson(
             ($getHoursSummary)(
@@ -38,7 +39,13 @@ final class HoursSummaryController extends Controller
                 $referenceMoment,
                 $monthStart,
                 $semesterStart,
+                $timezone,
             ),
         );
+    }
+
+    private function resolveTimezone(?string $timezone, User $user): string
+    {
+        return $timezone ?? $user->timezone;
     }
 }

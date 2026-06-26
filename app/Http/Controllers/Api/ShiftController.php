@@ -38,25 +38,28 @@ final class ShiftController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        /** @var array{from?: string|null, to?: string|null} $validated */
+        /** @var array{from?: string|null, to?: string|null, timezone?: string|null} $validated */
         $validated = $request->validated();
+        $timezone = $this->resolveTimezone($validated['timezone'] ?? null, $user);
 
         $query = Shift::query()
             ->where('user_id', $user->id)
             ->orderByDesc('started_at');
 
-        $from = $this->parseLocalDate($validated['from'] ?? null, $user, 'from');
+        $from = $this->parseLocalDate($validated['from'] ?? null, $timezone, 'from');
 
         if ($from !== null) {
-            $query->where('started_at', '>=', $from->utc());
+            $query->where(function (Builder $query) use ($from): void {
+                $query
+                    ->whereNull('ended_at')
+                    ->orWhere('ended_at', '>', $from->utc());
+            });
         }
 
-        $to = $this->parseLocalDate($validated['to'] ?? null, $user, 'to');
+        $to = $this->parseLocalDate($validated['to'] ?? null, $timezone, 'to');
 
         if ($to !== null) {
-            $query->where(function (Builder $query) use ($to) {
-                $this->applyToBoundary($query, $to);
-            });
+            $query->where('started_at', '<', $to->addDay()->utc());
         }
 
         return ShiftJson::collection($query->get());
@@ -69,7 +72,7 @@ final class ShiftController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        /** @var array{at?: string|null} $validated */
+        /** @var array{at?: string|null, timezone?: string|null} $validated */
         $validated = $request->validated();
 
         try {
@@ -88,7 +91,7 @@ final class ShiftController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        /** @var array{at?: string|null} $validated */
+        /** @var array{at?: string|null, timezone?: string|null} $validated */
         $validated = $request->validated();
 
         try {
@@ -107,7 +110,7 @@ final class ShiftController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        /** @var array{at?: string|null} $validated */
+        /** @var array{at?: string|null, timezone?: string|null} $validated */
         $validated = $request->validated();
 
         try {
@@ -127,7 +130,7 @@ final class ShiftController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        /** @var array{started_at: string, ended_at?: string|null} $validated */
+        /** @var array{started_at: string, ended_at?: string|null, timezone?: string|null} $validated */
         $validated = $request->validated();
 
         try {
@@ -159,30 +162,31 @@ final class ShiftController extends Controller
     }
 
     /**
-     * @param  array{at?: string|null}  $validated
+     * @param  array{at?: string|null, timezone?: string|null}  $validated
      */
     private function resolveMoment(array $validated, User $user): CarbonImmutable
     {
         $at = $validated['at'] ?? null;
+        $timezone = $this->resolveTimezone($validated['timezone'] ?? null, $user);
 
         if ($at === null) {
-            return DateParser::nowInTimezone($user->timezone);
+            return DateParser::nowInTimezone($timezone);
         }
 
         return DateParser::parseAtomDateTime($at, 'at');
     }
 
-    private function parseLocalDate(?string $value, User $user, string $field): ?CarbonImmutable
+    private function parseLocalDate(?string $value, string $timezone, string $field): ?CarbonImmutable
     {
         if ($value === null) {
             return null;
         }
 
-        return DateParser::parseLocalDate($value, $user->timezone, $field);
+        return DateParser::parseLocalDate($value, $timezone, $field);
     }
 
     /**
-     * @param  array{started_at: string, ended_at?: string|null}  $validated
+     * @param  array{started_at: string, ended_at?: string|null, timezone?: string|null}  $validated
      */
     private function buildShiftPeriod(array $validated): ShiftPeriodData
     {
@@ -194,20 +198,8 @@ final class ShiftController extends Controller
         );
     }
 
-    private function applyToBoundary(Builder $query, CarbonImmutable $to): void
+    private function resolveTimezone(?string $timezone, User $user): string
     {
-        $boundary = $to->addDay()->utc();
-
-        $query
-            ->where(function (Builder $query) use ($boundary): void {
-                $query
-                    ->whereNotNull('ended_at')
-                    ->where('ended_at', '<', $boundary);
-            })
-            ->orWhere(function (Builder $query) use ($boundary): void {
-                $query
-                    ->whereNull('ended_at')
-                    ->where('started_at', '<', $boundary);
-            });
+        return $timezone ?? $user->timezone;
     }
 }

@@ -111,6 +111,45 @@ test('dashboard hours summary prefers daily work schedule snapshots over updated
         ->assertJsonPath('data.today.missing_minutes', 480);
 });
 
+
+test('dashboard hours summary isolates overnight shift minutes using the requested timezone', function () {
+    $user = User::factory()->create([
+        'timezone' => 'UTC',
+    ]);
+
+    WorkSchedule::factory()->for($user)->create([
+        'weekday' => 4,
+        'effective_from' => '2026-06-25',
+        'type' => 'total_time',
+        'expected_minutes' => 480,
+    ]);
+    WorkSchedule::factory()->for($user)->create([
+        'weekday' => 5,
+        'effective_from' => '2026-06-25',
+        'type' => 'total_time',
+        'expected_minutes' => 480,
+    ]);
+
+    Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-25 13:00:00',
+        'ended_at' => '2026-06-26 13:00:00',
+    ]);
+
+    $this->actingAs($user)
+        ->getJson(route('api.me.hours-summary', [
+            'at' => '2026-06-26T10:43:00-03:00',
+            'timezone' => 'America/Sao_Paulo',
+        ]))
+        ->assertOk()
+        ->assertJsonPath('data.timezone', 'America/Sao_Paulo')
+        ->assertJsonPath('data.balance.balance_minutes', 360)
+        ->assertJsonPath('data.today.date', '2026-06-26')
+        ->assertJsonPath('data.today.worked_minutes', 600)
+        ->assertJsonPath('data.today.paused_minutes', 43)
+        ->assertJsonPath('data.today.extra_minutes', 120)
+        ->assertJsonPath('data.today.missing_minutes', 0);
+});
+
 test('dashboard overview rejects invalid datetime formats', function () {
     $user = User::factory()->create();
 
@@ -262,11 +301,41 @@ test('authenticated users can list shifts within a date range including ongoing 
             'to' => '2026-06-26',
         ]))
         ->assertOk()
-        ->assertJsonCount(2, 'data')
-        ->assertJsonPath('data.0.ended_at', null)
-        ->assertJsonPath('data.0.started_at', '2026-06-26T10:00:00-03:00')
-        ->assertJsonPath('data.1.started_at', '2026-06-25T09:00:00-03:00')
-        ->assertJsonPath('data.1.ended_at', '2026-06-25T18:00:00-03:00');
+        ->assertJsonCount(3, 'data')
+        ->assertJsonPath('data.0.started_at', '2026-06-26T22:00:00-03:00')
+        ->assertJsonPath('data.0.ended_at', '2026-06-27T02:00:00-03:00')
+        ->assertJsonPath('data.1.ended_at', null)
+        ->assertJsonPath('data.1.started_at', '2026-06-26T10:00:00-03:00')
+        ->assertJsonPath('data.2.started_at', '2026-06-25T09:00:00-03:00')
+        ->assertJsonPath('data.2.ended_at', '2026-06-25T18:00:00-03:00');
+});
+
+
+test('authenticated users can list overnight shifts within a local date range', function () {
+    $user = User::factory()->create([
+        'timezone' => 'UTC',
+    ]);
+
+    Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-24 12:00:00',
+        'ended_at' => '2026-06-24 21:00:00',
+    ]);
+    Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-25 13:00:00',
+        'ended_at' => '2026-06-26 13:00:00',
+    ]);
+
+    $this->actingAs($user)
+        ->getJson(route('api.me.shifts.index', [
+            'from' => '2026-06-26',
+            'to' => '2026-06-26',
+            'timezone' => 'America/Sao_Paulo',
+        ]))
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.timezone', 'America/Sao_Paulo')
+        ->assertJsonPath('data.0.started_at', '2026-06-25T10:00:00-03:00')
+        ->assertJsonPath('data.0.ended_at', '2026-06-26T10:00:00-03:00');
 });
 
 test('authenticated users can start and end shifts through the api', function () {

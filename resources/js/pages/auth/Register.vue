@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { getCurrentClientTimezone } from '@/lib/clientDateTime';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
 
@@ -20,6 +21,8 @@ defineOptions({
         description: 'Enter your details below to create your account',
     },
 });
+
+const timezone = getCurrentClientTimezone();
 </script>
 
 <template>
@@ -88,6 +91,12 @@ defineOptions({
                 />
                 <InputError :message="errors.password_confirmation" />
             </div>
+
+            <input
+                type="hidden"
+                name="timezone"
+                :value="timezone"
+            />
 
             <Button
                 type="submit"

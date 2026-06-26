@@ -23,6 +23,7 @@ final class ContinueShiftRequest extends FormRequest
     {
         return [
             'at' => ['nullable', Rule::date()->format(DateTimeInterface::ATOM)],
+            'timezone' => ['nullable', 'timezone:all'],
         ];
     }
 }

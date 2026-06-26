@@ -23,3 +23,16 @@ test('new users can register', function () {
     $this->assertAuthenticated();
     $response->assertRedirect(route('dashboard', absolute: false));
 });
+
+test('new users can register with a timezone', function () {
+    $this->post(route('register.store'), [
+        'name' => 'Test User',
+        'email' => 'timezone@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+        'timezone' => 'America/Sao_Paulo',
+    ]);
+
+    expect(\App\Models\User::query()->where('email', 'timezone@example.com')->first()?->timezone)
+        ->toBe('America/Sao_Paulo');
+});
