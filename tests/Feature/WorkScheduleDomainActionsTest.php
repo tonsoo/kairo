@@ -7,6 +7,7 @@ use App\Domain\WorkSchedule\DTOs\WorkScheduleData;
 use App\Domain\WorkSchedule\Enums\WorkScheduleType;
 use App\Domain\WorkSchedule\Exceptions\InvalidWorkScheduleConfiguration;
 use App\Models\User;
+use App\Models\WorkSchedule;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
@@ -24,6 +25,34 @@ test('upsert work schedule stores total time schedules', function () {
         ->and($workSchedule->expected_minutes)->toBe(480)
         ->and($workSchedule->starts_at)->toBeNull()
         ->and($workSchedule->ends_at)->toBeNull();
+});
+
+test('upsert work schedule updates an existing schedule for the same effective date', function () {
+    $user = User::factory()->create();
+    $existingWorkSchedule = WorkSchedule::factory()->for($user)->create([
+        'weekday' => 1,
+        'effective_from' => '2026-06-29',
+        'type' => 'total_time',
+        'expected_minutes' => 480,
+    ]);
+
+    $updatedWorkSchedule = app(UpsertWorkSchedule::class)($user, WorkScheduleData::timeRange(
+        1,
+        CarbonImmutable::parse('2026-06-29 09:00:00', 'UTC'),
+        CarbonImmutable::parse('2026-06-29 18:00:00', 'UTC'),
+        CarbonImmutable::parse('2026-06-29', 'UTC'),
+    ));
+
+    expect($updatedWorkSchedule->id)->toBe($existingWorkSchedule->id)
+        ->and($updatedWorkSchedule->type)->toBe(WorkScheduleType::timeRange)
+        ->and($updatedWorkSchedule->expected_minutes)->toBe(540)
+        ->and($updatedWorkSchedule->starts_at)->toBe('09:00:00')
+        ->and($updatedWorkSchedule->ends_at)->toBe('18:00:00')
+        ->and(WorkSchedule::query()
+            ->where('user_id', $user->id)
+            ->where('weekday', 1)
+            ->whereDate('effective_from', '2026-06-29')
+            ->count())->toBe(1);
 });
 
 test('upsert work schedule computes expected minutes for time ranges', function () {

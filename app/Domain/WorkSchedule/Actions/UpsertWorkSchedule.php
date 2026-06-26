@@ -18,7 +18,7 @@ final readonly class UpsertWorkSchedule
                 [
                     'user_id' => $user->id,
                     'weekday' => $workScheduleData->weekday,
-                    'effective_from' => $workScheduleData->effectiveFrom->toDateString(),
+                    'effective_from' => $workScheduleData->effectiveFrom,
                 ],
                 [
                     'type' => $workScheduleData->type,

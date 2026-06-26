@@ -1,0 +1,238 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Models\Shift;
+use App\Models\User;
+use App\Models\WorkSchedule;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+
+uses(LazilyRefreshDatabase::class);
+
+test('guests cannot access the hours tracker api', function () {
+    $this->getJson(route('api.me.current-shift-state'))
+        ->assertUnauthorized();
+});
+
+test('authenticated users can fetch the current shift state', function () {
+    $user = User::factory()->create([
+        'timezone' => 'America/Sao_Paulo',
+    ]);
+
+    Shift::factory()->ongoing()->for($user)->create([
+        'started_at' => '2026-06-25 12:00:00',
+    ]);
+
+    $this->actingAs($user)
+        ->getJson(route('api.me.current-shift-state', [
+            'at' => '2026-06-25T13:00:00-03:00',
+        ]))
+        ->assertOk()
+        ->assertJsonPath('data.next_action', 'end')
+        ->assertJsonPath('data.has_ongoing_shift', true)
+        ->assertJsonPath('data.active_shift.started_at', '2026-06-25T09:00:00-03:00');
+});
+
+test('current shift state rejects invalid datetime formats', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->getJson(route('api.me.current-shift-state', [
+            'at' => '2026-06-25 13:00:00',
+        ]))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('at');
+});
+
+test('authenticated users can list shifts within a date range including ongoing shifts', function () {
+    $user = User::factory()->create([
+        'timezone' => 'America/Sao_Paulo',
+    ]);
+
+    Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-24 12:00:00',
+        'ended_at' => '2026-06-24 21:00:00',
+    ]);
+    Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-25 12:00:00',
+        'ended_at' => '2026-06-25 21:00:00',
+    ]);
+    Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-26 13:00:00',
+        'ended_at' => null,
+    ]);
+    Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-27 01:00:00',
+        'ended_at' => '2026-06-27 05:00:00',
+    ]);
+
+    $this->actingAs($user)
+        ->getJson(route('api.me.shifts.index', [
+            'from' => '2026-06-25',
+            'to' => '2026-06-26',
+        ]))
+        ->assertOk()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonPath('data.0.ended_at', null)
+        ->assertJsonPath('data.0.started_at', '2026-06-26T10:00:00-03:00')
+        ->assertJsonPath('data.1.started_at', '2026-06-25T09:00:00-03:00')
+        ->assertJsonPath('data.1.ended_at', '2026-06-25T18:00:00-03:00');
+});
+
+test('authenticated users can start and end shifts through the api', function () {
+    $user = User::factory()->create([
+        'timezone' => 'America/Sao_Paulo',
+    ]);
+
+    $this->actingAs($user)
+        ->postJson(route('api.me.shifts.start'), [
+            'at' => '2026-06-25T09:00:00-03:00',
+        ])
+        ->assertCreated()
+        ->assertJsonPath('data.started_at', '2026-06-25T09:00:00-03:00')
+        ->assertJsonPath('data.ended_at', null);
+
+    $this->actingAs($user)
+        ->postJson(route('api.me.shifts.end'), [
+            'at' => '2026-06-25T18:00:00-03:00',
+        ])
+        ->assertOk()
+        ->assertJsonPath('data.ended_at', '2026-06-25T18:00:00-03:00');
+
+    expect($user->shifts()->count())->toBe(1);
+});
+
+test('users cannot manage another users shifts through the api', function () {
+    $owner = User::factory()->create();
+    $intruder = User::factory()->create();
+    $shift = Shift::factory()->for($owner)->create();
+
+    $this->actingAs($intruder)
+        ->patchJson(route('api.me.shifts.update', $shift), [
+            'started_at' => '2026-06-25T09:00:00+00:00',
+            'ended_at' => '2026-06-25T10:00:00+00:00',
+        ])
+        ->assertForbidden();
+});
+
+test('users can replace work schedules for an effective date', function () {
+    $user = User::factory()->create([
+        'timezone' => 'America/Sao_Paulo',
+    ]);
+
+    WorkSchedule::factory()->for($user)->create([
+        'weekday' => 1,
+        'effective_from' => '2026-06-29',
+        'type' => 'total_time',
+        'expected_minutes' => 480,
+    ]);
+    WorkSchedule::factory()->for($user)->create([
+        'weekday' => 2,
+        'effective_from' => '2026-06-29',
+        'type' => 'total_time',
+        'expected_minutes' => 480,
+    ]);
+
+    $this->actingAs($user)
+        ->putJson(route('api.me.work-schedules.replace'), [
+            'effective_from' => '2026-06-29',
+            'schedules' => [
+                [
+                    'weekday' => 1,
+                    'type' => 'time_range',
+                    'starts_at' => '09:00',
+                    'ends_at' => '18:00',
+                ],
+            ],
+        ])
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.weekday', 1)
+        ->assertJsonPath('data.0.type', 'time_range')
+        ->assertJsonPath('data.0.starts_at', '09:00');
+
+    expect($user->workSchedules()->whereDate('effective_from', '2026-06-29')->count())->toBe(1)
+        ->and($user->workSchedules()->whereDate('effective_from', '2026-06-29')->first()?->weekday)->toBe(1);
+});
+
+test('authenticated users can list work schedules from a date', function () {
+    $user = User::factory()->create([
+        'timezone' => 'America/Sao_Paulo',
+    ]);
+
+    WorkSchedule::factory()->for($user)->create([
+        'weekday' => 1,
+        'effective_from' => '2026-06-22',
+        'type' => 'total_time',
+        'expected_minutes' => 420,
+    ]);
+    WorkSchedule::factory()->for($user)->create([
+        'weekday' => 1,
+        'effective_from' => '2026-06-29',
+        'type' => 'total_time',
+        'expected_minutes' => 480,
+    ]);
+
+    $this->actingAs($user)
+        ->getJson(route('api.me.work-schedules.index', [
+            'from' => '2026-06-29',
+        ]))
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.effective_from', '2026-06-29')
+        ->assertJsonPath('data.0.expected_minutes', 480);
+});
+
+test('time range work schedules require both bounds', function () {
+    $user = User::factory()->create([
+        'timezone' => 'America/Sao_Paulo',
+    ]);
+
+    $this->actingAs($user)
+        ->putJson(route('api.me.work-schedules.replace'), [
+            'effective_from' => '2026-06-29',
+            'schedules' => [
+                [
+                    'weekday' => 1,
+                    'type' => 'time_range',
+                    'starts_at' => '09:00',
+                ],
+            ],
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('schedules.0.ends_at');
+});
+
+test('total time work schedules require expected minutes', function () {
+    $user = User::factory()->create([
+        'timezone' => 'America/Sao_Paulo',
+    ]);
+
+    $this->actingAs($user)
+        ->putJson(route('api.me.work-schedules.replace'), [
+            'effective_from' => '2026-06-29',
+            'schedules' => [
+                [
+                    'weekday' => 1,
+                    'type' => 'total_time',
+                ],
+            ],
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('schedules.0.expected_minutes');
+});
+
+test('read endpoints are rate limited', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    for ($attempt = 0; $attempt < 30; $attempt++) {
+        $this->getJson(route('api.me.current-shift-state'))
+            ->assertOk();
+    }
+
+    $this->getJson(route('api.me.current-shift-state'))
+        ->assertTooManyRequests()
+        ->assertJsonPath('message', 'Too many requests.');
+});
