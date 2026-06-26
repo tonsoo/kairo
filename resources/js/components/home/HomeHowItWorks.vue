@@ -33,7 +33,7 @@ const locale = getAppLocale();
                 <div class="space-y-6">
                     <div class="flex items-center justify-between border-b border-[#2e2f30] pb-4">
                         <div>
-                            <p class="text-sm font-semibold tracking-wide text-slate-500 uppercase">{{ translate('home.how_it_works.card.balance_label', locale) }}</p>
+                            <h3 class="text-sm font-semibold tracking-wide text-slate-500 uppercase">{{ translate('home.how_it_works.card.balance_label', locale) }}</h3>
                             <p class="mt-1 text-3xl font-bold text-white">01:13 <span class="ml-2 text-sm font-normal text-teal-400">{{ translate('home.how_it_works.card.balance_value_status', locale) }}</span></p>
                         </div>
                         <div class="size-16 rounded-full border-[6px] border-[#334155] border-t-teal-500 border-r-teal-500" />
@@ -44,7 +44,7 @@ const locale = getAppLocale();
                             <Play :size="18" fill="currentColor" />
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-white">{{ translate('home.how_it_works.card.shift_title', locale) }}</p>
+                            <h3 class="text-sm font-medium text-white">{{ translate('home.how_it_works.card.shift_title', locale) }}</h3>
                             <p class="text-xs text-slate-400">{{ translate('home.how_it_works.card.shift_description', locale) }}</p>
                         </div>
                     </div>

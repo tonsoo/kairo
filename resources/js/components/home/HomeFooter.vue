@@ -15,7 +15,7 @@ const locale = getAppLocale();
             <div class="md:col-span-2">
                 <div class="mb-4 flex items-center gap-2">
                     <Clock3 class="size-6 text-teal-600" />
-                    <span class="text-xl font-bold text-slate-200">Shiftly</span>
+                    <h3 class="text-xl font-bold text-slate-200">Shiftly</h3>
                 </div>
                 <p class="max-w-sm text-sm leading-relaxed text-slate-500">
                     {{ translate('home.footer.description', locale) }}
@@ -33,7 +33,10 @@ const locale = getAppLocale();
         <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-[#2e2f30] pt-8 text-sm text-slate-500 md:flex-row">
             <p>&copy; {{ year }} Shiftly. {{ translate('home.footer.rights', locale) }}</p>
             <div class="flex items-center gap-6">
-                <span class="flex items-center gap-2"><span class="size-2 rounded-full bg-emerald-500" /> {{ translate('home.footer.systems', locale) }}</span>
+                <div class="flex items-center gap-2">
+                    <span class="size-2 rounded-full bg-emerald-500" />
+                    <h5 class="text-sm font-medium text-slate-400">{{ translate('home.footer.systems', locale) }}</h5>
+                </div>
             </div>
         </div>
     </footer>

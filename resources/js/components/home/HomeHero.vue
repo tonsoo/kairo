@@ -34,7 +34,7 @@ const locale = getAppLocale();
                 </Link>
             </div>
 
-            <p class="mt-4 text-sm font-medium text-slate-500">{{ translate('home.hero.free', locale) }}</p>
+            <h6 class="mt-4 text-sm font-medium text-slate-500">{{ translate('home.hero.free', locale) }}</h6>
         </div>
 
         <div class="mx-auto mt-20 hidden max-w-5xl md:block">
