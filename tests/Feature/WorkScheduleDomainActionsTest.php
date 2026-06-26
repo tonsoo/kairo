@@ -28,6 +28,20 @@ test('upsert work schedule stores total time schedules', function () {
         ->and($workSchedule->ends_at)->toBeNull();
 });
 
+test('upsert work schedule stores day off schedules', function () {
+    $user = User::factory()->create();
+    $data = WorkScheduleData::dayOff(6, CarbonImmutable::parse('2026-06-06', 'UTC'));
+
+    $workSchedule = app(UpsertWorkSchedule::class)($user, $data);
+
+    expect($workSchedule->user_id)->toBe($user->id)
+        ->and($workSchedule->weekday)->toBe(6)
+        ->and($workSchedule->type)->toBe(WorkScheduleType::dayOff)
+        ->and($workSchedule->expected_minutes)->toBe(0)
+        ->and($workSchedule->starts_at)->toBeNull()
+        ->and($workSchedule->ends_at)->toBeNull();
+});
+
 test('upsert work schedule updates an existing schedule for the same effective date', function () {
     $user = User::factory()->create();
     $existingWorkSchedule = WorkSchedule::factory()->for($user)->create([

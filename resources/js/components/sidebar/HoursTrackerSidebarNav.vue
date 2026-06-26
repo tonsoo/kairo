@@ -11,7 +11,13 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
-import { dashboard } from '@/routes';
+import {
+    getDashboardLocale,
+    translateDashboard,
+} from '@/lib/dashboardTranslations';
+import { dashboard, weeklySchedule } from '@/routes';
+
+const locale = getDashboardLocale();
 
 type SidebarItem = {
     title: string;
@@ -25,14 +31,18 @@ const { isCurrentUrl } = useCurrentUrl();
 const sections: Array<{ title: string; items: SidebarItem[] }> = [
     {
         title: 'Geral',
-        items: [{ title: 'Dashboard', icon: LayoutGrid, href: dashboard() }],
+        items: [
+            { title: 'Dashboard', icon: LayoutGrid, href: dashboard() },
+            {
+                title: translateDashboard('weekly_schedule.nav', locale),
+                icon: CalendarDays,
+                href: weeklySchedule(),
+            },
+        ],
     },
     {
-        title: 'Em breve',
-        items: [
-            { title: 'Historico', icon: History, badge: 'Em breve' },
-            { title: 'Escala semanal', icon: CalendarDays, badge: 'Em breve' },
-        ],
+        title: 'Configuracoes',
+        items: [{ title: 'Historico', icon: History, badge: 'Em breve' }],
     },
 ];
 </script>

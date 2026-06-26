@@ -4,7 +4,7 @@ import type { InertiaLinkProps } from '@inertiajs/vue3';
 import { CalendarDays, History, LayoutGrid } from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
-import { dashboard } from '@/routes';
+import { dashboard, weeklySchedule } from '@/routes';
 
 type SidebarItem = {
     title: string;
@@ -24,7 +24,7 @@ const sections: Array<{ title: string; items: SidebarItem[] }> = [
         title: 'Horas',
         items: [
             { title: 'Historico', icon: History, badge: 'Em breve' },
-            { title: 'Escala semanal', icon: CalendarDays, badge: 'Em breve' },
+            { title: 'Escala semanal', icon: CalendarDays, href: weeklySchedule() },
         ],
     },
 ];

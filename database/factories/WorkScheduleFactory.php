@@ -20,7 +20,7 @@ class WorkScheduleFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'weekday' => fake()->numberBetween(1, 5),
+            'weekday' => fake()->numberBetween(1, 7),
             'type' => 'total_time',
             'expected_minutes' => 480,
             'starts_at' => null,
@@ -50,6 +50,19 @@ class WorkScheduleFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'type' => 'total_time',
             'expected_minutes' => $expectedMinutes,
+            'starts_at' => null,
+            'ends_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the work schedule is a day off.
+     */
+    public function dayOff(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => 'day_off',
+            'expected_minutes' => 0,
             'starts_at' => null,
             'ends_at' => null,
         ]);

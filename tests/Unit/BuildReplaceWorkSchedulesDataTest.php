@@ -27,6 +27,10 @@ test('it builds typed replace work schedules data from validated input', functio
                 'starts_at' => '09:00',
                 'ends_at' => '18:00',
             ],
+            [
+                'weekday' => 6,
+                'type' => 'day_off',
+            ],
         ],
     ]);
 
@@ -34,10 +38,11 @@ test('it builds typed replace work schedules data from validated input', functio
         ->toBeInstanceOf(ReplaceWorkSchedulesData::class)
         ->and($data->effectiveFrom->format('Y-m-d H:i:s'))->toBe('2026-06-29 00:00:00')
         ->and($data->effectiveFrom->timezoneName)->toBe('America/Sao_Paulo')
-        ->and($data->schedules)->toHaveCount(2)
+        ->and($data->schedules)->toHaveCount(3)
         ->and($data->schedules->first())->toBeInstanceOf(ReplaceWorkScheduleEntryData::class)
         ->and($data->schedules->first()->type)->toBe(WorkScheduleType::totalTime)
-        ->and($data->schedules->last()->type)->toBe(WorkScheduleType::timeRange);
+        ->and($data->schedules->get(1)?->type)->toBe(WorkScheduleType::timeRange)
+        ->and($data->schedules->last()?->type)->toBe(WorkScheduleType::dayOff);
 });
 
 test('it converts typed replacement data into domain work schedule data', function () {

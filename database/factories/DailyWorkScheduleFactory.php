@@ -50,6 +50,19 @@ class DailyWorkScheduleFactory extends Factory
     }
 
     /**
+     * Indicate that the daily work schedule is a day off.
+     */
+    public function dayOff(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => 'day_off',
+            'expected_minutes' => 0,
+            'starts_at' => null,
+            'ends_at' => null,
+        ]);
+    }
+
+    /**
      * Build a daily snapshot from a work schedule version.
      */
     public function fromWorkSchedule(WorkSchedule $workSchedule, DateTimeInterface|string|null $date = null): static

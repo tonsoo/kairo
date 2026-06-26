@@ -59,6 +59,20 @@ final readonly class WorkScheduleData
         );
     }
 
+    public static function dayOff(int $weekday, CarbonImmutable $effectiveFrom): self
+    {
+        self::assertWeekday($weekday);
+
+        return new self(
+            weekday: $weekday,
+            type: WorkScheduleType::dayOff,
+            expectedMinutes: 0,
+            startsAt: null,
+            endsAt: null,
+            effectiveFrom: $effectiveFrom,
+        );
+    }
+
     private static function assertWeekday(int $weekday): void
     {
         if ($weekday < 1 || $weekday > 7) {

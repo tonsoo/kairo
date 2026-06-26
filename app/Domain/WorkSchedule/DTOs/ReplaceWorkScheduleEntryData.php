@@ -44,6 +44,10 @@ final readonly class ReplaceWorkScheduleEntryData
                 ),
                 effectiveFrom: $effectiveFrom,
             ),
+            WorkScheduleType::dayOff => WorkScheduleData::dayOff(
+                weekday: $this->weekday,
+                effectiveFrom: $effectiveFrom,
+            ),
         };
     }
 }

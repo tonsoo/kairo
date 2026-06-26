@@ -232,6 +232,36 @@ test('users can replace work schedules for an effective date', function () {
         ->and($user->workSchedules()->whereDate('effective_from', '2026-06-29')->first()?->weekday)->toBe(1);
 });
 
+test('users can replace weekend work schedules and mark days off', function () {
+    $user = User::factory()->create([
+        'timezone' => 'America/Sao_Paulo',
+    ]);
+
+    $this->actingAs($user)
+        ->putJson(route('api.me.work-schedules.replace'), [
+            'effective_from' => '2026-06-29',
+            'schedules' => [
+                [
+                    'weekday' => 6,
+                    'type' => 'day_off',
+                ],
+                [
+                    'weekday' => 7,
+                    'type' => 'total_time',
+                    'expected_minutes' => 240,
+                ],
+            ],
+        ])
+        ->assertOk()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonPath('data.0.weekday', 6)
+        ->assertJsonPath('data.0.type', 'day_off')
+        ->assertJsonPath('data.0.expected_minutes', 0)
+        ->assertJsonPath('data.1.weekday', 7)
+        ->assertJsonPath('data.1.type', 'total_time')
+        ->assertJsonPath('data.1.expected_minutes', 240);
+});
+
 test('authenticated users can list work schedules from a date', function () {
     $user = User::factory()->create([
         'timezone' => 'America/Sao_Paulo',

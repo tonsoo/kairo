@@ -29,7 +29,7 @@ final class ReplaceWorkSchedulesRequest extends FormRequest
             'schedules.*' => ['array:weekday,type,expected_minutes,starts_at,ends_at'],
             'schedules.*.weekday' => ['required', 'integer', 'between:1,7', 'distinct'],
             'schedules.*.type' => ['required', Rule::enum(WorkScheduleType::class)],
-            'schedules.*.expected_minutes' => ['nullable', 'integer', 'min:1'],
+            'schedules.*.expected_minutes' => ['nullable', 'integer', 'min:0'],
             'schedules.*.starts_at' => ['nullable', Rule::date()->format(DateParser::localTimeFormat)],
             'schedules.*.ends_at' => ['nullable', Rule::date()->format(DateParser::localTimeFormat)],
         ];
@@ -56,6 +56,31 @@ final class ReplaceWorkSchedulesRequest extends FormRequest
                             "schedules.$index.expected_minutes",
                             'Total time schedules require expected_minutes.',
                         );
+                    }
+
+                    if ($type === WorkScheduleType::dayOff->value) {
+                        if (($schedule['expected_minutes'] ?? null) !== null) {
+                            $validator->errors()->add(
+                                "schedules.$index.expected_minutes",
+                                'Day off schedules do not accept expected_minutes.',
+                            );
+                        }
+
+                        if (($schedule['starts_at'] ?? null) !== null) {
+                            $validator->errors()->add(
+                                "schedules.$index.starts_at",
+                                'Day off schedules do not accept starts_at.',
+                            );
+                        }
+
+                        if (($schedule['ends_at'] ?? null) !== null) {
+                            $validator->errors()->add(
+                                "schedules.$index.ends_at",
+                                'Day off schedules do not accept ends_at.',
+                            );
+                        }
+
+                        continue;
                     }
 
                     if ($type !== WorkScheduleType::timeRange->value) {

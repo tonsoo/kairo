@@ -174,7 +174,6 @@ const monthTitle = computed(() => {
                         :meter-value="balanceCard.meterValue"
                         :meter-caption="balanceCard.meterCaption"
                         :segments="balanceCard.segments"
-                        show-info
                     />
                     <DashboardMetricCard
                         :title="translateDashboard('dashboard.hours.today.title', locale)"
