@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Domain\WorkSchedule\Actions\UpsertWorkSchedule;
+use App\Domain\WorkSchedule\DTOs\WorkScheduleData;
 use App\Models\Shift;
 use App\Models\User;
 use App\Models\WorkSchedule;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 uses(LazilyRefreshDatabase::class);
@@ -78,6 +81,34 @@ test('authenticated users can fetch the dashboard overview', function () {
             'extra_minutes' => 0,
             'missing_minutes' => 0,
         ]);
+});
+
+test('dashboard hours summary prefers daily work schedule snapshots over updated weekly schedules', function () {
+    CarbonImmutable::setTestNow('2026-06-26 00:00:00 UTC');
+
+    $user = User::factory()->create([
+        'timezone' => 'UTC',
+    ]);
+
+    CarbonImmutable::setTestNow();
+
+    $this->artisan('hours-tracker:snapshot-daily-work-schedules', [
+        '--date' => '2026-06-26',
+    ])->assertSuccessful();
+
+    app(UpsertWorkSchedule::class)($user, WorkScheduleData::totalTime(
+        5,
+        300,
+        CarbonImmutable::parse('2026-06-26', 'UTC'),
+    ));
+
+    $this->actingAs($user)
+        ->getJson(route('api.me.hours-summary', [
+            'at' => '2026-06-26T12:00:00+00:00',
+        ]))
+        ->assertOk()
+        ->assertJsonPath('data.today.expected_minutes', 480)
+        ->assertJsonPath('data.today.missing_minutes', 480);
 });
 
 test('dashboard overview rejects invalid datetime formats', function () {
@@ -416,7 +447,7 @@ test('read endpoints are rate limited', function () {
 
     $this->actingAs($user);
 
-    for ($attempt = 0; $attempt < 30; $attempt++) {
+    for ($attempt = 0; $attempt < 250; $attempt++) {
         $this->getJson(route('api.me.current-shift-state'))
             ->assertOk();
     }

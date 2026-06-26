@@ -1,23 +1,26 @@
 <?php
 
+use App\Domain\WorkSchedule\Enums\WorkScheduleType;
 use App\Models\DailyWorkSchedule;
 use App\Models\Shift;
 use App\Models\User;
 use App\Models\WorkSchedule;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 uses(LazilyRefreshDatabase::class);
 
 test('user exposes hours tracker relationships', function () {
     $user = User::factory()->create();
-    $workSchedule = WorkSchedule::factory()->timeRange()->for($user)->create();
+    $workSchedule = WorkSchedule::factory()->timeRange()->forWeekday(7)->for($user)->create([
+        'effective_from' => '2026-06-27',
+    ]);
     $dailyWorkSchedule = DailyWorkSchedule::factory()->fromWorkSchedule($workSchedule, '2026-06-23')->create();
     $shift = Shift::factory()->for($user)->create();
 
     $user->load('workSchedules', 'dailyWorkSchedules', 'shifts');
 
-    expect($user->workSchedules)->toHaveCount(1)
-        ->and($user->workSchedules->first()?->is($workSchedule))->toBeTrue()
+    expect($user->workSchedules->contains(fn (WorkSchedule $candidate): bool => $candidate->is($workSchedule)))->toBeTrue()
         ->and($user->dailyWorkSchedules)->toHaveCount(1)
         ->and($user->dailyWorkSchedules->first()?->is($dailyWorkSchedule))->toBeTrue()
         ->and($user->shifts)->toHaveCount(1)
@@ -26,6 +29,35 @@ test('user exposes hours tracker relationships', function () {
         ->and($dailyWorkSchedule->user->is($user))->toBeTrue()
         ->and($dailyWorkSchedule->workSchedule?->is($workSchedule))->toBeTrue()
         ->and($shift->user->is($user))->toBeTrue();
+});
+
+test('new users receive default weekly work schedules', function () {
+    CarbonImmutable::setTestNow('2026-06-01 00:00:00 UTC');
+
+    $user = User::factory()->create([
+        'timezone' => 'UTC',
+    ]);
+
+    CarbonImmutable::setTestNow();
+
+    $schedules = $user->workSchedules()
+        ->whereDate('effective_from', '2026-06-01')
+        ->orderBy('weekday')
+        ->get()
+        ->keyBy('weekday');
+
+    $mondaySchedule = $schedules->get(1);
+    $saturdaySchedule = $schedules->get(6);
+
+    expect($schedules)->toHaveCount(7)
+        ->and($mondaySchedule?->type)->toBe(WorkScheduleType::timeRange)
+        ->and($mondaySchedule?->expected_minutes)->toBe(480)
+        ->and($mondaySchedule?->starts_at)->toBe('09:00:00')
+        ->and($mondaySchedule?->ends_at)->toBe('17:00:00')
+        ->and($saturdaySchedule?->type)->toBe(WorkScheduleType::dayOff)
+        ->and($saturdaySchedule?->expected_minutes)->toBe(0)
+        ->and($saturdaySchedule?->starts_at)->toBeNull()
+        ->and($saturdaySchedule?->ends_at)->toBeNull();
 });
 
 test('hours tracker models cast temporal fields and expose shift scopes', function () {

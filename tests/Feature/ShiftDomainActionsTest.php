@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Domain\Shift\Actions\ContinueShift;
 use App\Domain\Shift\Actions\DeleteShift;
 use App\Domain\Shift\Actions\EndShift;
@@ -12,9 +14,6 @@ use App\Domain\Shift\Exceptions\NoOngoingShiftFound;
 use App\Domain\Shift\Exceptions\OngoingShiftAlreadyExists;
 use App\Domain\Shift\Exceptions\ShiftOverlapDetected;
 use App\Domain\Shift\Exceptions\ShiftOwnershipDenied;
-use App\Domain\WorkSchedule\Actions\UpsertWorkSchedule;
-use App\Domain\WorkSchedule\DTOs\WorkScheduleData;
-use App\Domain\WorkSchedule\Enums\WorkScheduleType;
 use App\Models\DailyWorkSchedule;
 use App\Models\Shift;
 use App\Models\User;
@@ -36,63 +35,17 @@ test('start shift stores the started instant in utc', function () {
     $this->assertModelExists($shift);
 });
 
-test('start shift creates the daily work schedule snapshot when it is missing', function () {
+test('start shift does not create the daily work schedule snapshot', function () {
     $user = User::factory()->create([
         'timezone' => 'America/Sao_Paulo',
     ]);
 
-    $workSchedule = app(UpsertWorkSchedule::class)($user, WorkScheduleData::timeRange(
-        4,
-        CarbonImmutable::parse('2026-06-01 08:30:00', 'America/Sao_Paulo'),
-        CarbonImmutable::parse('2026-06-01 17:30:00', 'America/Sao_Paulo'),
-        CarbonImmutable::parse('2026-06-01', 'America/Sao_Paulo'),
-    ));
-
     app(StartShift::class)($user, CarbonImmutable::parse('2026-06-25 09:00:00', 'America/Sao_Paulo'));
 
-    $dailyWorkSchedule = DailyWorkSchedule::query()
+    expect(DailyWorkSchedule::query()
         ->where('user_id', $user->id)
         ->whereDate('date', '2026-06-25')
-        ->first();
-
-    expect($dailyWorkSchedule)->not->toBeNull()
-        ->and($dailyWorkSchedule?->work_schedule_id)->toBe($workSchedule->id)
-        ->and($dailyWorkSchedule?->type)->toBe(WorkScheduleType::timeRange)
-        ->and($dailyWorkSchedule?->expected_minutes)->toBe(540)
-        ->and($dailyWorkSchedule?->starts_at)->toBe('08:30:00')
-        ->and($dailyWorkSchedule?->ends_at)->toBe('17:30:00');
-});
-
-test('start shift does not overwrite an existing daily work schedule snapshot', function () {
-    $user = User::factory()->create([
-        'timezone' => 'America/Sao_Paulo',
-    ]);
-
-    app(UpsertWorkSchedule::class)($user, WorkScheduleData::timeRange(
-        4,
-        CarbonImmutable::parse('2026-06-01 08:30:00', 'America/Sao_Paulo'),
-        CarbonImmutable::parse('2026-06-01 17:30:00', 'America/Sao_Paulo'),
-        CarbonImmutable::parse('2026-06-01', 'America/Sao_Paulo'),
-    ));
-
-    $dailyWorkSchedule = DailyWorkSchedule::factory()->for($user)->create([
-        'date' => '2026-06-25',
-        'weekday' => 4,
-        'type' => WorkScheduleType::totalTime,
-        'expected_minutes' => 420,
-        'starts_at' => null,
-        'ends_at' => null,
-    ]);
-
-    app(StartShift::class)($user, CarbonImmutable::parse('2026-06-25 09:00:00', 'America/Sao_Paulo'));
-
-    $dailyWorkSchedule->refresh();
-
-    expect($dailyWorkSchedule->work_schedule_id)->toBeNull()
-        ->and($dailyWorkSchedule->type)->toBe(WorkScheduleType::totalTime)
-        ->and($dailyWorkSchedule->expected_minutes)->toBe(420)
-        ->and($dailyWorkSchedule->starts_at)->toBeNull()
-        ->and($dailyWorkSchedule->ends_at)->toBeNull();
+        ->exists())->toBeFalse();
 });
 
 test('cannot start a second ongoing shift for the same user', function () {

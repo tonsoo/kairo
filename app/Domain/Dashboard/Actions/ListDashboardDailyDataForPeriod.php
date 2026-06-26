@@ -13,6 +13,7 @@ final readonly class ListDashboardDailyDataForPeriod
 {
     public function __construct(
         private ListDashboardRelevantShiftsForPeriod $listDashboardRelevantShiftsForPeriod,
+        private ListDashboardRelevantDailyWorkSchedulesForPeriod $listDashboardRelevantDailyWorkSchedulesForPeriod,
         private ListDashboardRelevantWorkSchedulesForPeriod $listDashboardRelevantWorkSchedulesForPeriod,
         private GetDashboardExpectedMinutesForDate $getDashboardExpectedMinutesForDate,
         private GetDashboardWorkedMinutesForDate $getDashboardWorkedMinutesForDate,
@@ -30,12 +31,18 @@ final readonly class ListDashboardDailyDataForPeriod
         $periodStart = $startsAt->startOfDay();
         $periodEnd = $endsAt->startOfDay();
         $shifts = ($this->listDashboardRelevantShiftsForPeriod)($user, $periodStart, $periodEnd);
+        $dailyWorkSchedulesByDate = ($this->listDashboardRelevantDailyWorkSchedulesForPeriod)($user, $periodStart, $periodEnd)
+            ->keyBy(fn ($dailyWorkSchedule) => $dailyWorkSchedule->date->toDateString());
         $workSchedulesByWeekday = ($this->listDashboardRelevantWorkSchedulesForPeriod)($user, $periodEnd);
         $days = collect();
 
         for ($date = $periodStart; $date->lte($periodEnd); $date = $date->addDay()) {
             $workedMinutes = ($this->getDashboardWorkedMinutesForDate)($shifts, $date, $referenceMoment);
-            $expectedMinutes = ($this->getDashboardExpectedMinutesForDate)($workSchedulesByWeekday, $date);
+            $expectedMinutes = ($this->getDashboardExpectedMinutesForDate)(
+                $dailyWorkSchedulesByDate,
+                $workSchedulesByWeekday,
+                $date,
+            );
             $regularMinutes = min($workedMinutes, $expectedMinutes);
             $extraMinutes = max($workedMinutes - $expectedMinutes, 0);
             $missingMinutes = max($expectedMinutes - $workedMinutes, 0);

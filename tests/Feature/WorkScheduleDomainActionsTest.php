@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Domain\WorkSchedule\Actions\BuildDailyWorkScheduleSnapshot;
 use App\Domain\WorkSchedule\Actions\GetEffectiveWorkScheduleForDate;
+use App\Domain\WorkSchedule\Actions\SnapshotDailyWorkSchedulesAtCurrentLocalMidnight;
+use App\Domain\WorkSchedule\Actions\SnapshotDailyWorkSchedulesForDate;
 use App\Domain\WorkSchedule\Actions\UpsertWorkSchedule;
 use App\Domain\WorkSchedule\DTOs\WorkScheduleData;
 use App\Domain\WorkSchedule\Enums\WorkScheduleType;
@@ -143,6 +147,58 @@ test('build daily work schedule snapshot does not overwrite an existing snapshot
 
     expect($existingSnapshot->expected_minutes)->toBe(420)
         ->and($existingSnapshot->work_schedule_id)->toBeNull();
+});
+
+test('snapshot daily work schedules for date creates snapshots for all users', function () {
+    CarbonImmutable::setTestNow('2026-06-01 00:00:00 UTC');
+
+    $user = User::factory()->create([
+        'timezone' => 'UTC',
+    ]);
+
+    CarbonImmutable::setTestNow();
+
+    $snapshottedUsers = app(SnapshotDailyWorkSchedulesForDate::class)(
+        CarbonImmutable::parse('2026-06-26', 'UTC'),
+    );
+
+    $snapshot = DailyWorkSchedule::query()
+        ->where('user_id', $user->id)
+        ->whereDate('date', '2026-06-26')
+        ->first();
+
+    expect($snapshottedUsers)->toBe(1)
+        ->and($snapshot)->not->toBeNull()
+        ->and($snapshot?->type)->toBe(WorkScheduleType::timeRange)
+        ->and($snapshot?->expected_minutes)->toBe(480)
+        ->and($snapshot?->starts_at)->toBe('09:00:00')
+        ->and($snapshot?->ends_at)->toBe('17:00:00');
+});
+
+test('snapshot daily work schedules at current local midnight only snapshots users in the first local hour of the day', function () {
+    CarbonImmutable::setTestNow('2026-06-01 00:00:00 UTC');
+
+    $utcUser = User::factory()->create([
+        'timezone' => 'UTC',
+    ]);
+    $saoPauloUser = User::factory()->create([
+        'timezone' => 'America/Sao_Paulo',
+    ]);
+
+    CarbonImmutable::setTestNow();
+
+    $snapshottedUsers = app(SnapshotDailyWorkSchedulesAtCurrentLocalMidnight::class)(
+        CarbonImmutable::parse('2026-06-26 00:15:00', 'UTC'),
+    );
+
+    expect($snapshottedUsers)->toBe(1)
+        ->and(DailyWorkSchedule::query()
+            ->where('user_id', $utcUser->id)
+            ->whereDate('date', '2026-06-26')
+            ->exists())->toBeTrue()
+        ->and(DailyWorkSchedule::query()
+            ->where('user_id', $saoPauloUser->id)
+            ->exists())->toBeFalse();
 });
 
 test('invalid work schedule data is rejected', function () {
