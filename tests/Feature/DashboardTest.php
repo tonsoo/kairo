@@ -18,8 +18,10 @@ test('authenticated users can visit the dashboard', function () {
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('Dashboard')
-            ->has('shiftExportFormats', 1)
-            ->where('shiftExportFormats.0.key', 'csv'));
+            ->has('shiftExportFormats', 3)
+            ->where('shiftExportFormats.0.key', 'csv')
+            ->where('shiftExportFormats.1.key', 'xlsx')
+            ->where('shiftExportFormats.2.key', 'pdf'));
 });
 
 test('authenticated users can visit the history page', function () {
@@ -32,6 +34,8 @@ test('authenticated users can visit the history page', function () {
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('History')
-            ->has('shiftExportFormats', 1)
-            ->where('shiftExportFormats.0.key', 'csv'));
+            ->has('shiftExportFormats', 3)
+            ->where('shiftExportFormats.0.key', 'csv')
+            ->where('shiftExportFormats.1.key', 'xlsx')
+            ->where('shiftExportFormats.2.key', 'pdf'));
 });

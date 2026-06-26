@@ -5,7 +5,9 @@ namespace App\Providers;
 use App\Models\User;
 use App\Observers\UserObserver;
 use App\Repositories\CsvShiftExportRepository;
+use App\Repositories\PdfShiftExportRepository;
 use App\Repositories\ShiftExportRegistry;
+use App\Repositories\XlsxShiftExportRepository;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -20,9 +22,13 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(CsvShiftExportRepository::class);
+        $this->app->singleton(XlsxShiftExportRepository::class);
+        $this->app->singleton(PdfShiftExportRepository::class);
         $this->app->singleton(ShiftExportRegistry::class, function ($app): ShiftExportRegistry {
             return new ShiftExportRegistry(
                 $app->make(CsvShiftExportRepository::class),
+                $app->make(XlsxShiftExportRepository::class),
+                $app->make(PdfShiftExportRepository::class),
             );
         });
     }
