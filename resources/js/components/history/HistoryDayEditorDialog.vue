@@ -66,7 +66,7 @@ function getBreakDurationMinutes(
 
 <template>
     <Dialog :open="props.open" @update:open="emit('update:open', $event)">
-        <DialogContent class="max-w-4xl border-[#2f3033] bg-[#161719] text-slate-100 sm:max-w-4xl">
+        <DialogContent class="max-w-4xl border-[#2f3033] bg-[#161719] text-slate-100 sm:max-w-4xl pt-12">
             <DialogHeader class="space-y-3 text-left">
                 <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                     <div class="space-y-1">
