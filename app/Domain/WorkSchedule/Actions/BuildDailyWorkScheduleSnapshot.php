@@ -18,19 +18,23 @@ final readonly class BuildDailyWorkScheduleSnapshot
     public function __invoke(User $user, CarbonImmutable $date): ?DailyWorkSchedule
     {
         $referenceDate = $date->startOfDay();
+        $existingDailyWorkSchedule = DailyWorkSchedule::query()
+            ->where('user_id', $user->id)
+            ->whereDate('date', $referenceDate)
+            ->first();
+
+        if ($existingDailyWorkSchedule !== null) {
+            return $existingDailyWorkSchedule;
+        }
+
         $workSchedule = ($this->getEffectiveWorkScheduleForDate)($user, $referenceDate);
 
-        return DB::transaction(function () use ($referenceDate, $user, $workSchedule) {
-            if ($workSchedule === null) {
-                DailyWorkSchedule::query()
-                    ->where('user_id', $user->id)
-                    ->whereDate('date', $referenceDate)
-                    ->delete();
+        if ($workSchedule === null) {
+            return null;
+        }
 
-                return null;
-            }
-
-            return DailyWorkSchedule::query()->updateOrCreate(
+        return DB::transaction(function () use ($referenceDate, $user, $workSchedule): DailyWorkSchedule {
+            return DailyWorkSchedule::query()->firstOrCreate(
                 [
                     'user_id' => $user->id,
                     'date' => $referenceDate,

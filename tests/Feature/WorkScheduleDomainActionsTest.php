@@ -6,6 +6,7 @@ use App\Domain\WorkSchedule\Actions\UpsertWorkSchedule;
 use App\Domain\WorkSchedule\DTOs\WorkScheduleData;
 use App\Domain\WorkSchedule\Enums\WorkScheduleType;
 use App\Domain\WorkSchedule\Exceptions\InvalidWorkScheduleConfiguration;
+use App\Models\DailyWorkSchedule;
 use App\Models\User;
 use App\Models\WorkSchedule;
 use Carbon\CarbonImmutable;
@@ -102,6 +103,34 @@ test('build daily work schedule snapshot mirrors the effective schedule', functi
         ->and($snapshot?->ends_at)->toBe('17:30:00');
 });
 
+test('build daily work schedule snapshot does not overwrite an existing snapshot', function () {
+    $user = User::factory()->create();
+
+    app(UpsertWorkSchedule::class)($user, WorkScheduleData::totalTime(
+        4,
+        480,
+        CarbonImmutable::parse('2026-06-01', 'UTC'),
+    ));
+
+    $existingSnapshot = DailyWorkSchedule::factory()->for($user)->create([
+        'date' => '2026-06-25',
+        'weekday' => 4,
+        'type' => WorkScheduleType::totalTime,
+        'expected_minutes' => 420,
+        'starts_at' => null,
+        'ends_at' => null,
+    ]);
+
+    $snapshot = app(BuildDailyWorkScheduleSnapshot::class)($user, CarbonImmutable::parse('2026-06-25', 'UTC'));
+
+    expect($snapshot?->is($existingSnapshot))->toBeTrue();
+
+    $existingSnapshot->refresh();
+
+    expect($existingSnapshot->expected_minutes)->toBe(420)
+        ->and($existingSnapshot->work_schedule_id)->toBeNull();
+});
+
 test('invalid work schedule data is rejected', function () {
     expect(fn () => WorkScheduleData::totalTime(1, 0, CarbonImmutable::parse('2026-06-01', 'UTC')))
         ->toThrow(InvalidWorkScheduleConfiguration::class)
@@ -111,5 +140,4 @@ test('invalid work schedule data is rejected', function () {
             CarbonImmutable::parse('2026-06-01 09:00:00', 'UTC'),
             CarbonImmutable::parse('2026-06-01', 'UTC'),
         ))->toThrow(InvalidWorkScheduleConfiguration::class);
-
 });
