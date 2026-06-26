@@ -96,6 +96,15 @@ export const chartLegend: DashboardLegendItem[] = [
 export function buildBalanceSegments(
     balance: HoursSummaryApiData['balance'],
 ): DashboardMeterSegment[] {
+    if (balance.positive_minutes === 0 && balance.negative_minutes === 0) {
+        return [
+            {
+                ...dashboardLegendConfig.missing,
+                value: 0.0001,
+            },
+        ];
+    }
+
     return [
         {
             ...dashboardLegendConfig.positive,

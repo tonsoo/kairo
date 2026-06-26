@@ -56,9 +56,9 @@ test('authenticated users can fetch the dashboard overview', function () {
             'at' => '2026-06-26T15:00:00-03:00',
         ]))
         ->assertOk()
-        ->assertJsonPath('data.balance.balance_minutes', -180)
+        ->assertJsonPath('data.balance.balance_minutes', 0)
         ->assertJsonPath('data.balance.positive_minutes', 0)
-        ->assertJsonPath('data.balance.negative_minutes', 180)
+        ->assertJsonPath('data.balance.negative_minutes', 0)
         ->assertJsonPath('data.today.date', '2026-06-26')
         ->assertJsonPath('data.today.worked_minutes', 300)
         ->assertJsonPath('data.today.paused_minutes', 60)

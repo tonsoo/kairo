@@ -72,7 +72,7 @@ final readonly class GetHoursSummary
             ->filter(fn (DashboardDayData $day) => $day->date->gte($monthStart) && $day->date->lte($monthEndsAt))
             ->values();
         $balanceDays = $allDays
-            ->filter(fn (DashboardDayData $day) => $day->date->gte($balanceStartsAt) && $day->date->lte($referenceDate))
+            ->filter(fn (DashboardDayData $day) => $day->date->gte($balanceStartsAt) && $day->date->lt($referenceDate))
             ->values();
 
         /** @var DashboardDayData|null $today */
