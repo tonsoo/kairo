@@ -1,2 +1,17 @@
 User-agent: *
-Disallow:
+Allow: /
+
+Disallow: /dashboard
+Disallow: /dashboard/*
+Disallow: /settings
+Disallow: /settings/*
+Disallow: /work-schedules
+Disallow: /work-schedules/*
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /api
+Disallow: /api/*
+
+Sitemap: https://shiftly.alysson-thoaldo.com.br/sitemap.xml
