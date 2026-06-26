@@ -24,7 +24,6 @@ const locale = getAppLocale();
             <nav :aria-label="translate('home.header.nav.how_it_works', locale)" class="hidden items-center gap-8 text-sm font-medium text-slate-400 md:flex">
                 <a href="#como-funciona" class="transition-colors hover:text-teal-400">{{ translate('home.header.nav.how_it_works', locale) }}</a>
                 <a href="#recursos" class="transition-colors hover:text-teal-400">{{ translate('home.header.nav.features', locale) }}</a>
-                <a href="#privacidade" class="transition-colors hover:text-teal-400">{{ translate('home.header.nav.privacy', locale) }}</a>
             </nav>
 
             <div class="flex items-center gap-4">
