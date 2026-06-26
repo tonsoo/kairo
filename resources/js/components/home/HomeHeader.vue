@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { Clock3 } from '@lucide/vue';
+import LocaleSwitch from '@/components/LocaleSwitch.vue';
 import { getAppLocale, translate } from '@/lib/translations';
 
 defineProps<{
@@ -21,12 +22,13 @@ const locale = getAppLocale();
                 <span class="text-xl font-bold tracking-tight text-slate-200">Shiftly</span>
             </div>
 
-            <nav :aria-label="translate('home.header.nav.how_it_works', locale)" class="hidden items-center gap-8 text-sm font-medium text-slate-400 md:flex">
+            <nav :aria-label="translate('home.header.nav.primary', locale)" class="hidden items-center gap-8 text-sm font-medium text-slate-400 md:flex">
                 <a href="#como-funciona" class="transition-colors hover:text-teal-400">{{ translate('home.header.nav.how_it_works', locale) }}</a>
                 <a href="#recursos" class="transition-colors hover:text-teal-400">{{ translate('home.header.nav.features', locale) }}</a>
             </nav>
 
             <div class="flex items-center gap-4">
+                <LocaleSwitch compact />
                 <Link :hidden="isAuthenticated" :href="isAuthenticated ? dashboardHref : loginHref" class="text-sm font-medium text-slate-300 transition-colors hover:text-white">
                     {{ translate('home.header.action.login', locale) }}
                 </Link>

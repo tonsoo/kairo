@@ -5,6 +5,7 @@ import { destroy } from '@/actions/Laravel/Passkeys/Http/Controllers/PasskeyRegi
 import Heading from '@/components/Heading.vue';
 import PasskeyItem from '@/components/PasskeyItem.vue';
 import PasskeyRegister from '@/components/PasskeyRegister.vue';
+import { getAppLocale, translate } from '@/lib/translations';
 import type { Passkey } from '@/types/auth';
 
 export type Props = {
@@ -16,6 +17,8 @@ withDefaults(defineProps<Props>(), {
     canManagePasskeys: false,
     passkeys: () => [],
 });
+
+const locale = getAppLocale();
 
 const handleDelete = (id: number, onError: () => void) => {
     router.delete(destroy.url(id), {
@@ -33,8 +36,8 @@ const handleRegisterSuccess = () => {
     <div v-if="canManagePasskeys" class="space-y-6">
         <Heading
             variant="small"
-            title="Passkeys"
-            description="Manage your passkeys for passwordless sign-in"
+            :title="translate('settings.passkeys.heading', locale)"
+            :description="translate('settings.passkeys.description', locale)"
         />
 
         <div class="overflow-hidden rounded-lg border border-border">
@@ -53,9 +56,9 @@ const handleRegisterSuccess = () => {
                 >
                     <KeyRound class="h-7 w-7 text-muted-foreground" />
                 </div>
-                <p class="font-medium">No passkeys yet</p>
+                <p class="font-medium">{{ translate('settings.passkeys.empty_title', locale) }}</p>
                 <p class="mt-1 text-sm text-muted-foreground">
-                    Add a passkey to sign in without a password
+                    {{ translate('settings.passkeys.empty_description', locale) }}
                 </p>
             </div>
         </div>

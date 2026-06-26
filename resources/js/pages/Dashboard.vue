@@ -252,7 +252,7 @@ async function showNextSemester(): Promise<void> {
 
 <template>
     <div class="px-8 py-8">
-        <Head title="Dashboard" />
+        <Head :title="translateDashboard('dashboard.page.title', locale)" />
 
         <div class="space-y-6">
             <p

@@ -11,6 +11,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { getAppLocale, translate } from '@/lib/translations';
 import type { Passkey } from '@/types/auth';
 
 const props = defineProps<{
@@ -21,6 +22,7 @@ const emit = defineEmits<{
     remove: [id: number, onError: () => void];
 }>();
 
+const locale = getAppLocale();
 const isDeleting = ref(false);
 
 const handleDelete = () => {
@@ -50,10 +52,10 @@ const handleDelete = () => {
                     </span>
                 </div>
                 <p class="text-sm text-muted-foreground">
-                    Added {{ passkey.created_at_diff }}
+                    {{ translate('settings.passkeys.added', locale, { value: passkey.created_at_diff }) }}
                     <template v-if="passkey.last_used_at_diff">
                         <span class="mx-1 text-muted-foreground/50">/</span>
-                        Last used {{ passkey.last_used_at_diff }}
+                        {{ translate('settings.passkeys.last_used', locale, { value: passkey.last_used_at_diff }) }}
                     </template>
                 </p>
             </div>
@@ -67,26 +69,25 @@ const handleDelete = () => {
                     class="text-destructive hover:bg-destructive/10 hover:text-destructive"
                 >
                     <Trash2 class="h-4 w-4" />
-                    <span class="sr-only">Remove</span>
+                    <span class="sr-only">{{ translate('settings.passkeys.remove_sr', locale) }}</span>
                 </Button>
             </DialogTrigger>
 
             <DialogContent>
-                <DialogTitle>Remove passkey</DialogTitle>
+                <DialogTitle>{{ translate('settings.passkeys.remove_title', locale) }}</DialogTitle>
                 <DialogDescription>
-                    Are you sure you want to remove the "{{ passkey.name }}"
-                    passkey? You will no longer be able to use it to sign in.
+                    {{ translate('settings.passkeys.remove_description', locale, { name: passkey.name }) }}
                 </DialogDescription>
                 <DialogFooter class="gap-2">
                     <DialogClose as-child>
-                        <Button variant="secondary">Cancel</Button>
+                        <Button variant="secondary">{{ translate('shared.actions.cancel', locale) }}</Button>
                     </DialogClose>
                     <Button
                         variant="destructive"
                         :disabled="isDeleting"
                         @click="handleDelete"
                     >
-                        {{ isDeleting ? 'Removing...' : 'Remove passkey' }}
+                        {{ isDeleting ? translate('settings.passkeys.removing', locale) : translate('settings.passkeys.remove_confirm', locale) }}
                     </Button>
                 </DialogFooter>
             </DialogContent>

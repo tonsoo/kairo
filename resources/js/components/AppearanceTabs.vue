@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { Monitor, Moon, Sun } from '@lucide/vue';
 import { useAppearance } from '@/composables/useAppearance';
+import { getAppLocale, translate } from '@/lib/translations';
 
 const { appearance, updateAppearance } = useAppearance();
+const locale = getAppLocale();
 
 const tabs = [
-    { value: 'light', Icon: Sun, label: 'Light' },
-    { value: 'dark', Icon: Moon, label: 'Dark' },
-    { value: 'system', Icon: Monitor, label: 'System' },
+    { value: 'light', Icon: Sun, label: translate('settings.appearance.light', locale) },
+    { value: 'dark', Icon: Moon, label: translate('settings.appearance.dark', locale) },
+    { value: 'system', Icon: Monitor, label: translate('settings.appearance.system', locale) },
 ] as const;
 </script>
 

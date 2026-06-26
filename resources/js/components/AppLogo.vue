@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { Clock3 } from '@lucide/vue';
+import { getAppLocale, translate } from '@/lib/translations';
+
+const locale = getAppLocale();
 </script>
 
 <template>
@@ -10,8 +13,6 @@ import { Clock3 } from '@lucide/vue';
     </div>
     <div class="ml-1 grid flex-1 text-left text-sm leading-tight">
         <span class="truncate font-semibold">Shiftly</span>
-        <span class="truncate text-xs text-sidebar-foreground/60"
-            >Banco pessoal</span
-        >
+        <span class="truncate text-xs text-sidebar-foreground/60">{{ translate('app.logo.tagline', locale) }}</span>
     </div>
 </template>

@@ -9,6 +9,7 @@ import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { getAppLocale, translate } from '@/lib/translations';
 import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
 
@@ -23,20 +24,21 @@ defineOptions({
     },
 });
 
+const locale = getAppLocale();
 const page = usePage();
 const user = computed(() => page.props.auth.user);
 </script>
 
 <template>
-    <Head title="Profile settings" />
+    <Head :title="translate('settings.profile.page_title', locale)" />
 
-    <h1 class="sr-only">Profile settings</h1>
+    <h1 class="sr-only">{{ translate('settings.profile.page_title', locale) }}</h1>
 
     <div class="flex flex-col space-y-6">
         <Heading
             variant="small"
-            title="Profile"
-            description="Update your name and email address"
+            :title="translate('settings.profile.heading', locale)"
+            :description="translate('settings.profile.description', locale)"
         />
 
         <Form
@@ -45,7 +47,7 @@ const user = computed(() => page.props.auth.user);
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-2">
-                <Label for="name">Name</Label>
+                <Label for="name">{{ translate('settings.profile.name', locale) }}</Label>
                 <Input
                     id="name"
                     class="mt-1 block w-full"
@@ -53,13 +55,13 @@ const user = computed(() => page.props.auth.user);
                     :default-value="user.name"
                     required
                     autocomplete="name"
-                    placeholder="Full name"
+                    :placeholder="translate('settings.profile.name_placeholder', locale)"
                 />
                 <InputError class="mt-2" :message="errors.name" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="email">Email address</Label>
+                <Label for="email">{{ translate('settings.profile.email', locale) }}</Label>
                 <Input
                     id="email"
                     type="email"
@@ -68,20 +70,20 @@ const user = computed(() => page.props.auth.user);
                     :default-value="user.email"
                     required
                     autocomplete="username"
-                    placeholder="Email address"
+                    :placeholder="translate('settings.profile.email_placeholder', locale)"
                 />
                 <InputError class="mt-2" :message="errors.email" />
             </div>
 
             <div v-if="page.props.mustVerifyEmail && !user.email_verified_at">
                 <p class="-mt-4 text-sm text-muted-foreground">
-                    Your email address is unverified.
+                    {{ translate('settings.profile.email_unverified', locale) }}
                     <Link
                         :href="send()"
                         as="button"
                         class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                     >
-                        Click here to re-send the verification email.
+                        {{ translate('settings.profile.email_resend', locale) }}
                     </Link>
                 </p>
 
@@ -89,14 +91,12 @@ const user = computed(() => page.props.auth.user);
                     v-if="page.props.status === 'verification-link-sent'"
                     class="mt-2 text-sm font-medium text-green-600"
                 >
-                    A new verification link has been sent to your email address.
+                    {{ translate('settings.profile.email_sent', locale) }}
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
-                <Button :disabled="processing" data-test="update-profile-button"
-                    >Save</Button
-                >
+                <Button :disabled="processing" data-test="update-profile-button">{{ translate('shared.actions.save', locale) }}</Button>
             </div>
         </Form>
     </div>

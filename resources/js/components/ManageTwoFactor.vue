@@ -7,6 +7,7 @@ import TwoFactorRecoveryCodes from '@/components/TwoFactorRecoveryCodes.vue';
 import TwoFactorSetupModal from '@/components/TwoFactorSetupModal.vue';
 import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
+import { getAppLocale, translate } from '@/lib/translations';
 import { disable, enable } from '@/routes/two-factor';
 
 export type Props = {
@@ -21,6 +22,7 @@ withDefaults(defineProps<Props>(), {
     twoFactorEnabled: false,
 });
 
+const locale = getAppLocale();
 const { hasSetupData, clearTwoFactorAuthData } = useTwoFactorAuth();
 const showSetupModal = ref<boolean>(false);
 
@@ -31,8 +33,8 @@ onUnmounted(() => clearTwoFactorAuthData());
     <div v-if="canManageTwoFactor" class="space-y-6">
         <Heading
             variant="small"
-            title="Two-factor authentication"
-            description="Manage your two-factor authentication settings"
+            :title="translate('settings.two_factor.heading', locale)"
+            :description="translate('settings.two_factor.description', locale)"
         />
 
         <div
@@ -40,14 +42,12 @@ onUnmounted(() => clearTwoFactorAuthData());
             class="flex flex-col items-start justify-start space-y-4"
         >
             <p class="text-sm text-muted-foreground">
-                When you enable two-factor authentication, you will be prompted
-                for a secure pin during login. This pin can be retrieved from a
-                TOTP-supported application on your phone.
+                {{ translate('settings.two_factor.enable_description', locale) }}
             </p>
 
             <div>
                 <Button v-if="hasSetupData" @click="showSetupModal = true">
-                    <ShieldCheck />Continue setup
+                    <ShieldCheck />{{ translate('settings.two_factor.continue_setup', locale) }}
                 </Button>
                 <Form
                     v-else
@@ -56,7 +56,7 @@ onUnmounted(() => clearTwoFactorAuthData());
                     #default="{ processing }"
                 >
                     <Button type="submit" :disabled="processing">
-                        Enable 2FA
+                        {{ translate('settings.two_factor.enable', locale) }}
                     </Button>
                 </Form>
             </div>
@@ -64,9 +64,7 @@ onUnmounted(() => clearTwoFactorAuthData());
 
         <div v-else class="flex flex-col items-start justify-start space-y-4">
             <p class="text-sm text-muted-foreground">
-                You will be prompted for a secure, random pin during login,
-                which you can retrieve from the TOTP-supported application on
-                your phone.
+                {{ translate('settings.two_factor.enabled_description', locale) }}
             </p>
 
             <div class="relative inline">
@@ -76,7 +74,7 @@ onUnmounted(() => clearTwoFactorAuthData());
                         type="submit"
                         :disabled="processing"
                     >
-                        Disable 2FA
+                        {{ translate('settings.two_factor.disable', locale) }}
                     </Button>
                 </Form>
             </div>

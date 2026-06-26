@@ -21,6 +21,7 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { useAppearance } from '@/composables/useAppearance';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
+import { getAppLocale, translate } from '@/lib/translations';
 import { confirm } from '@/routes/two-factor';
 import type { TwoFactorConfigContent } from '@/types';
 
@@ -34,6 +35,7 @@ const { resolvedAppearance } = useAppearance();
 const props = defineProps<Props>();
 const isOpen = defineModel<boolean>('isOpen');
 
+const locale = getAppLocale();
 const { copy, copied } = useClipboard();
 const { qrCodeSvg, manualSetupKey, clearSetupData, fetchSetupData, errors } =
     useTwoFactorAuth();
@@ -46,26 +48,24 @@ const pinInputContainerRef = useTemplateRef('pinInputContainerRef');
 const modalConfig = computed<TwoFactorConfigContent>(() => {
     if (props.twoFactorEnabled) {
         return {
-            title: 'Two-factor authentication enabled',
-            description:
-                'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
-            buttonText: 'Close',
+            title: translate('settings.two_factor.modal.enabled_title', locale),
+            description: translate('settings.two_factor.modal.enabled_description', locale),
+            buttonText: translate('settings.two_factor.modal.close', locale),
         };
     }
 
     if (showVerificationStep.value) {
         return {
-            title: 'Verify authentication code',
-            description: 'Enter the 6-digit code from your authenticator app',
-            buttonText: 'Continue',
+            title: translate('settings.two_factor.modal.verify_title', locale),
+            description: translate('settings.two_factor.modal.verify_description', locale),
+            buttonText: translate('settings.two_factor.modal.continue', locale),
         };
     }
 
     return {
-        title: 'Enable two-factor authentication',
-        description:
-            'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
-        buttonText: 'Continue',
+        title: translate('settings.two_factor.modal.enable_title', locale),
+        description: translate('settings.two_factor.modal.enable_description', locale),
+        buttonText: translate('settings.two_factor.modal.continue', locale),
     };
 });
 
@@ -196,9 +196,7 @@ watch(
                             <div
                                 class="absolute inset-0 top-1/2 h-px w-full bg-border"
                             />
-                            <span class="relative bg-card px-2 py-1"
-                                >or, enter the code manually</span
-                            >
+                            <span class="relative bg-card px-2 py-1">{{ translate('settings.two_factor.modal.manual_entry', locale) }}</span>
                         </div>
 
                         <div
@@ -279,14 +277,14 @@ watch(
                                     @click="showVerificationStep = false"
                                     :disabled="processing"
                                 >
-                                    Back
+                                    {{ translate('settings.two_factor.modal.back', locale) }}
                                 </Button>
                                 <Button
                                     type="submit"
                                     class="w-auto flex-1"
                                     :disabled="processing || code.length < 6"
                                 >
-                                    Confirm
+                                    {{ translate('settings.two_factor.modal.confirm', locale) }}
                                 </Button>
                             </div>
                         </div>

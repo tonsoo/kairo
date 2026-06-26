@@ -2,6 +2,7 @@
 import DashboardShiftAction from '@/components/dashboard-layout/DashboardShiftAction.vue';
 import DashboardSidebarNav from '@/components/dashboard-layout/DashboardSidebarNav.vue';
 import DashboardUserMenu from '@/components/dashboard-layout/DashboardUserMenu.vue';
+import LocaleSwitch from '@/components/LocaleSwitch.vue';
 </script>
 
 <template>
@@ -20,7 +21,10 @@ import DashboardUserMenu from '@/components/dashboard-layout/DashboardUserMenu.v
                 </div>
             </aside>
 
-            <main class="min-w-0 flex-1 bg-[#1e1f20]">
+            <main class="relative min-w-0 flex-1 bg-[#1e1f20]">
+                <div class="pt-8 px-8 flex justify-end">
+                    <LocaleSwitch compact />
+                </div>
                 <slot />
             </main>
         </div>
