@@ -13,7 +13,7 @@ import {
 } from '@/lib/dashboardTranslations';
 
 const locale = getDashboardLocale();
-const value = defineModel<string>({ required: true });
+const value = defineModel<string | number | null>({ required: true });
 
 const hoursOptions = Array.from({ length: 25 }, (_, index) => pad(index));
 const minutesOptions = computed(() => {
@@ -46,20 +46,46 @@ const selectedMinutes = computed({
     },
 });
 
-function parseDuration(rawValue: string): { hours: string; minutes: string } | null {
-    const match = rawValue.match(/^(\d{2}):(\d{2})$/);
+function parseDuration(rawValue: string | number | null): { hours: string; minutes: string } | null {
+    if (typeof rawValue === 'number') {
+        return {
+            hours: pad(rawValue),
+            minutes: '00',
+        };
+    }
 
-    if (match === null) {
+    if (typeof rawValue !== 'string') {
+        return null;
+    }
+
+    const durationMatch = rawValue.match(/^(\d{2}):(\d{2})$/);
+
+    if (durationMatch !== null) {
+        return {
+            hours: durationMatch[1],
+            minutes: durationMatch[2],
+        };
+    }
+
+    const hoursOnlyMatch = rawValue.match(/^\d+$/);
+
+    if (hoursOnlyMatch === null) {
+        return null;
+    }
+
+    const normalizedHours = normalizePart(rawValue);
+
+    if (normalizedHours === null) {
         return null;
     }
 
     return {
-        hours: match[1],
-        minutes: match[2],
+        hours: normalizedHours,
+        minutes: '00',
     };
 }
 
-function buildDuration(hours: string, minutes: string): string {
+function buildDuration(hours: string | number, minutes: string | number): string {
     const normalizedHours = normalizePart(hours);
 
     if (normalizedHours === null) {
@@ -73,7 +99,19 @@ function buildDuration(hours: string, minutes: string): string {
     return `${normalizedHours}:${normalizedMinutes}`;
 }
 
-function normalizePart(value: string): string | null {
+function normalizePart(value: string | number | null | undefined): string | null {
+    if (typeof value === 'number') {
+        if (! Number.isInteger(value) || value < 0) {
+            return null;
+        }
+
+        return pad(value);
+    }
+
+    if (typeof value !== 'string') {
+        return null;
+    }
+
     if (value.trim() === '') {
         return null;
     }
