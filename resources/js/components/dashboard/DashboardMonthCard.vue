@@ -16,6 +16,10 @@ import {
 } from '@/lib/dashboardTranslations';
 
 const locale = getDashboardLocale();
+const emit = defineEmits<{
+    previous: [];
+    next: [];
+}>();
 
 defineProps<{
     title: string;
@@ -23,6 +27,8 @@ defineProps<{
     journeyItems: DashboardJourneyItem[];
     legend: DashboardLegendItem[];
     maxMinutes: number;
+    canGoPrevious: boolean;
+    canGoNext: boolean;
 }>();
 
 const mode = ref<'summary' | 'journey'>('summary');
@@ -45,13 +51,17 @@ const views = computed(() => [
             <div class="flex items-center gap-1">
                 <button
                     type="button"
-                    class="flex size-6 items-center justify-center rounded-full border border-[#3a3b3c] bg-[#18191a] text-slate-400 transition hover:text-white"
+                    class="flex size-6 items-center justify-center rounded-full border border-[#3a3b3c] bg-[#18191a] text-slate-400 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
+                    :disabled="!canGoPrevious"
+                    @click="emit('previous')"
                 >
                     <ChevronLeft class="size-4" />
                 </button>
                 <button
                     type="button"
-                    class="flex size-6 items-center justify-center rounded-full border border-[#3a3b3c] bg-[#18191a] text-slate-400 transition hover:text-white"
+                    class="flex size-6 items-center justify-center rounded-full border border-[#3a3b3c] bg-[#18191a] text-slate-400 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
+                    :disabled="!canGoNext"
+                    @click="emit('next')"
                 >
                     <ChevronRight class="size-4" />
                 </button>

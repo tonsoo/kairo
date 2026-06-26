@@ -44,11 +44,16 @@ type HoursSummaryResponse = {
     data: HoursSummaryApiData;
 };
 
+type FetchHoursSummaryOptions = {
+    month?: string;
+    semesterStart?: string;
+};
+
 export type UseHoursSummaryReturn = {
     hoursSummaryData: typeof hoursSummaryData;
     errorMessageKey: typeof errorMessageKey;
     isLoading: typeof isLoading;
-    fetchHoursSummary: () => Promise<void>;
+    fetchHoursSummary: (options?: FetchHoursSummaryOptions) => Promise<void>;
 };
 
 const hoursSummaryData = ref<HoursSummaryApiData | null>(null);
@@ -58,13 +63,23 @@ const isLoading = ref(false);
 export const useHoursSummary = (): UseHoursSummaryReturn => {
     const http = useHttp();
 
-    const fetchHoursSummary = async (): Promise<void> => {
+    const fetchHoursSummary = async (options: FetchHoursSummaryOptions = {}): Promise<void> => {
         isLoading.value = true;
         errorMessageKey.value = null;
 
         try {
+            const query: Record<string, string> = {};
+
+            if (options.month !== undefined) {
+                query.month = options.month;
+            }
+
+            if (options.semesterStart !== undefined) {
+                query.semester_start = options.semesterStart;
+            }
+
             const response = (await http.submit(
-                hoursSummary(),
+                hoursSummary({ query }),
             )) as HoursSummaryResponse;
 
             hoursSummaryData.value = response.data;

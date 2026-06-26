@@ -1,8 +1,9 @@
 import { useHttp } from '@inertiajs/vue3';
+import type { Ref } from 'vue';
 import { ref } from 'vue';
 import { index as listShifts } from '@/actions/App/Http/Controllers/Api/ShiftController';
 
-export type MonthJourneyShift = {
+export type ShiftInRange = {
     id: number;
     timezone: string;
     started_at: string;
@@ -10,32 +11,31 @@ export type MonthJourneyShift = {
     duration_minutes: number | null;
 };
 
-type MonthJourneyShiftsResponse = {
-    data: MonthJourneyShift[];
+type ShiftsInRangeResponse = {
+    data: ShiftInRange[];
 };
 
-export type UseMonthJourneyShiftsReturn = {
-    shifts: typeof shifts;
-    errorMessageKey: typeof errorMessageKey;
-    isLoading: typeof isLoading;
-    fetchMonthJourneyShifts: (from: string, to: string) => Promise<void>;
+export type UseShiftsInRangeReturn = {
+    shifts: Ref<ShiftInRange[]>;
+    errorMessageKey: Ref<string | null>;
+    isLoading: Ref<boolean>;
+    fetchShiftsInRange: (from: string, to: string) => Promise<void>;
 };
 
-const shifts = ref<MonthJourneyShift[]>([]);
-const errorMessageKey = ref<string | null>(null);
-const isLoading = ref(false);
-
-export const useMonthJourneyShifts = (): UseMonthJourneyShiftsReturn => {
+export const useShiftsInRange = (): UseShiftsInRangeReturn => {
     const http = useHttp();
+    const shifts = ref<ShiftInRange[]>([]);
+    const errorMessageKey = ref<string | null>(null);
+    const isLoading = ref(false);
 
-    const fetchMonthJourneyShifts = async (from: string, to: string): Promise<void> => {
+    const fetchShiftsInRange = async (from: string, to: string): Promise<void> => {
         isLoading.value = true;
         errorMessageKey.value = null;
 
         try {
             const response = (await http.submit(
                 listShifts({ query: { from, to } }),
-            )) as MonthJourneyShiftsResponse;
+            )) as ShiftsInRangeResponse;
 
             shifts.value = response.data;
         } catch {
@@ -50,6 +50,6 @@ export const useMonthJourneyShifts = (): UseMonthJourneyShiftsReturn => {
         shifts,
         errorMessageKey,
         isLoading,
-        fetchMonthJourneyShifts,
+        fetchShiftsInRange,
     };
 };

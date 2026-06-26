@@ -2,7 +2,7 @@ import type {
     HoursSummaryApiData,
     HoursSummaryItem,
 } from '@/composables/useHoursSummary';
-import type { MonthJourneyShift } from '@/composables/useMonthJourneyShifts';
+import type { ShiftInRange } from '@/composables/useShiftsInRange';
 
 export type DashboardLegendKey =
     | 'worked'
@@ -111,7 +111,7 @@ export function buildBalanceSegments(
 export function buildTodaySegments(
     today: HoursSummaryApiData['today'],
     referenceDateTime: string,
-    shifts: MonthJourneyShift[],
+    shifts: ShiftInRange[],
 ): DashboardMeterSegment[] {
     const reference = parseLocalIsoDateTime(referenceDateTime);
     const intervals = mergeDayShiftIntervals(
@@ -248,7 +248,7 @@ export function resolveChartMaxMinutes(
 export function buildMonthJourneyItems(
     monthStartsAt: string,
     referenceDateTime: string,
-    shifts: MonthJourneyShift[],
+    shifts: ShiftInRange[],
 ): DashboardJourneyItem[] {
     const { month, year } = parseLocalDate(monthStartsAt);
     const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
@@ -349,11 +349,45 @@ export function formatMonthHeading(date: string, locale: string): string {
     return `${capitalize(monthName, locale)}, ${year}`;
 }
 
-export function getMonthEndDate(monthStartsAt: string): string {
-    const { month, year } = parseLocalDate(monthStartsAt);
-    const day = new Date(Date.UTC(year, month, 0)).getUTCDate();
+export function formatSemesterHeading(
+    startsAt: string,
+    endsAt: string,
+    locale: string,
+): string {
+    const start = parseLocalDate(startsAt);
+    const end = parseLocalDate(endsAt);
+    const startLabel = new Intl.DateTimeFormat(locale, {
+        month: 'short',
+        timeZone: 'UTC',
+    }).format(new Date(Date.UTC(start.year, start.month - 1, 1)));
+    const endLabel = new Intl.DateTimeFormat(locale, {
+        month: 'short',
+        timeZone: 'UTC',
+    }).format(new Date(Date.UTC(end.year, end.month - 1, 1)));
 
-    return `${year}-${padTimeUnit(month)}-${padTimeUnit(day)}`;
+    if (start.year === end.year) {
+        return `${capitalize(startLabel, locale)} - ${capitalize(endLabel, locale)} ${end.year}`;
+    }
+
+    return `${capitalize(startLabel, locale)} ${start.year} - ${capitalize(endLabel, locale)} ${end.year}`;
+}
+
+export function getMonthStartFromDateTime(value: string): string {
+    const { date } = parseLocalIsoDateTime(value);
+    const { month, year } = parseLocalDate(date);
+
+    return `${year}-${padTimeUnit(month)}-01`;
+}
+
+export function getCurrentSemesterStart(value: string): string {
+    return shiftMonthStart(getMonthStartFromDateTime(value), -5);
+}
+
+export function shiftMonthStart(date: string, offsetMonths: number): string {
+    const { month, year } = parseLocalDate(date);
+    const shifted = new Date(Date.UTC(year, month - 1 + offsetMonths, 1));
+
+    return shifted.toISOString().slice(0, 10);
 }
 
 function formatShortMonthLabel(date: string, locale: string): string {
@@ -400,7 +434,7 @@ function mergeDayShiftIntervals(intervals: DayShiftInterval[]): DayShiftInterval
 
 function toDayShiftInterval(
     todayDate: string,
-    shift: MonthJourneyShift,
+    shift: ShiftInRange,
     reference: LocalDateTimeParts,
 ): DayShiftInterval | null {
     const startedAt = parseLocalIsoDateTime(shift.started_at);

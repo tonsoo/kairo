@@ -91,6 +91,88 @@ test('dashboard overview rejects invalid datetime formats', function () {
         ->assertJsonValidationErrors('at');
 });
 
+test('authenticated users can fetch traversed dashboard periods', function () {
+    $user = User::factory()->create([
+        'timezone' => 'America/Sao_Paulo',
+    ]);
+
+    foreach (range(1, 5) as $weekday) {
+        WorkSchedule::factory()->for($user)->create([
+            'weekday' => $weekday,
+            'effective_from' => '2025-12-01',
+            'type' => 'total_time',
+            'expected_minutes' => 480,
+        ]);
+    }
+
+    Shift::factory()->for($user)->create([
+        'started_at' => '2025-12-15 12:00:00',
+        'ended_at' => '2025-12-15 20:00:00',
+    ]);
+    Shift::factory()->for($user)->create([
+        'started_at' => '2026-05-12 12:00:00',
+        'ended_at' => '2026-05-12 20:00:00',
+    ]);
+    Shift::factory()->for($user)->create([
+        'started_at' => '2026-06-26 12:00:00',
+        'ended_at' => '2026-06-26 15:00:00',
+    ]);
+
+    $defaultResponse = $this->actingAs($user)
+        ->getJson(route('api.me.hours-summary', [
+            'at' => '2026-06-26T15:00:00-03:00',
+        ]))
+        ->assertOk();
+
+    $traversedResponse = $this->actingAs($user)
+        ->getJson(route('api.me.hours-summary', [
+            'at' => '2026-06-26T15:00:00-03:00',
+            'month' => '2026-05-01',
+            'semester_start' => '2025-12-01',
+        ]))
+        ->assertOk()
+        ->assertJsonPath('data.today.date', '2026-06-26')
+        ->assertJsonPath('data.month.starts_at', '2026-05-01')
+        ->assertJsonPath('data.month.ends_at', '2026-05-31')
+        ->assertJsonPath('data.semester.starts_at', '2025-12-01')
+        ->assertJsonPath('data.semester.ends_at', '2026-05-31')
+        ->assertJsonCount(31, 'data.month.items')
+        ->assertJsonCount(6, 'data.semester.items')
+        ->assertJsonFragment([
+            'date' => '2026-05-01',
+            'worked_minutes' => 480,
+            'regular_minutes' => 480,
+            'extra_minutes' => 0,
+        ])
+        ->assertJsonFragment([
+            'date' => '2025-12-01',
+            'worked_minutes' => 480,
+            'regular_minutes' => 480,
+            'extra_minutes' => 0,
+        ]);
+
+    expect($traversedResponse->json('data.today'))->toBe($defaultResponse->json('data.today'))
+        ->and($traversedResponse->json('data.balance'))->toBe($defaultResponse->json('data.balance'));
+});
+
+test('dashboard overview rejects future month and semester periods', function () {
+    $user = User::factory()->create([
+        'timezone' => 'America/Sao_Paulo',
+    ]);
+
+    $this->actingAs($user)
+        ->getJson(route('api.me.hours-summary', [
+            'at' => '2026-06-26T15:00:00-03:00',
+            'month' => '2026-07-01',
+            'semester_start' => '2026-02-01',
+        ]))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors([
+            'month',
+            'semester_start',
+        ]);
+});
+
 test('authenticated users can fetch the current shift state', function () {
     $user = User::factory()->create([
         'timezone' => 'America/Sao_Paulo',

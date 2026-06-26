@@ -19,8 +19,8 @@ final class RateLimitServiceProvider extends ServiceProvider
 
     private function configureHoursTrackerLimiters(): void
     {
-        $this->forUserOrIp(RateLimiterType::read, 30);
-        $this->forUserOrIp(RateLimiterType::write, 15);
+        $this->forUserOrIp(RateLimiterType::read, 250);
+        $this->forUserOrIp(RateLimiterType::write, 150);
     }
 
     private function forUserOrIp(RateLimiterType $type, int $perMinute): void

@@ -13,6 +13,7 @@ use LogicException;
 final readonly class GetHoursSummary
 {
     public function __construct(
+        private ResolveDashboardBalanceStartsAt $resolveDashboardBalanceStartsAt,
         private ListDashboardDailyDataForPeriod $listDashboardDailyDataForPeriod,
         private BuildDashboardBalanceData $buildDashboardBalanceData,
         private BuildDashboardTodayData $buildDashboardTodayData,
@@ -20,39 +21,80 @@ final readonly class GetHoursSummary
         private BuildDashboardMonthItems $buildDashboardMonthItems,
     ) {}
 
-    public function __invoke(User $user, CarbonImmutable $referenceMoment): HoursSummaryData
-    {
-        $monthEndsAt = $referenceMoment->startOfDay();
-        $monthStartsAt = $referenceMoment->startOfMonth();
-        $semesterStartsAt = $referenceMoment->startOfMonth()->subMonths(5);
-        $semesterDays = ($this->listDashboardDailyDataForPeriod)(
+    public function __invoke(
+        User $user,
+        CarbonImmutable $referenceMoment,
+        CarbonImmutable $monthStart,
+        CarbonImmutable $semesterStart,
+    ): HoursSummaryData {
+        $referenceDate = $referenceMoment->startOfDay();
+        $currentMonthStart = $referenceMoment->startOfMonth();
+        $currentSemesterStart = $currentMonthStart->subMonths(5);
+        $balanceStartsAt = ($this->resolveDashboardBalanceStartsAt)(
             $user,
-            $semesterStartsAt,
-            $monthEndsAt,
             $referenceMoment,
         );
+        $monthEndsAt = $monthStart->equalTo($currentMonthStart)
+            ? $referenceDate
+            : $monthStart->endOfMonth()->startOfDay();
+        $semesterEndsAt = $semesterStart->equalTo($currentSemesterStart)
+            ? $referenceDate
+            : $semesterStart->addMonths(5)->endOfMonth()->startOfDay();
+        $periodStartsAt = $balanceStartsAt;
+        $periodEndsAt = $referenceDate;
+
+        if ($monthStart->lt($periodStartsAt)) {
+            $periodStartsAt = $monthStart;
+        }
+
+        if ($semesterStart->lt($periodStartsAt)) {
+            $periodStartsAt = $semesterStart;
+        }
+
+        if ($monthEndsAt->gt($periodEndsAt)) {
+            $periodEndsAt = $monthEndsAt;
+        }
+
+        if ($semesterEndsAt->gt($periodEndsAt)) {
+            $periodEndsAt = $semesterEndsAt;
+        }
+
+        $allDays = ($this->listDashboardDailyDataForPeriod)(
+            $user,
+            $periodStartsAt,
+            $periodEndsAt,
+            $referenceMoment,
+        );
+        $semesterDays = $allDays
+            ->filter(fn (DashboardDayData $day) => $day->date->gte($semesterStart) && $day->date->lte($semesterEndsAt))
+            ->values();
+        $monthDays = $allDays
+            ->filter(fn (DashboardDayData $day) => $day->date->gte($monthStart) && $day->date->lte($monthEndsAt))
+            ->values();
+        $balanceDays = $allDays
+            ->filter(fn (DashboardDayData $day) => $day->date->gte($balanceStartsAt) && $day->date->lte($referenceDate))
+            ->values();
 
         /** @var DashboardDayData|null $today */
-        $today = $semesterDays->last();
+        $today = $allDays->first(
+            fn (DashboardDayData $day) => $day->date->equalTo($referenceDate),
+        );
 
         if ($today === null) {
             throw new LogicException('Hours summary requires at least one day of data.');
         }
 
-        $monthDays = $semesterDays
-            ->filter(fn (DashboardDayData $day) => $day->date->gte($monthStartsAt))
-            ->values();
         $monthBalance = ($this->buildDashboardBalanceData)($monthDays);
 
         return new HoursSummaryData(
             generatedAt: $referenceMoment,
             timezone: $user->timezone,
-            balance: ($this->buildDashboardBalanceData)($semesterDays),
+            balance: ($this->buildDashboardBalanceData)($balanceDays),
             today: ($this->buildDashboardTodayData)($user, $today, $referenceMoment),
-            semesterStartsAt: $semesterStartsAt,
-            semesterEndsAt: $monthEndsAt,
+            semesterStartsAt: $semesterStart,
+            semesterEndsAt: $semesterEndsAt,
             semesterItems: ($this->buildDashboardSemesterItems)($semesterDays),
-            monthStartsAt: $monthStartsAt,
+            monthStartsAt: $monthStart,
             monthEndsAt: $monthEndsAt,
             monthBalanceMinutes: $monthBalance->balanceMinutes,
             monthItems: ($this->buildDashboardMonthItems)($monthDays),

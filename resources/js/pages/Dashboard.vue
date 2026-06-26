@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
-import { computed, onMounted, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import {
     buildBalanceSegments,
     buildLegendFromSegments,
@@ -11,16 +11,19 @@ import {
     chartLegend,
     formatDurationMinutes,
     formatMonthHeading,
+    formatSemesterHeading,
     getBalanceStatusLabelKey,
-    getMonthEndDate,
+    getCurrentSemesterStart,
+    getMonthStartFromDateTime,
     resolveBalanceStatus,
     resolveChartMaxMinutes,
+    shiftMonthStart,
 } from '@/components/dashboard/dashboardData';
 import DashboardMetricCard from '@/components/dashboard/DashboardMetricCard.vue';
 import DashboardMonthCard from '@/components/dashboard/DashboardMonthCard.vue';
 import DashboardSemesterCard from '@/components/dashboard/DashboardSemesterCard.vue';
 import { useHoursSummary } from '@/composables/useHoursSummary';
-import { useMonthJourneyShifts } from '@/composables/useMonthJourneyShifts';
+import { useShiftsInRange } from '@/composables/useShiftsInRange';
 import {
     getDashboardLocale,
     translateDashboard,
@@ -28,10 +31,13 @@ import {
 
 const locale = getDashboardLocale();
 const { hoursSummaryData, errorMessageKey, isLoading, fetchHoursSummary } = useHoursSummary();
-const { shifts: monthJourneyShifts, fetchMonthJourneyShifts } = useMonthJourneyShifts();
+const { shifts: monthJourneyShifts, fetchShiftsInRange: fetchMonthJourneyShifts } = useShiftsInRange();
+const { shifts: todayShifts, fetchShiftsInRange: fetchTodayShifts } = useShiftsInRange();
+const selectedMonthStart = ref<string | null>(null);
+const selectedSemesterStart = ref<string | null>(null);
 
 onMounted(() => {
-    void fetchHoursSummary();
+    void fetchDashboardData();
 });
 
 watch(
@@ -41,10 +47,24 @@ watch(
             return;
         }
 
-        await fetchMonthJourneyShifts(
-            summary.month.starts_at,
-            getMonthEndDate(summary.month.starts_at),
-        );
+        if (selectedMonthStart.value === null) {
+            selectedMonthStart.value = summary.month.starts_at;
+        }
+
+        if (selectedSemesterStart.value === null) {
+            selectedSemesterStart.value = summary.semester.starts_at;
+        }
+
+        await Promise.all([
+            fetchMonthJourneyShifts(
+                summary.month.starts_at,
+                summary.month.ends_at,
+            ),
+            fetchTodayShifts(
+                summary.today.date,
+                summary.today.date,
+            ),
+        ]);
     },
 );
 
@@ -86,7 +106,7 @@ const todayCard = computed(() => {
     const segments = buildTodaySegments(
         hoursSummaryData.value.today,
         hoursSummaryData.value.generated_at,
-        monthJourneyShifts.value,
+        todayShifts.value,
     );
 
     return {
@@ -138,6 +158,30 @@ const monthJourneyItems = computed(() => {
     );
 });
 
+const currentMonthStart = computed(() =>
+    hoursSummaryData.value === null
+        ? null
+        : getMonthStartFromDateTime(hoursSummaryData.value.generated_at),
+);
+
+const currentSemesterStart = computed(() =>
+    hoursSummaryData.value === null
+        ? null
+        : getCurrentSemesterStart(hoursSummaryData.value.generated_at),
+);
+
+const canGoToNextMonth = computed(() =>
+    selectedMonthStart.value !== null
+    && currentMonthStart.value !== null
+    && selectedMonthStart.value < currentMonthStart.value,
+);
+
+const canGoToNextSemester = computed(() =>
+    selectedSemesterStart.value !== null
+    && currentSemesterStart.value !== null
+    && selectedSemesterStart.value < currentSemesterStart.value,
+);
+
 const monthTitle = computed(() => {
     if (hoursSummaryData.value === null) {
         return translateDashboard('dashboard.hours.month.title', locale);
@@ -145,6 +189,65 @@ const monthTitle = computed(() => {
 
     return `${formatMonthHeading(hoursSummaryData.value.month.starts_at, locale)} • ${translateDashboard('dashboard.hours.month.title', locale)}: ${formatDurationMinutes(hoursSummaryData.value.month.balance_minutes, { signed: true })}`;
 });
+
+const semesterTitle = computed(() => {
+    if (hoursSummaryData.value === null) {
+        return translateDashboard('dashboard.hours.semester.title', locale);
+    }
+
+    return `${formatSemesterHeading(
+        hoursSummaryData.value.semester.starts_at,
+        hoursSummaryData.value.semester.ends_at,
+        locale,
+    )} • ${translateDashboard('dashboard.hours.semester.title', locale)}`;
+});
+
+async function fetchDashboardData(): Promise<void> {
+    await fetchHoursSummary({
+        month: selectedMonthStart.value ?? undefined,
+        semesterStart: selectedSemesterStart.value ?? undefined,
+    });
+}
+
+async function showPreviousMonth(): Promise<void> {
+    if (selectedMonthStart.value === null) {
+        return;
+    }
+
+    selectedMonthStart.value = shiftMonthStart(selectedMonthStart.value, -1);
+
+    await fetchDashboardData();
+}
+
+async function showNextMonth(): Promise<void> {
+    if (! canGoToNextMonth.value || selectedMonthStart.value === null) {
+        return;
+    }
+
+    selectedMonthStart.value = shiftMonthStart(selectedMonthStart.value, 1);
+
+    await fetchDashboardData();
+}
+
+async function showPreviousSemester(): Promise<void> {
+    if (selectedSemesterStart.value === null) {
+        return;
+    }
+
+    selectedSemesterStart.value = shiftMonthStart(selectedSemesterStart.value, -6);
+
+    await fetchDashboardData();
+}
+
+async function showNextSemester(): Promise<void> {
+    if (! canGoToNextSemester.value || selectedSemesterStart.value === null) {
+        return;
+    }
+
+    selectedSemesterStart.value = shiftMonthStart(selectedSemesterStart.value, 6);
+
+    await fetchDashboardData();
+}
 </script>
 
 <template>
@@ -187,9 +290,14 @@ const monthTitle = computed(() => {
                 </div>
 
                 <DashboardSemesterCard
+                    :title="semesterTitle"
                     :items="semesterItems"
                     :legend="chartLegend"
+                    :can-go-previous="true"
+                    :can-go-next="canGoToNextSemester"
                     class="lg:col-span-9"
+                    @previous="void showPreviousSemester()"
+                    @next="void showNextSemester()"
                 />
             </div>
 
@@ -199,6 +307,10 @@ const monthTitle = computed(() => {
                 :journey-items="monthJourneyItems"
                 :legend="chartLegend"
                 :max-minutes="monthChartMaxMinutes"
+                :can-go-previous="true"
+                :can-go-next="canGoToNextMonth"
+                @previous="void showPreviousMonth()"
+                @next="void showNextMonth()"
             />
         </div>
     </div>
