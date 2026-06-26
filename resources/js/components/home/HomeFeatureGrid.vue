@@ -1,31 +1,35 @@
 <script setup lang="ts">
 import { CalendarDays, History, User } from '@lucide/vue';
+import { computed } from 'vue';
+import { getAppLocale, translate } from '@/lib/translations';
 
-const features = [
+const locale = getAppLocale();
+
+const features = computed(() => [
     {
-        title: 'Rotinas Flexíveis',
-        description: 'Configure horários fixos ou carga horária diária. Mude as regras para o futuro sem quebrar o histórico do passado.',
+        title: translate('home.features.flexible.title', locale),
+        description: translate('home.features.flexible.description', locale),
         icon: CalendarDays,
     },
     {
-        title: 'Histórico Editável',
-        description: 'Esqueceu de bater o ponto? O sistema permite correções retroativas no seu histórico de turnos de forma segura e imediata.',
+        title: translate('home.features.history.title', locale),
+        description: translate('home.features.history.description', locale),
         icon: History,
     },
     {
-        title: 'Privacidade Total',
-        description: 'Não somos um painel de monitoramento de gestores. Este é o seu espaço pessoal. Você é o único dono dos seus dados de jornada.',
+        title: translate('home.features.privacy.title', locale),
+        description: translate('home.features.privacy.description', locale),
         icon: User,
     },
-];
+]);
 </script>
 
 <template>
     <section id="recursos" class="border-t border-[#2e2f30] bg-[#18191a] px-6 py-24">
         <div class="mx-auto max-w-6xl">
             <div class="mb-16 text-center">
-                <h2 class="mb-4 text-3xl font-bold text-white">Feito para a sua realidade</h2>
-                <p class="mx-auto max-w-2xl text-slate-400">Não tentamos ser um sistema de gestão completo. Fazemos uma coisa: rastrear suas horas perfeitamente.</p>
+                <h2 class="mb-4 text-3xl font-bold text-white">{{ translate('home.features.title', locale) }}</h2>
+                <p class="mx-auto max-w-2xl text-slate-400">{{ translate('home.features.description', locale) }}</p>
             </div>
 
             <div class="grid grid-cols-1 gap-6 md:grid-cols-3">

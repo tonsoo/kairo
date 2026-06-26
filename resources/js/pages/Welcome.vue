@@ -8,6 +8,7 @@ import HomeHeader from '@/components/home/HomeHeader.vue';
 import HomeHero from '@/components/home/HomeHero.vue';
 import HomeHowItWorks from '@/components/home/HomeHowItWorks.vue';
 import HomeTimezoneFeature from '@/components/home/HomeTimezoneFeature.vue';
+import { translate } from '@/lib/translations';
 import { dashboard, login, register } from '@/routes';
 import type { User } from '@/types/auth';
 
@@ -24,13 +25,12 @@ const loginHref = login().url;
 const registerHref = register().url;
 const primaryHref = computed(() => isAuthenticated.value ? dashboardHref : registerHref);
 const secondaryHref = computed(() => isAuthenticated.value ? dashboardHref : loginHref);
-const primaryLabel = computed(() => isAuthenticated.value ? 'Acessar meu painel' : 'Criar minha conta');
-const secondaryLabel = computed(() => isAuthenticated.value ? 'Abrir painel' : 'Entrar');
+const primaryLabel = computed(() => isAuthenticated.value ? translate('home.hero.cta.primary_auth') : translate('home.hero.cta.primary_guest'));
 const currentYear = new Date().getFullYear();
 </script>
 
 <template>
-    <Head title="HoursTracker" />
+    <Head title="Shiftly" />
 
     <div class="min-h-screen bg-[#1e1f20] font-sans text-slate-300 selection:bg-teal-500/30 selection:text-white">
         <HomeHeader
@@ -45,7 +45,6 @@ const currentYear = new Date().getFullYear();
                 :primary-href="primaryHref"
                 :secondary-href="secondaryHref"
                 :primary-label="primaryLabel"
-                :secondary-label="secondaryLabel"
             />
             <HomeHowItWorks />
             <HomeTimezoneFeature />
