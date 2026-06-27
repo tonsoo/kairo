@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Http;
+namespace App\Http\Controllers\Panel;
 
 use App\Domain\Shift\Actions\BuildShiftExportData;
 use App\Domain\Shift\Enums\ShiftExportType;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Http\ExportShiftsRequest;
+use App\Http\Requests\Panel\ExportShiftsRequest;
 use App\Models\User;
 use App\Repositories\ShiftExport\ShiftExportRegistry;
 use App\Support\Parsing\DateParser;

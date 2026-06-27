@@ -9,10 +9,10 @@ use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
-final readonly class BuildDailyWorkScheduleSnapshot
+final readonly class CreateDailyWorkScheduleSnapshot
 {
     public function __construct(
-        private GetEffectiveWorkScheduleForDate $getEffectiveWorkScheduleForDate
+        private FindEffectiveWorkScheduleForDate $getEffectiveWorkScheduleForDate
     ) {}
 
     public function __invoke(User $user, CarbonImmutable $date): ?DailyWorkSchedule

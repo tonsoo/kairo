@@ -7,11 +7,11 @@ namespace App\Domain\Dashboard\Actions;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 
-final readonly class ResolveDashboardBalanceStartsAt
+final readonly class ResolveDashboardBalanceStartsDate
 {
     public function __construct(
-        private GetDashboardEarliestShiftDate $getDashboardEarliestShiftDate,
-        private GetDashboardEarliestWorkScheduleDate $getDashboardEarliestWorkScheduleDate,
+        private ResolveDashboardEarliestShiftDate        $getDashboardEarliestShiftDate,
+        private ResolveDashboardEarliestWorkScheduleDate $getDashboardEarliestWorkScheduleDate,
     ) {}
 
     public function __invoke(User $user, CarbonImmutable $referenceMoment, string $timezone): CarbonImmutable
@@ -25,16 +25,13 @@ final readonly class ResolveDashboardBalanceStartsAt
             $user,
             $timezone,
         );
-        $startsAt = $referenceDate;
 
-        if ($earliestShiftDate !== null && $earliestShiftDate->lt($startsAt)) {
-            $startsAt = $earliestShiftDate;
-        }
-
-        if ($earliestWorkScheduleDate !== null && $earliestWorkScheduleDate->lt($startsAt)) {
-            $startsAt = $earliestWorkScheduleDate;
-        }
-
-        return $startsAt;
+        return collect([
+            $referenceDate,
+            $earliestShiftDate,
+            $earliestWorkScheduleDate,
+        ])
+            ->filter()
+            ->min();
     }
 }

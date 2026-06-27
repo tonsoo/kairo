@@ -19,31 +19,30 @@ final readonly class EndShift
 
     public function __invoke(User $user, CarbonImmutable $endedAt): Shift
     {
-        $shift = Shift::query()
-            ->where('user_id', $user->id)
-            ->ongoing()
-            ->latest('started_at')
-            ->first();
+        return DB::transaction(function () use ($user, $endedAt): Shift {
+            $shift = Shift::query()
+                ->whereBelongsTo($user)
+                ->ongoing()
+                ->latest('started_at')
+                ->lockForUpdate()
+                ->first();
 
-        if ($shift === null) {
-            throw NoOngoingShiftFound::forUser($user->id);
-        }
+            if ($shift === null) {
+                throw NoOngoingShiftFound::forUser($user->id);
+            }
 
-        $period = new ShiftPeriodData(
-            CarbonImmutable::instance($shift->started_at),
-            $endedAt,
-        );
+            $period = new ShiftPeriodData(
+                startedAt: CarbonImmutable::instance($shift->started_at),
+                endedAt: $endedAt,
+            );
 
-        ($this->assertShiftDoesNotOverlap)($user, $period, $shift);
+            ($this->assertShiftDoesNotOverlap)($user, $period, $shift);
 
-        $updatedShift = DB::transaction(function () use ($period, $shift) {
             $shift->forceFill([
-                'ended_at' => $period->endedAt?->utc(),
+                'ended_at' => $endedAt->utc(),
             ])->save();
 
-            return $shift;
+            return $shift->fresh();
         });
-
-        return $updatedShift->fresh();
     }
 }

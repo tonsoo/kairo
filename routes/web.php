@@ -1,9 +1,9 @@
 <?php
 
 use App\Enums\RateLimiterType;
-use App\Http\Controllers\Http\DashboardController;
-use App\Http\Controllers\Http\HistoryController;
-use App\Http\Controllers\Http\ShiftExportController;
+use App\Http\Controllers\Panel\DashboardController;
+use App\Http\Controllers\Panel\HistoryController;
+use App\Http\Controllers\Panel\ShiftExportController;
 use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
 

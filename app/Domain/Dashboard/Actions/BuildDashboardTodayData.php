@@ -13,7 +13,7 @@ final readonly class BuildDashboardTodayData
 {
     public function __construct(
         private ListDashboardRelevantShiftsForPeriod $listDashboardRelevantShiftsForPeriod,
-        private GetDashboardPausedMinutesForDate $getDashboardPausedMinutesForDate,
+        private ResolveDashboardPausedMinutesForDate $getDashboardPausedMinutesForDate,
     ) {}
 
     public function __invoke(User $user, DashboardDayData $day, CarbonImmutable $referenceMoment): DashboardTodayData

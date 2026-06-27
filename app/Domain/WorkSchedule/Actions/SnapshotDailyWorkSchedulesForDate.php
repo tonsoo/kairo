@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 final readonly class SnapshotDailyWorkSchedulesForDate
 {
     public function __construct(
-        private BuildDailyWorkScheduleSnapshot $buildDailyWorkScheduleSnapshot,
+        private CreateDailyWorkScheduleSnapshot $createDailyWorkScheduleSnapshot,
     ) {}
 
     public function __invoke(CarbonImmutable $date): int
@@ -24,7 +24,7 @@ final readonly class SnapshotDailyWorkSchedulesForDate
             ->orderBy('id')
             ->chunkById(100, function (Collection $users) use (&$snapshotUsers, $snapshotDate): void {
                 foreach ($users as $user) {
-                    if (($this->buildDailyWorkScheduleSnapshot)($user, $snapshotDate) !== null) {
+                    if (($this->createDailyWorkScheduleSnapshot)($user, $snapshotDate) !== null) {
                         $snapshotUsers++;
                     }
                 }

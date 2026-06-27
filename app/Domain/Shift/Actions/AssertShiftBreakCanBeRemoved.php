@@ -20,7 +20,7 @@ final readonly class AssertShiftBreakCanBeRemoved
         ($this->assertShiftBelongsToUser)($user, $previousShift);
         ($this->assertShiftBelongsToUser)($user, $nextShift);
 
-        if ($previousShift->id === $nextShift->id) {
+        if ($previousShift->is($nextShift)) {
             throw InvalidShiftBreakRemoval::identicalShifts();
         }
 
@@ -28,15 +28,11 @@ final readonly class AssertShiftBreakCanBeRemoved
             throw InvalidShiftBreakRemoval::previousShiftMustBeCompleted();
         }
 
-        $previousStartedAt = CarbonImmutable::instance($previousShift->started_at);
-        $previousEndedAt = CarbonImmutable::instance($previousShift->ended_at);
-        $nextStartedAt = CarbonImmutable::instance($nextShift->started_at);
-
-        if ($previousStartedAt->greaterThanOrEqualTo($nextStartedAt)) {
+        if ($previousShift->started_at->greaterThanOrEqualTo($nextShift->started_at)) {
             throw InvalidShiftBreakRemoval::invalidOrder();
         }
 
-        if ($previousEndedAt->greaterThan($nextStartedAt)) {
+        if ($previousShift->ended_at->greaterThan($nextShift->started_at)) {
             throw InvalidShiftBreakRemoval::invalidOrder();
         }
     }

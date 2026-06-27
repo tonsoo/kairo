@@ -10,7 +10,7 @@ use App\Models\Shift;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 
-final readonly class GetCurrentShiftState
+final readonly class ResolveCurrentShiftState
 {
     public function __invoke(User $user, CarbonImmutable $moment): CurrentShiftStateData
     {

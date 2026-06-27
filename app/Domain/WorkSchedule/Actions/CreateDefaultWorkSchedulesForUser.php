@@ -21,11 +21,10 @@ final readonly class CreateDefaultWorkSchedulesForUser
 
         DB::transaction(function () use ($effectiveFrom, $user): void {
             foreach (range(1, 5) as $weekday) {
-                ($this->upsertWorkSchedule)($user, WorkScheduleData::timeRange(
+                ($this->upsertWorkSchedule)($user, WorkScheduleData::totalTime(
                     $weekday,
+                    8 * 60 * 60,
                     $effectiveFrom->setTime(9, 0),
-                    $effectiveFrom->setTime(17, 0),
-                    $effectiveFrom,
                 ));
             }
 

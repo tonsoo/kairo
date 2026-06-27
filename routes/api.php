@@ -1,8 +1,10 @@
 <?php
 
 use App\Enums\RateLimiterType;
+use App\Http\Controllers\Api\CurrentShiftActionsController;
 use App\Http\Controllers\Api\CurrentShiftStateController;
 use App\Http\Controllers\Api\HoursSummaryController;
+use App\Http\Controllers\Api\ShiftBreakController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\WorkScheduleController;
 use Illuminate\Support\Facades\Route;
@@ -25,22 +27,22 @@ Route::middleware(['web', 'auth', 'verified'])
             ->middleware($readThrottle)
             ->name('api.me.shifts.index');
 
-        Route::post('shifts/start', [ShiftController::class, 'start'])
+        Route::post('shifts/start', [CurrentShiftActionsController::class, 'start'])
             ->middleware($writeThrottle)
             ->block()
             ->name('api.me.shifts.start');
 
-        Route::post('shifts/end', [ShiftController::class, 'end'])
+        Route::post('shifts/end', [CurrentShiftActionsController::class, 'end'])
             ->middleware($writeThrottle)
             ->block()
             ->name('api.me.shifts.end');
 
-        Route::post('shifts/continue', [ShiftController::class, 'continueMethod'])
+        Route::post('shifts/continue', [CurrentShiftActionsController::class, 'resume'])
             ->middleware($writeThrottle)
             ->block()
             ->name('api.me.shifts.continue');
 
-        Route::post('shifts/remove-break', [ShiftController::class, 'removeBreak'])
+        Route::post('shifts/remove-break', [ShiftBreakController::class, 'destroy'])
             ->middleware($writeThrottle)
             ->block()
             ->name('api.me.shifts.remove-break');

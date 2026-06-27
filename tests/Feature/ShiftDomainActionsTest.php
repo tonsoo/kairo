@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Domain\Shift\Actions\ContinueShift;
 use App\Domain\Shift\Actions\DeleteShift;
 use App\Domain\Shift\Actions\EndShift;
-use App\Domain\Shift\Actions\GetCurrentShiftState;
+use App\Domain\Shift\Actions\ResolveCurrentShiftState;
 use App\Domain\Shift\Actions\RemoveShiftBreak;
 use App\Domain\Shift\Actions\StartShift;
 use App\Domain\Shift\Actions\UpdateShift;
@@ -168,7 +168,7 @@ test('delete shift enforces ownership', function () {
 test('current shift state resolves start end and continue actions', function () {
     $user = User::factory()->create();
 
-    $startState = app(GetCurrentShiftState::class)($user, CarbonImmutable::parse('2026-06-25 08:00', 'America/Sao_Paulo'));
+    $startState = app(ResolveCurrentShiftState::class)($user, CarbonImmutable::parse('2026-06-25 08:00', 'America/Sao_Paulo'));
 
     expect($startState->nextAction)->toBe(CurrentShiftAction::start);
 
@@ -177,7 +177,7 @@ test('current shift state resolves start end and continue actions', function () 
         'ended_at' => null,
     ]);
 
-    $endState = app(GetCurrentShiftState::class)($user, CarbonImmutable::parse('2026-06-25 08:00', 'America/Sao_Paulo'));
+    $endState = app(ResolveCurrentShiftState::class)($user, CarbonImmutable::parse('2026-06-25 08:00', 'America/Sao_Paulo'));
 
     expect($endState->nextAction)->toBe(CurrentShiftAction::end)
         ->and($endState->hasOngoingShift)->toBeTrue();
@@ -189,7 +189,7 @@ test('current shift state resolves start end and continue actions', function () 
         'ended_at' => '2026-06-25 15:00:00',
     ]);
 
-    $continueState = app(GetCurrentShiftState::class)($user, CarbonImmutable::parse('2026-06-25 14:00', 'America/Sao_Paulo'));
+    $continueState = app(ResolveCurrentShiftState::class)($user, CarbonImmutable::parse('2026-06-25 14:00', 'America/Sao_Paulo'));
 
     expect($continueState->nextAction)->toBe(CurrentShiftAction::continue)
         ->and($continueState->hasShiftToday)->toBeTrue();

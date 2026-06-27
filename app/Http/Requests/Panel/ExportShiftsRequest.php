@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\Http;
+namespace App\Http\Requests\Panel;
 
 use App\Domain\Shift\Enums\ShiftExportType;
 use App\Models\User;
@@ -21,7 +21,7 @@ final class ExportShiftsRequest extends FormRequest
     }
 
     /**
-     * @return array<string, ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {

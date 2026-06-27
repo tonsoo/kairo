@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Shift\Actions;
 
-use App\Domain\Shift\Exceptions\ShiftOverlapDetected;
+use App\Domain\Shift\DTOs\ShiftPeriodData;
 use App\Models\Shift;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -14,42 +14,45 @@ final readonly class RemoveShiftBreak
 {
     public function __construct(
         private AssertShiftBreakCanBeRemoved $assertShiftBreakCanBeRemoved,
+        private AssertShiftDoesNotOverlap $assertShiftDoesNotOverlap,
     ) {}
 
     public function __invoke(User $user, Shift $previousShift, Shift $nextShift): Shift
     {
-        ($this->assertShiftBreakCanBeRemoved)($user, $previousShift, $nextShift);
+        return DB::transaction(function () use ($user, $previousShift, $nextShift): Shift {
+            $previousShift = Shift::query()
+                ->whereKey($previousShift->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $mergedStartedAt = $previousShift->started_at->clone();
-        $mergedEndedAt = $nextShift->ended_at?->clone();
+            $nextShift = Shift::query()
+                ->whereKey($nextShift->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $overlapExists = Shift::query()
-            ->where('user_id', $user->id)
-            ->whereNotIn('id', [$previousShift->id, $nextShift->id])
-            ->when(
-                $mergedEndedAt !== null,
-                fn ($query) => $query->where('started_at', '<', $mergedEndedAt->utc()),
-            )
-            ->where(function ($query) use ($mergedStartedAt): void {
-                $query->whereNull('ended_at')
-                    ->orWhere('ended_at', '>', $mergedStartedAt->utc());
-            })
-            ->exists();
+            ($this->assertShiftBreakCanBeRemoved)($user, $previousShift, $nextShift);
 
-        if ($overlapExists) {
-            throw ShiftOverlapDetected::forUser($user->id);
-        }
+            $mergedPeriod = new ShiftPeriodData(
+                startedAt: CarbonImmutable::instance($previousShift->started_at),
+                endedAt: $nextShift->ended_at === null
+                    ? null
+                    : CarbonImmutable::instance($nextShift->ended_at),
+            );
 
-        $mergedShift = DB::transaction(function () use ($previousShift, $nextShift) {
+            ($this->assertShiftDoesNotOverlap)(
+                $user,
+                $mergedPeriod,
+                $previousShift,
+                $nextShift,
+            );
+
             $previousShift->forceFill([
                 'ended_at' => $nextShift->ended_at,
             ])->save();
 
             $nextShift->delete();
 
-            return $previousShift;
+            return $previousShift->fresh();
         });
-
-        return $mergedShift->fresh();
     }
 }

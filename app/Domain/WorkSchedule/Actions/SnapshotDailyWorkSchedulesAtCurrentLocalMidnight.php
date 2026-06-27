@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 final readonly class SnapshotDailyWorkSchedulesAtCurrentLocalMidnight
 {
     public function __construct(
-        private BuildDailyWorkScheduleSnapshot $buildDailyWorkScheduleSnapshot,
+        private CreateDailyWorkScheduleSnapshot $createDailyWorkScheduleSnapshot,
     ) {}
 
     public function __invoke(?CarbonImmutable $referenceMoment = null): int
@@ -30,7 +30,7 @@ final readonly class SnapshotDailyWorkSchedulesAtCurrentLocalMidnight
                         continue;
                     }
 
-                    if (($this->buildDailyWorkScheduleSnapshot)($user, $localMoment->startOfDay()) !== null) {
+                    if (($this->createDailyWorkScheduleSnapshot)($user, $localMoment->startOfDay()) !== null) {
                         $snapshotUsers++;
                     }
                 }

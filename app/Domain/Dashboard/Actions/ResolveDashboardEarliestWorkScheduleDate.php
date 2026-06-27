@@ -4,26 +4,25 @@ declare(strict_types=1);
 
 namespace App\Domain\Dashboard\Actions;
 
-use App\Models\Shift;
 use App\Models\User;
+use App\Models\WorkSchedule;
 use Carbon\CarbonImmutable;
 
-final readonly class GetDashboardEarliestShiftDate
+final readonly class ResolveDashboardEarliestWorkScheduleDate
 {
     public function __invoke(User $user, string $timezone): ?CarbonImmutable
     {
-        $shift = Shift::query()
-            ->select('started_at')
+        $workSchedule = WorkSchedule::query()
+            ->select('effective_from')
             ->where('user_id', $user->id)
-            ->orderBy('started_at')
+            ->orderBy('effective_from')
             ->first();
 
-        if ($shift === null) {
+        if ($workSchedule === null) {
             return null;
         }
 
-        return $shift->started_at
-            ->toImmutable()
+        return CarbonImmutable::instance($workSchedule->effective_from)
             ->setTimezone($timezone)
             ->startOfDay();
     }

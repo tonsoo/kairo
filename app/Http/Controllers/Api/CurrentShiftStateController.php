@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
-use App\Domain\Shift\Actions\GetCurrentShiftState;
+use App\Domain\Shift\Actions\ResolveCurrentShiftState;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\CurrentShiftStateRequest;
 use App\Http\Resources\CurrentShiftStateJson;
@@ -15,7 +15,7 @@ final class CurrentShiftStateController extends Controller
 {
     public function __invoke(
         CurrentShiftStateRequest $request,
-        GetCurrentShiftState $getCurrentShiftState,
+        ResolveCurrentShiftState $getCurrentShiftState,
     ): CurrentShiftStateJson {
         /** @var User $user */
         $user = $request->user();

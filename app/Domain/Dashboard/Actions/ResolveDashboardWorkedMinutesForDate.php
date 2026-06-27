@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace App\Domain\Dashboard\Actions;
 
+use App\Domain\Shift\Actions\ResolveShiftOverlapPeriod;
 use App\Models\Shift;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
-final readonly class GetDashboardWorkedMinutesForDate
+final readonly class ResolveDashboardWorkedMinutesForDate
 {
+    public function __construct(
+        private ResolveShiftOverlapPeriod $resolveShiftOverlapPeriod,
+    ) {}
+
     /**
      * @param  Collection<int, Shift>  $shifts
      */
@@ -25,19 +30,13 @@ final readonly class GetDashboardWorkedMinutesForDate
         $rangeEnd = $referenceMoment->lt($dayEnd) ? $referenceMoment : $dayEnd;
 
         return $shifts->sum(function (Shift $shift) use ($dayStart, $rangeEnd): int {
-            $startedAt = $shift->started_at->toImmutable()->setTimezone($dayStart->timezone);
-            $endedAt = $shift->ended_at === null
-                ? $rangeEnd
-                : $shift->ended_at->toImmutable()->setTimezone($dayStart->timezone);
+            $overlap = ($this->resolveShiftOverlapPeriod)($shift, $dayStart, $rangeEnd);
 
-            $overlapStart = $startedAt->greaterThan($dayStart) ? $startedAt : $dayStart;
-            $overlapEnd = $endedAt->lessThan($rangeEnd) ? $endedAt : $rangeEnd;
-
-            if ($overlapEnd->lte($overlapStart)) {
+            if ($overlap->end->lte($overlap->start)) {
                 return 0;
             }
 
-            return (int) $overlapStart->diffInMinutes($overlapEnd);
+            return (int) $overlap->start->diffInMinutes($overlap->end);
         });
     }
 }

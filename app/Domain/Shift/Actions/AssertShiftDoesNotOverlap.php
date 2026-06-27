@@ -11,23 +11,28 @@ use App\Models\User;
 
 final readonly class AssertShiftDoesNotOverlap
 {
-    public function __invoke(User $user, ShiftPeriodData $period, ?Shift $ignoredShift = null): void
+    public function __invoke(User $user, ShiftPeriodData $period, Shift ...$ignoredShifts): void
     {
         $startedAt = $period->startedAt->utc();
         $endedAt = $period->endedAt?->utc();
 
+        $ignoredShiftIds = collect($ignoredShifts)
+            ->map(fn (Shift $shift) => $shift->getKey())
+            ->all();
+
         $overlapExists = Shift::query()
-            ->where('user_id', $user->id)
+            ->whereBelongsTo($user)
             ->when(
-                $ignoredShift !== null,
-                fn ($query) => $query->whereKeyNot($ignoredShift->getKey())
+                $ignoredShiftIds !== [],
+                fn ($query) => $query->whereKeyNot($ignoredShiftIds),
             )
             ->when(
                 $endedAt !== null,
-                fn ($query) => $query->where('started_at', '<', $endedAt)
+                fn ($query) => $query->where('started_at', '<', $endedAt),
             )
-            ->where(function ($query) use ($startedAt) {
-                $query->whereNull('ended_at')
+            ->where(function ($query) use ($startedAt): void {
+                $query
+                    ->whereNull('ended_at')
                     ->orWhere('ended_at', '>', $startedAt);
             })
             ->exists();

@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\WorkSchedule;
 use Carbon\CarbonImmutable;
 
-final readonly class GetEffectiveWorkScheduleForDate
+final readonly class FindEffectiveWorkScheduleForDate
 {
     public function __invoke(User $user, CarbonImmutable $date): ?WorkSchedule
     {

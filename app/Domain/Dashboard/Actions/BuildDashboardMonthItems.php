@@ -17,13 +17,15 @@ final readonly class BuildDashboardMonthItems
     public function __invoke(Collection $days): Collection
     {
         return $days
-            ->map(fn (DashboardDayData $day) => new DashboardPeriodItemData(
-                date: $day->date,
-                workedMinutes: $day->workedMinutes,
-                regularMinutes: $day->regularMinutes,
-                extraMinutes: $day->extraMinutes,
-                missingMinutes: $day->missingMinutes,
-            ))
+            ->map(
+                fn (DashboardDayData $day) => new DashboardPeriodItemData(
+                    date: $day->date,
+                    workedMinutes: $day->workedMinutes,
+                    regularMinutes: $day->regularMinutes,
+                    extraMinutes: $day->extraMinutes,
+                    missingMinutes: $day->missingMinutes,
+                )
+            )
             ->values();
     }
 }

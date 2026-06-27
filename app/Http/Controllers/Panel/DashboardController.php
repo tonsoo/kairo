@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Http;
+namespace App\Http\Controllers\Panel;
 
 use App\Domain\Shift\Actions\ListShiftExportFormats;
 use App\Domain\Shift\DTOs\ShiftExportFormatData;

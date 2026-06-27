@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Shift\Actions;
 
-use App\Domain\Dashboard\Actions\ListDashboardDailyDataForPeriod;
+use App\Domain\Dashboard\Actions\BuildDashboardDaysForPeriod;
 use App\Domain\Dashboard\DTOs\DashboardDayData;
 use App\Domain\Shift\DTOs\ShiftExportData;
 use App\Domain\Shift\DTOs\ShiftExportDayData;
@@ -14,7 +14,7 @@ use Carbon\CarbonImmutable;
 final readonly class BuildShiftExportData
 {
     public function __construct(
-        private ListDashboardDailyDataForPeriod $listDashboardDailyDataForPeriod,
+        private BuildDashboardDaysForPeriod $listDashboardDailyDataForPeriod,
     ) {}
 
     public function __invoke(

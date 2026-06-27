@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Domain\WorkSchedule\Actions\BuildDailyWorkScheduleSnapshot;
-use App\Domain\WorkSchedule\Actions\GetEffectiveWorkScheduleForDate;
+use App\Domain\WorkSchedule\Actions\CreateDailyWorkScheduleSnapshot;
+use App\Domain\WorkSchedule\Actions\FindEffectiveWorkScheduleForDate;
 use App\Domain\WorkSchedule\Actions\SnapshotDailyWorkSchedulesAtCurrentLocalMidnight;
 use App\Domain\WorkSchedule\Actions\SnapshotDailyWorkSchedulesForDate;
 use App\Domain\WorkSchedule\Actions\UpsertWorkSchedule;
@@ -97,7 +97,7 @@ test('effective work schedule picks the latest schedule version for the date', f
     app(UpsertWorkSchedule::class)($user, WorkScheduleData::totalTime(1, 420, CarbonImmutable::parse('2026-06-01', 'UTC')));
     $latestSchedule = app(UpsertWorkSchedule::class)($user, WorkScheduleData::totalTime(1, 480, CarbonImmutable::parse('2026-06-15', 'UTC')));
 
-    $resolvedSchedule = app(GetEffectiveWorkScheduleForDate::class)($user, CarbonImmutable::parse('2026-06-22', 'UTC'));
+    $resolvedSchedule = app(FindEffectiveWorkScheduleForDate::class)($user, CarbonImmutable::parse('2026-06-22', 'UTC'));
 
     expect($resolvedSchedule?->is($latestSchedule))->toBeTrue();
 });
@@ -112,7 +112,7 @@ test('build daily work schedule snapshot mirrors the effective schedule', functi
         CarbonImmutable::parse('2026-06-01', 'America/Sao_Paulo'),
     ));
 
-    $snapshot = app(BuildDailyWorkScheduleSnapshot::class)($user, CarbonImmutable::parse('2026-06-25', 'America/Sao_Paulo'));
+    $snapshot = app(CreateDailyWorkScheduleSnapshot::class)($user, CarbonImmutable::parse('2026-06-25', 'America/Sao_Paulo'));
 
     expect($snapshot)->not->toBeNull()
         ->and($snapshot?->work_schedule_id)->toBe($workSchedule->id)
@@ -139,7 +139,7 @@ test('build daily work schedule snapshot does not overwrite an existing snapshot
         'ends_at' => null,
     ]);
 
-    $snapshot = app(BuildDailyWorkScheduleSnapshot::class)($user, CarbonImmutable::parse('2026-06-25', 'UTC'));
+    $snapshot = app(CreateDailyWorkScheduleSnapshot::class)($user, CarbonImmutable::parse('2026-06-25', 'UTC'));
 
     expect($snapshot?->is($existingSnapshot))->toBeTrue();
 

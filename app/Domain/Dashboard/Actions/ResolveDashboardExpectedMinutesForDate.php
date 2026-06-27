@@ -9,7 +9,7 @@ use App\Models\WorkSchedule;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
-final readonly class GetDashboardExpectedMinutesForDate
+final readonly class ResolveDashboardExpectedMinutesForDate
 {
     /**
      * @param  Collection<string, DailyWorkSchedule>  $dailyWorkSchedulesByDate
@@ -26,22 +26,26 @@ final readonly class GetDashboardExpectedMinutesForDate
             return $dailyWorkSchedule->expected_minutes;
         }
 
+        /** @var Collection<int, WorkSchedule>|null $weekdaySchedules */
         $weekdaySchedules = $workSchedulesByWeekday->get($date->dayOfWeekIso);
 
-        if (! $weekdaySchedules instanceof Collection) {
-            return 0;
-        }
+        return $weekdaySchedules
+            ? $this->expectedMinutesFromWorkSchedules($weekdaySchedules, $date)
+            : 0;
+    }
 
+    /**
+     * @param  Collection<int, WorkSchedule>  $workSchedules
+     */
+    private function expectedMinutesFromWorkSchedules(Collection $workSchedules, CarbonImmutable $date): int
+    {
         /** @var WorkSchedule|null $workSchedule */
-        $workSchedule = $weekdaySchedules
-            ->last(
-                fn (WorkSchedule $workSchedule) => $workSchedule->effective_from->toImmutable()->lte($date->startOfDay())
-            );
+        $workSchedule = $workSchedules->last(
+            fn (WorkSchedule $workSchedule): bool => $workSchedule->effective_from
+                ->toImmutable()
+                ->lte($date->startOfDay()),
+        );
 
-        if (! $workSchedule instanceof WorkSchedule) {
-            return 0;
-        }
-
-        return $workSchedule->expected_minutes;
+        return $workSchedule?->expected_minutes ?? 0;
     }
 }

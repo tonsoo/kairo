@@ -18,7 +18,7 @@ final readonly class BuildDashboardSemesterItems
     {
         return $days
             ->groupBy(fn (DashboardDayData $day) => $day->date->startOfMonth()->toDateString())
-            ->map(function (Collection $monthDays): DashboardPeriodItemData {
+            ->map(function (Collection $monthDays) {
                 /** @var DashboardDayData $firstDay */
                 $firstDay = $monthDays->first();
 
