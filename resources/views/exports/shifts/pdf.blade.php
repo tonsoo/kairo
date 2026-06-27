@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="{{ str_replace("_", "-", app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <style>
@@ -228,9 +228,9 @@
             <tbody>
                 @foreach ($dayRows as $day)
                     <tr>
-                        <td class="weekday-cell">{{ $day['weekday'] }}</td>
-                        <td class="date-cell mono">{{ $day['date'] }}</td>
-                        <td class="hours-cell mono">{{ $day['duration'] }}</td>
+                        <td class="weekday-cell">{{ $day->weekdayLabel() }}</td>
+                        <td class="date-cell mono">{{ $day->dateAsDM() }}</td>
+                        <td class="hours-cell mono">{{ $day->durationAsReadableHours() }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -239,10 +239,10 @@
         <div class="summary-wrapper">
             <table class="summary-table">
                 <tbody>
-                    @foreach ($summaryRows as $summary)
-                        <tr class="{{ $summary['is_total'] ? 'summary-total' : '' }}">
-                            <td class="summary-label">{{ $summary['label'] }}</td>
-                            <td class="summary-value mono">{{ $summary['duration'] }}</td>
+                    @foreach ($summaryRows as $label => $duration)
+                        <tr class="{{ $loop->first ? 'summary-total' : '' }}">
+                            <td class="summary-label">{{ $label }}</td>
+                            <td class="summary-value mono">{{ $duration }}</td>
                         </tr>
                     @endforeach
                 </tbody>

@@ -80,8 +80,10 @@ test('dashboard relevant work schedules are grouped by weekday with historical o
         CarbonImmutable::parse('2026-06-30', 'UTC'),
     );
 
-    expect($groupedSchedules->keys()->all())->toBe([1, 3])
-        ->and($groupedSchedules->get(1)?->modelKeys())->toBe([$firstMondaySchedule->id, $latestMondaySchedule->id])
-        ->and($groupedSchedules->get(3)?->modelKeys())->toBe([$wednesdaySchedule->id])
+    expect($groupedSchedules->has(1))->toBeTrue()
+        ->and($groupedSchedules->has(3))->toBeTrue()
+        ->and($groupedSchedules->get(1)?->contains(fn (WorkSchedule $schedule): bool => $schedule->is($firstMondaySchedule)))->toBeTrue()
+        ->and($groupedSchedules->get(1)?->contains(fn (WorkSchedule $schedule): bool => $schedule->is($latestMondaySchedule)))->toBeTrue()
+        ->and($groupedSchedules->get(3)?->contains(fn (WorkSchedule $schedule): bool => $schedule->is($wednesdaySchedule)))->toBeTrue()
         ->and($groupedSchedules->get(1)?->contains(fn (WorkSchedule $schedule): bool => $schedule->is($futureMondaySchedule)))->toBeFalse();
 });

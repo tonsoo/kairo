@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Shift\Actions;
 
 use App\Domain\Shift\DTOs\ShiftExportFormatData;
-use App\Repositories\ShiftExportRegistry;
+use App\Repositories\ShiftExport\ShiftExportRegistry;
 
 final readonly class ListShiftExportFormats
 {

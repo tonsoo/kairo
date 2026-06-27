@@ -9,7 +9,7 @@ use App\Domain\Shift\Enums\ShiftExportType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Http\ExportShiftsRequest;
 use App\Models\User;
-use App\Repositories\ShiftExportRegistry;
+use App\Repositories\ShiftExport\ShiftExportRegistry;
 use App\Support\Parsing\DateParser;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -42,7 +42,7 @@ final class ShiftExportController extends Controller
             $timezone,
         );
 
-        $content = $repository->export($exportData, app()->getLocale());
+        $content = $repository->export($exportData);
         $filename = sprintf(
             'shifts-%s_%s.%s',
             $startsAt->format('Y-m-d'),

@@ -2,15 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\Repositories;
+namespace App\Repositories\ShiftExport;
 
 use App\Domain\Shift\DTOs\ShiftExportData;
+use App\Domain\Shift\DTOs\ShiftExportDayData;
 use App\Domain\Shift\Enums\ShiftExportType;
-use App\Support\Exports\ShiftExportFormatter;
+use App\Traits\UsesShiftExportSummaryRows;
+use League\Csv\CannotInsertRecord;
+use League\Csv\Exception;
 use League\Csv\Writer;
 
 final class CsvShiftExportRepository implements ShiftExportRepository
 {
+    use UsesShiftExportSummaryRows;
+
     public function type(): ShiftExportType
     {
         return ShiftExportType::Csv;
@@ -31,25 +36,30 @@ final class CsvShiftExportRepository implements ShiftExportRepository
         return 'text/csv; charset=UTF-8';
     }
 
-    public function export(ShiftExportData $data, string $locale): string
+    /**
+     * @throws CannotInsertRecord
+     * @throws Exception
+     */
+    public function export(ShiftExportData $data): string
     {
-        $writer = Writer::createFromString();
+        $writer = Writer::fromString();
 
-        foreach (ShiftExportFormatter::buildDayRows($data, $locale) as $day) {
+        foreach ($data->days as $day) {
+            /** @var ShiftExportDayData $day */
             $writer->insertOne([
-                $day['weekday'],
-                $day['date'],
-                $day['duration'],
+                $day->weekdayLabel(),
+                $day->dateAsDM(),
+                $day->durationAsReadableHours(),
             ]);
         }
 
         $writer->insertOne([]);
 
-        foreach (ShiftExportFormatter::buildSummaryRows($data, $locale) as $summary) {
+        foreach (self::buildSummaryRows($data) as $label => $duration) {
             $writer->insertOne([
                 '',
-                $summary['label'],
-                $summary['duration'],
+                $label,
+                $duration,
             ]);
         }
 

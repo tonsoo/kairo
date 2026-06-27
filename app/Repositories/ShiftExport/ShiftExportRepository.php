@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Repositories;
+namespace App\Repositories\ShiftExport;
 
 use App\Domain\Shift\DTOs\ShiftExportData;
 use App\Domain\Shift\Enums\ShiftExportType;
@@ -17,5 +17,5 @@ interface ShiftExportRepository
 
     public function mimeType(): string;
 
-    public function export(ShiftExportData $data, string $locale): string;
+    public function export(ShiftExportData $data): string;
 }

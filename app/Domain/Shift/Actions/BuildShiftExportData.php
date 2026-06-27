@@ -30,6 +30,9 @@ final readonly class BuildShiftExportData
             $endsAt,
             $referenceMoment,
         )
+            ->filter(
+                fn (DashboardDayData $day) => $day->workedMinutes > 0,
+            )
             ->map(fn (DashboardDayData $day) => new ShiftExportDayData(
                 date: $day->date,
                 workedMinutes: $day->workedMinutes,

@@ -114,7 +114,7 @@ test('authenticated users can download an xlsx shift export', function () {
     $spreadsheet = (new XlsxReader())->load($path);
     $sheet = $spreadsheet->getActiveSheet();
 
-    expect($sheet->getCell('A1')->getValue())->toBe('Exportacao de horas')
+    expect($sheet->getCell('A1')->getValue())->toBe('Exportação de horas')
         ->and($sheet->getCell('A5')->getValue())->toBe('Dia')
         ->and($sheet->getCell('A6')->getValue())->toBe('SEG')
         ->and($sheet->getCell('B6')->getValue())->toBe('04/05')

@@ -4,10 +4,10 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Observers\UserObserver;
-use App\Repositories\CsvShiftExportRepository;
-use App\Repositories\PdfShiftExportRepository;
-use App\Repositories\ShiftExportRegistry;
-use App\Repositories\XlsxShiftExportRepository;
+use App\Repositories\ShiftExport\CsvShiftExportRepository;
+use App\Repositories\ShiftExport\PdfShiftExportRepository;
+use App\Repositories\ShiftExport\ShiftExportRegistry;
+use App\Repositories\ShiftExport\XlsxShiftExportRepository;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;

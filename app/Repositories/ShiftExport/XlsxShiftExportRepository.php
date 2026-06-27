@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Repositories;
+namespace App\Repositories\ShiftExport;
 
 use App\Domain\Shift\DTOs\ShiftExportData;
+use App\Domain\Shift\DTOs\ShiftExportDayData;
 use App\Domain\Shift\Enums\ShiftExportType;
-use App\Support\Exports\ShiftExportFormatter;
+use App\Traits\UsesShiftExportLabels;
+use App\Traits\UsesShiftExportSummaryRows;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -17,6 +19,8 @@ use RuntimeException;
 
 final class XlsxShiftExportRepository implements ShiftExportRepository
 {
+    use UsesShiftExportLabels, UsesShiftExportSummaryRows;
+
     public function type(): ShiftExportType
     {
         return ShiftExportType::Xlsx;
@@ -37,39 +41,40 @@ final class XlsxShiftExportRepository implements ShiftExportRepository
         return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     }
 
-    public function export(ShiftExportData $data, string $locale): string
+    public function export(ShiftExportData $data): string
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
 
-        $sheet->setTitle(ShiftExportFormatter::sheetName($locale));
+        $sheet->setTitle(self::exportSheetName());
 
         $sheet->mergeCells('A1:C1');
-        $sheet->setCellValueExplicit('A1', ShiftExportFormatter::title($locale), DataType::TYPE_STRING);
+        $sheet->setCellValueExplicit('A1', self::exportTitle(), DataType::TYPE_STRING);
         $sheet->mergeCells('A2:C2');
-        $sheet->setCellValueExplicit('A2', ShiftExportFormatter::periodLabel($data, $locale), DataType::TYPE_STRING);
+        $sheet->setCellValueExplicit('A2', self::exportPeriodLabel($data), DataType::TYPE_STRING);
         $sheet->mergeCells('A3:C3');
-        $sheet->setCellValueExplicit('A3', ShiftExportFormatter::timezoneLabel($data, $locale), DataType::TYPE_STRING);
+        $sheet->setCellValueExplicit('A3', self::exportTimezoneLabel($data), DataType::TYPE_STRING);
 
-        $headings = ShiftExportFormatter::headings($locale);
+        $headings = self::exportHeadings();
         $sheet->setCellValueExplicit('A5', $headings['weekday'], DataType::TYPE_STRING);
         $sheet->setCellValueExplicit('B5', $headings['date'], DataType::TYPE_STRING);
         $sheet->setCellValueExplicit('C5', $headings['duration'], DataType::TYPE_STRING);
 
         $row = 6;
 
-        foreach (ShiftExportFormatter::buildDayRows($data, $locale) as $day) {
-            $sheet->setCellValueExplicit("A{$row}", $day['weekday'], DataType::TYPE_STRING);
-            $sheet->setCellValueExplicit("B{$row}", $day['date'], DataType::TYPE_STRING);
-            $sheet->setCellValueExplicit("C{$row}", $day['duration'], DataType::TYPE_STRING);
+        foreach ($data->days as $day) {
+            /** @var ShiftExportDayData $day */
+            $sheet->setCellValueExplicit("A{$row}", $day->weekdayLabel(), DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit("B{$row}", $day->dateAsDM(), DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit("C{$row}", $day->durationAsReadableHours(), DataType::TYPE_STRING);
             $row++;
         }
 
         $row++;
 
-        foreach (ShiftExportFormatter::buildSummaryRows($data, $locale) as $summary) {
-            $sheet->setCellValueExplicit("B{$row}", $summary['label'], DataType::TYPE_STRING);
-            $sheet->setCellValueExplicit("C{$row}", $summary['duration'], DataType::TYPE_STRING);
+        foreach (self::buildSummaryRows($data) as $label => $duration) {
+            $sheet->setCellValueExplicit("B{$row}", $label, DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit("C{$row}", $duration, DataType::TYPE_STRING);
             $row++;
         }
 
@@ -85,9 +90,9 @@ final class XlsxShiftExportRepository implements ShiftExportRepository
                 'startColor' => ['rgb' => '0F766E'],
             ],
         ]);
-        $sheet->getStyle("A5:C".($row - 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-        $sheet->getStyle("C6:C".($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle("A5:C".($row - 1))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle('A5:C'.($row - 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('C6:C'.($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('A5:C'.($row - 1))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
 
         $sheet->getColumnDimension('A')->setWidth(12);
         $sheet->getColumnDimension('B')->setWidth(14);
