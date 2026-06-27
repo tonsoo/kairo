@@ -5,18 +5,21 @@ declare(strict_types=1);
 namespace App\Domain\Dashboard\Actions;
 
 use App\Domain\Dashboard\DTOs\DashboardDayData;
+use App\Models\DailyWorkSchedule;
+use App\Models\Shift;
 use App\Models\User;
+use App\Models\WorkSchedule;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
 final readonly class BuildDashboardDaysForPeriod
 {
     public function __construct(
-        private ListDashboardRelevantShiftsForPeriod             $listDashboardRelevantShiftsForPeriod,
+        private ListDashboardRelevantShiftsForPeriod $listDashboardRelevantShiftsForPeriod,
         private ListDashboardRelevantDailyWorkSchedulesForPeriod $listDashboardRelevantDailyWorkSchedulesForPeriod,
-        private ListDashboardRelevantWorkSchedulesForPeriod      $listDashboardRelevantWorkSchedulesForPeriod,
-        private ResolveDashboardExpectedMinutesForDate           $getDashboardExpectedMinutesForDate,
-        private ResolveDashboardWorkedMinutesForDate             $getDashboardWorkedMinutesForDate,
+        private ListDashboardRelevantWorkSchedulesForPeriod $listDashboardRelevantWorkSchedulesForPeriod,
+        private ResolveDashboardExpectedMinutesForDate $getDashboardExpectedMinutesForDate,
+        private ResolveDashboardWorkedMinutesForDate $getDashboardWorkedMinutesForDate,
     ) {}
 
     /**
@@ -31,14 +34,20 @@ final readonly class BuildDashboardDaysForPeriod
         $periodStart = $startsAt->startOfDay();
         $periodEnd = $endsAt->startOfDay();
 
+        /** @var Collection<int, Shift> $shifts */
         $shifts = ($this->listDashboardRelevantShiftsForPeriod)($user, $periodStart, $periodEnd);
 
+        /** @var Collection<string, DailyWorkSchedule> $dailyWorkSchedulesByDate */
         $dailyWorkSchedulesByDate = ($this->listDashboardRelevantDailyWorkSchedulesForPeriod)($user, $periodStart, $periodEnd)
-            ->keyBy(fn ($schedule) => $schedule->date->toDateString());
+            ->keyBy(fn (DailyWorkSchedule $schedule) => $schedule->date->toDateString());
 
+        /** @var Collection<int, Collection<int, WorkSchedule>> $workSchedulesByWeekday */
         $workSchedulesByWeekday = ($this->listDashboardRelevantWorkSchedulesForPeriod)($user, $periodEnd);
 
-        return collect($periodStart->daysUntil($periodEnd->addDay()))
+        /** @var list<CarbonImmutable> $dates */
+        $dates = iterator_to_array($periodStart->daysUntil($periodEnd->addDay()), false);
+
+        return collect($dates)
             ->map(
                 fn (CarbonImmutable $date) => $this->buildDayData(
                     shifts: $shifts,
@@ -52,9 +61,9 @@ final readonly class BuildDashboardDaysForPeriod
     }
 
     /**
-     * @param  Collection<int, mixed>  $shifts
-     * @param  Collection<string, mixed>  $dailyWorkSchedulesByDate
-     * @param  Collection<int, mixed>  $workSchedulesByWeekday
+     * @param  Collection<int, Shift>  $shifts
+     * @param  Collection<string, DailyWorkSchedule>  $dailyWorkSchedulesByDate
+     * @param  Collection<int, Collection<int, WorkSchedule>>  $workSchedulesByWeekday
      */
     private function buildDayData(
         Collection $shifts,

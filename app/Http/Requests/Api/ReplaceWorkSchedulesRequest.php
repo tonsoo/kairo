@@ -6,7 +6,6 @@ namespace App\Http\Requests\Api;
 
 use App\Domain\WorkSchedule\Enums\WorkScheduleType;
 use App\Support\Parsing\DateParser;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -19,7 +18,7 @@ final class ReplaceWorkSchedulesRequest extends FormRequest
     }
 
     /**
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, list<mixed>>
      */
     public function rules(): array
     {

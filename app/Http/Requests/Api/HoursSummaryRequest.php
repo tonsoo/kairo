@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Support\Parsing\DateParser;
 use Carbon\CarbonImmutable;
 use DateTimeInterface;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -21,7 +20,7 @@ final class HoursSummaryRequest extends FormRequest
     }
 
     /**
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, list<mixed>>
      */
     public function rules(): array
     {

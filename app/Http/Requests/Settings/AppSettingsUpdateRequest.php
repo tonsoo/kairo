@@ -15,7 +15,7 @@ final class AppSettingsUpdateRequest extends FormRequest
     }
 
     /**
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, list<mixed>>
      */
     public function rules(): array
     {

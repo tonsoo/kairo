@@ -46,6 +46,10 @@ final readonly class ResolveDashboardExpectedMinutesForDate
                 ->lte($date->startOfDay()),
         );
 
-        return $workSchedule?->expected_minutes ?? 0;
+        if ($workSchedule === null) {
+            return 0;
+        }
+
+        return $workSchedule->expected_minutes;
     }
 }
