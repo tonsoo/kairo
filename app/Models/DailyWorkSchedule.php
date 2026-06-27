@@ -45,7 +45,7 @@ class DailyWorkSchedule extends Model
     }
 
     /**
-     * Get the user that owns the daily work schedule.
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -53,7 +53,7 @@ class DailyWorkSchedule extends Model
     }
 
     /**
-     * Get the work schedule version used to create this daily snapshot.
+     * @return BelongsTo<WorkSchedule, $this>
      */
     public function workSchedule(): BelongsTo
     {

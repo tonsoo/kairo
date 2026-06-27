@@ -16,10 +16,10 @@ final readonly class BuildDashboardBalanceData
     public function __invoke(Collection $days): DashboardBalanceData
     {
         $positiveMinutes = $days->sum(
-            fn (DashboardDayData $day): int => $day->extraMinutes,
+            fn (DashboardDayData $day) => $day->extraMinutes,
         );
         $negativeMinutes = $days->sum(
-            fn (DashboardDayData $day): int => $day->missingMinutes,
+            fn (DashboardDayData $day) => $day->missingMinutes,
         );
 
         return new DashboardBalanceData(

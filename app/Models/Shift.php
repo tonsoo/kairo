@@ -38,7 +38,7 @@ class Shift extends Model
     }
 
     /**
-     * Get the user that owns the shift.
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -47,6 +47,9 @@ class Shift extends Model
 
     /**
      * Scope a query to ongoing shifts.
+     *
+     * @param  Builder<Shift>  $query
+     * @return Builder<Shift>
      */
     public function scopeOngoing(Builder $query): Builder
     {
@@ -55,6 +58,9 @@ class Shift extends Model
 
     /**
      * Scope a query to completed shifts.
+     *
+     * @param  Builder<Shift>  $query
+     * @return Builder<Shift>
      */
     public function scopeCompleted(Builder $query): Builder
     {

@@ -60,7 +60,7 @@ class User extends Authenticatable implements PasskeyUser
     }
 
     /**
-     * Get the work schedules for the user.
+     * @return HasMany<WorkSchedule, $this>
      */
     public function workSchedules(): HasMany
     {
@@ -68,7 +68,7 @@ class User extends Authenticatable implements PasskeyUser
     }
 
     /**
-     * Get the daily work schedules for the user.
+     * @return HasMany<DailyWorkSchedule, $this>
      */
     public function dailyWorkSchedules(): HasMany
     {
@@ -76,7 +76,7 @@ class User extends Authenticatable implements PasskeyUser
     }
 
     /**
-     * Get the shifts for the user.
+     * @return HasMany<Shift, $this>
      */
     public function shifts(): HasMany
     {

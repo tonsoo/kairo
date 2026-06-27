@@ -16,12 +16,18 @@ final readonly class ListDashboardRelevantWorkSchedulesForPeriod
      */
     public function __invoke(User $user, CarbonImmutable $endsAt): Collection
     {
-        return WorkSchedule::query()
+        /** @var Collection<int, Collection<int, WorkSchedule>> $workSchedules */
+        $workSchedules = WorkSchedule::query()
             ->where('user_id', $user->id)
             ->whereDate('effective_from', '<=', $endsAt->startOfDay())
             ->orderBy('effective_from')
             ->get()
-            ->groupBy('weekday')
-            ->map(fn (Collection $workSchedules) => $workSchedules->values());
+            ->groupBy(fn (WorkSchedule $workSchedule): int => (int) $workSchedule->weekday)
+            ->map(
+                /** @param Collection<int, WorkSchedule> $workSchedules */
+                fn (Collection $workSchedules): Collection => $workSchedules->values(),
+            );
+
+        return $workSchedules;
     }
 }

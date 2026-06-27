@@ -6,20 +6,21 @@ namespace App\Support\Exports;
 
 use App\Domain\Shift\DTOs\ShiftExportData;
 use App\Domain\Shift\DTOs\ShiftExportDayData;
+use LogicException;
 
 final class ShiftExportFormatter
 {
     /**
-     * @return list<array{weekday: string, date: string, duration: string}>
+     * @return array<array{weekday: string, date: string, duration: string}>
      */
     public static function buildDayRows(ShiftExportData $data, string $locale): array
     {
         return $data->days
             ->filter(
-                fn (ShiftExportDayData $day): bool => $day->workedMinutes > 0 || $day->expectedMinutes > 0,
+                fn (ShiftExportDayData $day) => $day->workedMinutes > 0 || $day->expectedMinutes > 0,
             )
             ->map(
-                fn (ShiftExportDayData $day): array => [
+                fn (ShiftExportDayData $day) => [
                     'weekday' => self::weekdayLabel($day->date->dayOfWeekIso, $locale),
                     'date' => $day->date->format('d/m'),
                     'duration' => self::formatDuration($day->workedMinutes),
@@ -130,6 +131,7 @@ final class ShiftExportFormatter
                 5 => 'SEX',
                 6 => 'SAB',
                 7 => 'DOM',
+                default => throw new LogicException(sprintf('Unsupported ISO weekday [%d].', $weekday)),
             },
             default => match ($weekday) {
                 1 => 'MON',
@@ -139,6 +141,7 @@ final class ShiftExportFormatter
                 5 => 'FRI',
                 6 => 'SAT',
                 7 => 'SUN',
+                default => throw new LogicException(sprintf('Unsupported ISO weekday [%d].', $weekday)),
             },
         };
     }
@@ -151,12 +154,14 @@ final class ShiftExportFormatter
                 'regular' => 'Normais',
                 'extra' => 'Extras',
                 'missing' => 'Faltando',
+                default => throw new LogicException(sprintf('Unsupported summary key [%s].', $key)),
             },
             default => match ($key) {
                 'total' => 'TOTAL',
                 'regular' => 'Regular',
                 'extra' => 'Extra',
                 'missing' => 'Missing',
+                default => throw new LogicException(sprintf('Unsupported summary key [%s].', $key)),
             },
         };
     }

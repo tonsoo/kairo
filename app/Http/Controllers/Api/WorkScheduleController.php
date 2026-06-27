@@ -52,6 +52,18 @@ final class WorkScheduleController extends Controller
         /** @var User $user */
         $user = $request->user();
 
+        /**
+         * @var array{
+         *      effective_from: string,
+         *      schedules: array<int, array{
+         *          weekday: int,
+         *          type: string,
+         *          expected_minutes?: int|null,
+         *          starts_at?: string|null,
+         *          ends_at?: string|null
+         *      }>
+         * } $validated
+         */
         $validated = $request->validated();
 
         $replaceWorkSchedulesData = ($buildReplaceWorkSchedulesData)($user, $validated);

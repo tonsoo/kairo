@@ -68,7 +68,7 @@ final class DateParser
             throw new LogicException(sprintf('Validated %s value could not be parsed.', $field));
         }
 
-        if ($dateTime === false) {
+        if (! $dateTime instanceof CarbonImmutable) {
             throw new LogicException(sprintf('Validated %s value could not be parsed.', $field));
         }
 

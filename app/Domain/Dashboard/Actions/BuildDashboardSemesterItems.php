@@ -38,6 +38,7 @@ final readonly class BuildDashboardSemesterItems
                     ),
                 );
             })
-            ->values();
+            ->values()
+            ->collect();
     }
 }

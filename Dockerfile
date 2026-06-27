@@ -7,16 +7,17 @@ COPY php.ini /usr/local/etc/php/conf.d/99-custom.ini
 RUN --mount=type=bind,from=mlocati/php-extension-installer:latest,source=/usr/bin/install-php-extensions,target=/usr/local/bin/install-php-extensions \
     install-php-extensions \
     intl pdo_mysql pgsql zip bcmath exif gd opcache pcntl sockets \
+    dom mbstring simplexml xml xmlreader xmlwriter \
     && rm -rf /var/cache/apk/* /tmp/*
 
-FROM dunglas/frankenphp:php8.4-alpine AS builder
+FROM base AS builder
 
 WORKDIR /app
 
 RUN apk add --no-cache nodejs npm git unzip
 
 RUN --mount=type=bind,from=mlocati/php-extension-installer:latest,source=/usr/bin/install-php-extensions,target=/usr/local/bin/install-php-extensions \
-    install-php-extensions @composer intl zip dom fileinfo tokenizer session
+    install-php-extensions @composer
 
 # Copy dependency manifests first
 COPY composer.json composer.lock ./
@@ -37,8 +38,6 @@ RUN --mount=type=cache,target=/root/.npm \
 
 # Copy the rest of the application only now
 COPY . .
-
-RUN touch .dockerenv
 
 # Build frontend
 RUN npm run build && rm -rf node_modules

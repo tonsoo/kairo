@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Models\Shift;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -17,9 +18,12 @@ class ShiftJson extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        /** @var User|null $user */
+        $user = $request->user();
+
         $timezone = is_string($request->input('timezone'))
             ? $request->input('timezone')
-            : ($request->user()?->timezone ?? 'UTC');
+            : ($user instanceof User ? $user->timezone : 'UTC');
         $startedAt = CarbonImmutable::instance($this->started_at)->setTimezone($timezone);
         $endedAt = $this->ended_at === null
             ? null

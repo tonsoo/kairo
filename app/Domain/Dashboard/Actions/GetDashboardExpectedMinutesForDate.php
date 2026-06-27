@@ -34,9 +34,14 @@ final readonly class GetDashboardExpectedMinutesForDate
 
         /** @var WorkSchedule|null $workSchedule */
         $workSchedule = $weekdaySchedules
-            ->filter(fn (WorkSchedule $workSchedule) => $workSchedule->effective_from->toImmutable()->lte($date->startOfDay()))
-            ->last();
+            ->last(
+                fn (WorkSchedule $workSchedule) => $workSchedule->effective_from->toImmutable()->lte($date->startOfDay())
+            );
 
-        return $workSchedule?->expected_minutes ?? 0;
+        if (! $workSchedule instanceof WorkSchedule) {
+            return 0;
+        }
+
+        return $workSchedule->expected_minutes;
     }
 }
