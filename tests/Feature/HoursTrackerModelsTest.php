@@ -5,13 +5,19 @@ use App\Models\DailyWorkSchedule;
 use App\Models\Shift;
 use App\Models\User;
 use App\Models\WorkSchedule;
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 uses(LazilyRefreshDatabase::class);
 
 test('user exposes hours tracker relationships', function () {
+    CarbonImmutable::setTestNow('2026-06-01 00:00:00 UTC');
+
     $user = User::factory()->create();
+
+    CarbonImmutable::setTestNow();
+
     $workSchedule = WorkSchedule::factory()->timeRange()->forWeekday(7)->for($user)->create([
         'effective_from' => '2026-06-27',
     ]);
