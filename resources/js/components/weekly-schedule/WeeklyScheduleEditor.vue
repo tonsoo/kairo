@@ -2,10 +2,9 @@
 import { computed } from 'vue';
 import DashboardPanel from '@/components/dashboard/DashboardPanel.vue';
 import WeeklyScheduleRow from '@/components/weekly-schedule/WeeklyScheduleRow.vue';
-import { getDashboardLocale, translateDashboard } from '@/lib/dashboardTranslations';
+import { i18n } from '@/lib/i18n';
 import type { WeeklyScheduleFormRow } from '@/lib/weeklySchedule';
 
-const locale = getDashboardLocale();
 const rows = defineModel<WeeklyScheduleFormRow[]>('rows', { required: true });
 
 const props = withDefaults(defineProps<{
@@ -23,8 +22,8 @@ const props = withDefaults(defineProps<{
 });
 
 const saveLabel = computed(() => props.isSubmitting
-    ? translateDashboard('weekly_schedule.saving', locale)
-    : translateDashboard('weekly_schedule.save', locale));
+    ? i18n.global.t('weekly_schedule.saving')
+    : i18n.global.t('weekly_schedule.save'));
 
 const emit = defineEmits<{
     submit: [];
@@ -39,11 +38,11 @@ function fieldError(index: number, field: 'expected_minutes' | 'starts_at' | 'en
     <DashboardPanel class="p-6">
         <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#2e2f30] pb-5">
             <div class="space-y-2">
-                <h1 class="text-xl font-semibold text-slate-100">{{ translateDashboard('weekly_schedule.title', locale) }}</h1>
-                <p class="max-w-2xl text-sm text-slate-400">{{ translateDashboard('weekly_schedule.description', locale) }}</p>
+                <h1 class="text-xl font-semibold text-slate-100">{{ i18n.global.t('weekly_schedule.title') }}</h1>
+                <p class="max-w-2xl text-sm text-slate-400">{{ i18n.global.t('weekly_schedule.description') }}</p>
                 <div class="flex flex-wrap gap-3 text-xs uppercase tracking-[0.18em] text-slate-500">
-                    <span>{{ translateDashboard('weekly_schedule.effective_from', locale) }}: {{ effectiveFrom }}</span>
-                    <span>{{ translateDashboard('weekly_schedule.timezone', locale) }}: {{ timezone }}</span>
+                    <span>{{ i18n.global.t('weekly_schedule.effective_from') }}: {{ effectiveFrom }}</span>
+                    <span>{{ i18n.global.t('weekly_schedule.timezone') }}: {{ timezone }}</span>
                 </div>
             </div>
 
@@ -52,7 +51,7 @@ function fieldError(index: number, field: 'expected_minutes' | 'starts_at' | 'en
                     v-if="recentlySuccessful"
                     class="rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs font-medium text-teal-300"
                 >
-                    {{ translateDashboard('weekly_schedule.saved', locale) }}
+                    {{ i18n.global.t('weekly_schedule.saved') }}
                 </span>
                 <button
                     type="button"
@@ -66,11 +65,11 @@ function fieldError(index: number, field: 'expected_minutes' | 'starts_at' | 'en
         </div>
 
         <p v-if="errorMessageKey" class="mt-4 rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
-            {{ translateDashboard(errorMessageKey, locale) }}
+            {{ i18n.global.t(errorMessageKey) }}
         </p>
 
         <p v-if="isLoading" class="mt-6 text-sm text-slate-400">
-            {{ translateDashboard('weekly_schedule.loading', locale) }}
+            {{ i18n.global.t('weekly_schedule.loading') }}
         </p>
 
         <div v-else class="mt-6 space-y-4">

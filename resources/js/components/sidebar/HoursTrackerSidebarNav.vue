@@ -11,10 +11,9 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 import { dashboard, history, weeklySchedule } from '@/routes';
 
-const locale = getAppLocale();
 
 type SidebarItem = {
     title: string;
@@ -26,20 +25,20 @@ const { isCurrentUrl } = useCurrentUrl();
 
 const sections: Array<{ title: string; items: SidebarItem[] }> = [
     {
-        title: translate('panel.section.general', locale),
+        title: i18n.global.t('panel.section.general'),
         items: [
             {
-                title: translate('panel.item.dashboard', locale),
+                title: i18n.global.t('panel.item.dashboard'),
                 icon: LayoutGrid,
                 href: dashboard(),
             },
             {
-                title: translate('panel.item.history', locale),
+                title: i18n.global.t('panel.item.history'),
                 icon: History,
                 href: history(),
             },
             {
-                title: translate('panel.item.weekly_schedule', locale),
+                title: i18n.global.t('panel.item.weekly_schedule'),
                 icon: CalendarDays,
                 href: weeklySchedule(),
             },

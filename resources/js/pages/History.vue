@@ -9,14 +9,11 @@ import ShiftExportDialog from '@/components/shift-export/ShiftExportDialog.vue';
 import { useShiftHistory } from '@/composables/useShiftHistory';
 import { getCurrentClientLocalDate } from '@/lib/clientDateTime';
 import {
-    getDashboardLocale,
-    translateDashboard,
-} from '@/lib/dashboardTranslations';
-import {
     buildHistoryDaySummaries,
     formatHistoryMonthHeading,
 } from '@/lib/history';
 import type { HistoryView } from '@/lib/history';
+import { getDashboardLocale, i18n } from '@/lib/i18n';
 import type { ShiftExportFormatOption } from '@/lib/shiftExport';
 
 const props = defineProps<{
@@ -76,7 +73,7 @@ function handleDialogOpenChange(isOpen: boolean): void {
 
 <template>
     <div class="px-8 py-8">
-        <Head :title="translateDashboard('history.page.title', locale)" />
+        <Head :title="i18n.global.t('history.page.title')" />
 
         <div class="space-y-6">
             <HistoryToolbar
@@ -95,14 +92,14 @@ function handleDialogOpenChange(isOpen: boolean): void {
                 v-if="errorMessageKey"
                 class="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
             >
-                {{ translateDashboard(errorMessageKey, locale) }}
+                {{ i18n.global.t(errorMessageKey) }}
             </p>
 
             <p
                 v-else-if="isLoadingMonth && monthSummary === null"
                 class="rounded-2xl border border-[#2f3033] bg-[#18191a] px-4 py-3 text-sm text-slate-400"
             >
-                {{ translateDashboard('history.loading', locale) }}
+                {{ i18n.global.t('history.loading') }}
             </p>
 
             <HistoryListView

@@ -2,10 +2,9 @@
 import { Head } from '@inertiajs/vue3';
 import AppearanceTabs from '@/components/AppearanceTabs.vue';
 import Heading from '@/components/Heading.vue';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 import { edit } from '@/routes/appearance';
 
-const locale = getAppLocale();
 
 defineOptions({
     layout: {
@@ -20,15 +19,15 @@ defineOptions({
 </script>
 
 <template>
-    <Head :title="translate('settings.appearance.page_title', locale)" />
+    <Head :title="i18n.global.t('settings.appearance.page_title')" />
 
-    <h1 class="sr-only">{{ translate('settings.appearance.page_title', locale) }}</h1>
+    <h1 class="sr-only">{{ i18n.global.t('settings.appearance.page_title') }}</h1>
 
     <div class="space-y-6">
         <Heading
             variant="small"
-            :title="translate('settings.appearance.heading', locale)"
-            :description="translate('settings.appearance.description', locale)"
+            :title="i18n.global.t('settings.appearance.heading')"
+            :description="i18n.global.t('settings.appearance.description')"
         />
         <AppearanceTabs />
     </div>

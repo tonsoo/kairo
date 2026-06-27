@@ -6,9 +6,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 
-const locale = getAppLocale();
 const value = defineModel<string>({ required: true });
 
 const props = defineProps<{
@@ -23,7 +22,7 @@ const props = defineProps<{
             :id="props.id"
             class="h-11 w-full rounded-xl border-[#3a3b3c] bg-[#18191a] px-3 text-sm text-slate-100"
         >
-            <SelectValue :placeholder="translate('settings.app.timezone_placeholder', locale)" />
+            <SelectValue :placeholder="i18n.global.t('settings.app.timezone_placeholder')" />
         </SelectTrigger>
         <SelectContent class="max-h-80 border-[#2e2f30] bg-[#18191a] text-slate-100">
             <SelectItem

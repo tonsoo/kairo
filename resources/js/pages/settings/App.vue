@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import AppSettingsController from '@/actions/App/Http/Controllers/Settings/AppSettingsController';
+import AppSettingsController from '@/actions/App/Http/Controllers/Panel/Settings/AppSettingsController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import TimezoneSelect from '@/components/settings/TimezoneSelect.vue';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 import { edit } from '@/routes/app-settings';
 
 type Props = {
@@ -16,7 +16,6 @@ type Props = {
 };
 
 const props = defineProps<Props>();
-const locale = getAppLocale();
 const selectedTimezone = ref(props.timezone);
 
 defineOptions({
@@ -32,15 +31,15 @@ defineOptions({
 </script>
 
 <template>
-    <Head :title="translate('settings.app.page_title', locale)" />
+    <Head :title="i18n.global.t('settings.app.page_title')" />
 
-    <h1 class="sr-only">{{ translate('settings.app.page_title', locale) }}</h1>
+    <h1 class="sr-only">{{ i18n.global.t('settings.app.page_title') }}</h1>
 
     <div class="flex flex-col space-y-6">
         <Heading
             variant="small"
-            :title="translate('settings.app.heading', locale)"
-            :description="translate('settings.app.description', locale)"
+            :title="i18n.global.t('settings.app.heading')"
+            :description="i18n.global.t('settings.app.description')"
         />
 
         <Form
@@ -52,13 +51,13 @@ defineOptions({
             <input type="hidden" name="timezone" :value="selectedTimezone">
 
             <div class="grid gap-2">
-                <Label for="timezone">{{ translate('settings.app.timezone', locale) }}</Label>
+                <Label for="timezone">{{ i18n.global.t('settings.app.timezone') }}</Label>
                 <TimezoneSelect id="timezone" v-model="selectedTimezone" :options="props.timezones" />
                 <InputError :message="errors.timezone" />
             </div>
 
             <div class="flex items-center gap-4">
-                <Button :disabled="processing">{{ translate('shared.actions.save', locale) }}</Button>
+                <Button :disabled="processing">{{ i18n.global.t('shared.actions.save') }}</Button>
             </div>
         </Form>
     </div>

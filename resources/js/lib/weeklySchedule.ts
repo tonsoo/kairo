@@ -1,4 +1,4 @@
-import { getDashboardLocale } from '@/lib/dashboardTranslations';
+import { getDashboardLocale } from '@/lib/i18n';
 
 export type WorkScheduleType = 'day_off' | 'total_time' | 'time_range';
 

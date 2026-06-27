@@ -7,12 +7,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import {
-    getDashboardLocale,
-    translateDashboard,
-} from '@/lib/dashboardTranslations';
+import { i18n } from '@/lib/i18n';
 
-const locale = getDashboardLocale();
 const value = defineModel<string | number | null>({ required: true });
 
 const hoursOptions = Array.from({ length: 25 }, (_, index) => pad(index));
@@ -135,11 +131,11 @@ function pad(value: number): string {
         <div class="grid gap-3 sm:grid-cols-2">
             <div class="space-y-2">
                 <span class="text-xs font-medium tracking-[0.18em] text-slate-500 uppercase">
-                    {{ translateDashboard('weekly_schedule.field.goal_hours_hours', locale) }}
+                    {{ i18n.global.t('weekly_schedule.field.goal_hours_hours') }}
                 </span>
                 <Select v-model="selectedHours">
                     <SelectTrigger class="h-11 w-full rounded-xl border-[#3a3b3c] bg-[#18191a] px-3 text-sm text-slate-100">
-                        <SelectValue :placeholder="translateDashboard('weekly_schedule.field.goal_hours_hours', locale)" />
+                        <SelectValue :placeholder="i18n.global.t('weekly_schedule.field.goal_hours_hours')" />
                     </SelectTrigger>
                     <SelectContent class="border-[#2e2f30] bg-[#18191a] text-slate-100">
                         <SelectItem
@@ -156,11 +152,11 @@ function pad(value: number): string {
 
             <div class="space-y-2">
                 <span class="text-xs font-medium tracking-[0.18em] text-slate-500 uppercase">
-                    {{ translateDashboard('weekly_schedule.field.goal_hours_minutes', locale) }}
+                    {{ i18n.global.t('weekly_schedule.field.goal_hours_minutes') }}
                 </span>
                 <Select v-model="selectedMinutes">
                     <SelectTrigger class="h-11 w-full rounded-xl border-[#3a3b3c] bg-[#18191a] px-3 text-sm text-slate-100">
-                        <SelectValue :placeholder="translateDashboard('weekly_schedule.field.goal_hours_minutes', locale)" />
+                        <SelectValue :placeholder="i18n.global.t('weekly_schedule.field.goal_hours_minutes')" />
                     </SelectTrigger>
                     <SelectContent class="border-[#2e2f30] bg-[#18191a] text-slate-100">
                         <SelectItem

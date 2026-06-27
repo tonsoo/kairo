@@ -4,7 +4,7 @@ import type { InertiaLinkProps } from '@inertiajs/vue3';
 import { CalendarDays, History, LayoutGrid } from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 import { dashboard, history, weeklySchedule } from '@/routes';
 
 type SidebarItem = {
@@ -13,30 +13,29 @@ type SidebarItem = {
     href: NonNullable<InertiaLinkProps['href']>;
 };
 
-const locale = getAppLocale();
 const { isCurrentUrl } = useCurrentUrl();
 
 const sections: Array<{ title: string; items: SidebarItem[] }> = [
     {
-        title: translate('panel.section.general', locale),
+        title: i18n.global.t('panel.section.general'),
         items: [
             {
-                title: translate('panel.item.dashboard', locale),
+                title: i18n.global.t('panel.item.dashboard'),
                 icon: LayoutGrid,
                 href: dashboard(),
             },
         ],
     },
     {
-        title: translate('panel.section.hours', locale),
+        title: i18n.global.t('panel.section.hours'),
         items: [
             {
-                title: translate('panel.item.history', locale),
+                title: i18n.global.t('panel.item.history'),
                 icon: History,
                 href: history(),
             },
             {
-                title: translate('panel.item.weekly_schedule', locale),
+                title: i18n.global.t('panel.item.weekly_schedule'),
                 icon: CalendarDays,
                 href: weeklySchedule(),
             },

@@ -7,12 +7,8 @@ import {
     resolveChartMaxMinutes,
 } from '@/components/dashboard/dashboardData';
 import type { DashboardBarItem } from '@/components/dashboard/dashboardData';
-import {
-    getDashboardLocale,
-    translateDashboard,
-} from '@/lib/dashboardTranslations';
+import { i18n } from '@/lib/i18n';
 
-const locale = getDashboardLocale();
 
 const props = withDefaults(
     defineProps<{
@@ -34,15 +30,15 @@ const chartMaxMinutes = computed(() =>
 
 const chartSeries = computed(() => [
     {
-        name: translateDashboard('dashboard.hours.legend.worked', locale),
+        name: i18n.global.t('dashboard.hours.legend.worked'),
         data: props.items.map((item) => item.workedMinutes),
     },
     {
-        name: translateDashboard('dashboard.hours.legend.extra', locale),
+        name: i18n.global.t('dashboard.hours.legend.extra'),
         data: props.items.map((item) => item.extraMinutes),
     },
     {
-        name: translateDashboard('dashboard.hours.legend.missing', locale),
+        name: i18n.global.t('dashboard.hours.legend.missing'),
         data: props.items.map((item) => item.missingMinutes),
     },
 ]);

@@ -7,7 +7,7 @@ import TwoFactorRecoveryCodes from '@/components/TwoFactorRecoveryCodes.vue';
 import TwoFactorSetupModal from '@/components/TwoFactorSetupModal.vue';
 import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 import { disable, enable } from '@/routes/two-factor';
 
 export type Props = {
@@ -22,7 +22,6 @@ withDefaults(defineProps<Props>(), {
     twoFactorEnabled: false,
 });
 
-const locale = getAppLocale();
 const { hasSetupData, clearTwoFactorAuthData } = useTwoFactorAuth();
 const showSetupModal = ref<boolean>(false);
 
@@ -33,8 +32,8 @@ onUnmounted(() => clearTwoFactorAuthData());
     <div v-if="canManageTwoFactor" class="space-y-6">
         <Heading
             variant="small"
-            :title="translate('settings.two_factor.heading', locale)"
-            :description="translate('settings.two_factor.description', locale)"
+            :title="i18n.global.t('settings.two_factor.heading')"
+            :description="i18n.global.t('settings.two_factor.description')"
         />
 
         <div
@@ -42,12 +41,12 @@ onUnmounted(() => clearTwoFactorAuthData());
             class="flex flex-col items-start justify-start space-y-4"
         >
             <p class="text-sm text-muted-foreground">
-                {{ translate('settings.two_factor.enable_description', locale) }}
+                {{ i18n.global.t('settings.two_factor.enable_description') }}
             </p>
 
             <div>
                 <Button v-if="hasSetupData" @click="showSetupModal = true">
-                    <ShieldCheck />{{ translate('settings.two_factor.continue_setup', locale) }}
+                    <ShieldCheck />{{ i18n.global.t('settings.two_factor.continue_setup') }}
                 </Button>
                 <Form
                     v-else
@@ -56,7 +55,7 @@ onUnmounted(() => clearTwoFactorAuthData());
                     #default="{ processing }"
                 >
                     <Button type="submit" :disabled="processing">
-                        {{ translate('settings.two_factor.enable', locale) }}
+                        {{ i18n.global.t('settings.two_factor.enable') }}
                     </Button>
                 </Form>
             </div>
@@ -64,7 +63,7 @@ onUnmounted(() => clearTwoFactorAuthData());
 
         <div v-else class="flex flex-col items-start justify-start space-y-4">
             <p class="text-sm text-muted-foreground">
-                {{ translate('settings.two_factor.enabled_description', locale) }}
+                {{ i18n.global.t('settings.two_factor.enabled_description') }}
             </p>
 
             <div class="relative inline">
@@ -74,7 +73,7 @@ onUnmounted(() => clearTwoFactorAuthData());
                         type="submit"
                         :disabled="processing"
                     >
-                        {{ translate('settings.two_factor.disable', locale) }}
+                        {{ i18n.global.t('settings.two_factor.disable') }}
                     </Button>
                 </Form>
             </div>

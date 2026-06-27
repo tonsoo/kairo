@@ -25,10 +25,7 @@ import DashboardSemesterCard from '@/components/dashboard/DashboardSemesterCard.
 import ShiftExportDialog from '@/components/shift-export/ShiftExportDialog.vue';
 import { useHoursSummary } from '@/composables/useHoursSummary';
 import { useShiftsInRange } from '@/composables/useShiftsInRange';
-import {
-    getDashboardLocale,
-    translateDashboard,
-} from '@/lib/dashboardTranslations';
+import { getDashboardLocale, i18n } from '@/lib/i18n';
 import type { ShiftExportFormatOption } from '@/lib/shiftExport';
 
 const props = defineProps<{
@@ -80,7 +77,7 @@ const balanceCard = computed(() => {
         return {
             highlight: '--:--',
             meterValue: '00:00',
-            meterCaption: translateDashboard('dashboard.hours.balance.status.zero', locale),
+            meterCaption: i18n.global.t('dashboard.hours.balance.status.zero'),
             segments: [],
         };
     }
@@ -96,7 +93,7 @@ const balanceCard = computed(() => {
     return {
         highlight: formatDurationMinutes(balance.balance_minutes, { signed: true }),
         meterValue: formatDurationMinutes(varianceMinutes),
-        meterCaption: translateDashboard(getBalanceStatusLabelKey(status), locale),
+        meterCaption: i18n.global.t(getBalanceStatusLabelKey(status)),
         segments: buildBalanceSegments(balance),
     };
 });
@@ -195,22 +192,22 @@ const canGoToNextSemester = computed(() =>
 
 const monthTitle = computed(() => {
     if (hoursSummaryData.value === null) {
-        return translateDashboard('dashboard.hours.month.title', locale);
+        return i18n.global.t('dashboard.hours.month.title');
     }
 
-    return `${formatMonthHeading(hoursSummaryData.value.month.starts_at, locale)} • ${translateDashboard('dashboard.hours.month.title', locale)}: ${formatDurationMinutes(hoursSummaryData.value.month.balance_minutes, { signed: true })}`;
+    return `${formatMonthHeading(hoursSummaryData.value.month.starts_at, locale)} • ${i18n.global.t('dashboard.hours.month.title')}: ${formatDurationMinutes(hoursSummaryData.value.month.balance_minutes, { signed: true })}`;
 });
 
 const semesterTitle = computed(() => {
     if (hoursSummaryData.value === null) {
-        return translateDashboard('dashboard.hours.semester.title', locale);
+        return i18n.global.t('dashboard.hours.semester.title');
     }
 
     return `${formatSemesterHeading(
         hoursSummaryData.value.semester.starts_at,
         hoursSummaryData.value.semester.ends_at,
         locale,
-    )} • ${translateDashboard('dashboard.hours.semester.title', locale)}`;
+    )} • ${i18n.global.t('dashboard.hours.semester.title')}`;
 });
 
 const activeExportRange = computed(() => {
@@ -283,20 +280,20 @@ async function showNextSemester(): Promise<void> {
 
 <template>
     <div class="px-8 py-8">
-        <Head :title="translateDashboard('dashboard.page.title', locale)" />
+        <Head :title="i18n.global.t('dashboard.page.title')" />
 
         <div class="space-y-6">
             <p
                 v-if="errorMessageKey"
                 class="rounded-md border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
             >
-                {{ translateDashboard(errorMessageKey, locale) }}
+                {{ i18n.global.t(errorMessageKey) }}
             </p>
 
             <div class="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.25fr)]">
                 <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-1">
                     <DashboardMetricCard
-                        :title="translateDashboard('dashboard.hours.balance.title', locale)"
+                        :title="i18n.global.t('dashboard.hours.balance.title')"
                         :highlight="balanceCard.highlight"
                         :meter-value="balanceCard.meterValue"
                         :meter-caption="balanceCard.meterCaption"
@@ -304,7 +301,7 @@ async function showNextSemester(): Promise<void> {
                     />
 
                     <DashboardMetricCard
-                        :title="translateDashboard('dashboard.hours.today.title', locale)"
+                        :title="i18n.global.t('dashboard.hours.today.title')"
                         :highlight="todayCard.highlight"
                         :meter-value="todayCard.meterValue"
                         :meter-caption="todayCard.meterCaption"
@@ -344,7 +341,7 @@ async function showNextSemester(): Promise<void> {
                 v-if="isLoading"
                 class="rounded-md border border-[#2f3033] bg-[#18191a] px-4 py-3 text-sm text-slate-400"
             >
-                {{ translateDashboard('dashboard.hours.loading', locale) }}
+                {{ i18n.global.t('dashboard.hours.loading') }}
             </p>
         </div>
 

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ArrowUpRight, Clock3 } from '@lucide/vue';
-import { translateDashboard } from '@/lib/dashboardTranslations';
-import type { DashboardLocale } from '@/lib/dashboardTranslations';
 import {
     formatHistoryDayHeading,
     formatHistoryDaySubheading,
 } from '@/lib/history';
 import type { HistoryDaySummary } from '@/lib/history';
+import { i18n } from '@/lib/i18n';
+import type { DashboardLocale } from '@/lib/i18n';
 import { formatDurationMinutes } from '@/lib/time';
 
 const props = defineProps<{
@@ -46,7 +46,7 @@ const emit = defineEmits<{
             <div class="flex flex-wrap items-center gap-3 md:justify-end">
                 <div class="inline-flex items-center gap-2 rounded-full border border-teal-500/15 bg-teal-500/10 px-3 py-1.5 text-sm text-teal-200">
                     <Clock3 class="size-4 text-teal-400" />
-                    <span>{{ translateDashboard('history.day.worked', props.locale) }}</span>
+                    <span>{{ i18n.global.t('history.day.worked') }}</span>
                     <span class="font-semibold text-slate-100">{{ formatDurationMinutes(day.workedMinutes) }}</span>
                 </div>
 
@@ -54,7 +54,7 @@ const emit = defineEmits<{
                     v-if="day.extraMinutes > 0"
                     class="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-200"
                 >
-                    {{ translateDashboard('history.day.extra', props.locale) }}
+                    {{ i18n.global.t('history.day.extra') }}
                     {{ formatDurationMinutes(day.extraMinutes) }}
                 </div>
 
@@ -62,7 +62,7 @@ const emit = defineEmits<{
                     v-if="day.missingMinutes > 0"
                     class="rounded-full border border-slate-500/20 bg-slate-500/10 px-3 py-1 text-xs font-medium text-slate-300"
                 >
-                    {{ translateDashboard('history.day.missing', props.locale) }}
+                    {{ i18n.global.t('history.day.missing') }}
                     {{ formatDurationMinutes(day.missingMinutes) }}
                 </div>
 
@@ -75,10 +75,10 @@ const emit = defineEmits<{
             class="rounded-2xl border border-dashed border-[#343538] bg-[#18191a] px-6 py-12 text-center"
         >
             <p class="text-base font-medium text-slate-100">
-                {{ translateDashboard('history.empty.title', props.locale) }}
+                {{ i18n.global.t('history.empty.title') }}
             </p>
             <p class="mt-2 text-sm text-slate-400">
-                {{ translateDashboard('history.empty.description', props.locale) }}
+                {{ i18n.global.t('history.empty.description') }}
             </p>
         </div>
     </section>

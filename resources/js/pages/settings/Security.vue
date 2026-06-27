@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
-import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
+import SecurityController from '@/actions/App/Http/Controllers/Panel/Settings/SecurityController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import type { Props as ManagePasskeysProps } from '@/components/ManagePasskeys.vue';
@@ -10,7 +10,7 @@ import ManageTwoFactor from '@/components/ManageTwoFactor.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 import { edit } from '@/routes/security';
 
 type Props = {
@@ -19,7 +19,6 @@ type Props = {
     ManageTwoFactorProps;
 
 const props = defineProps<Props>();
-const locale = getAppLocale();
 
 defineOptions({
     layout: {
@@ -34,15 +33,15 @@ defineOptions({
 </script>
 
 <template>
-    <Head :title="translate('settings.security.page_title', locale)" />
+    <Head :title="i18n.global.t('settings.security.page_title')" />
 
-    <h1 class="sr-only">{{ translate('settings.security.page_title', locale) }}</h1>
+    <h1 class="sr-only">{{ i18n.global.t('settings.security.page_title') }}</h1>
 
     <div class="space-y-6">
         <Heading
             variant="small"
-            :title="translate('settings.security.heading', locale)"
-            :description="translate('settings.security.description', locale)"
+            :title="i18n.global.t('settings.security.heading')"
+            :description="i18n.global.t('settings.security.description')"
         />
 
         <Form
@@ -60,38 +59,38 @@ defineOptions({
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-2">
-                <Label for="current_password">{{ translate('settings.security.current_password', locale) }}</Label>
+                <Label for="current_password">{{ i18n.global.t('settings.security.current_password') }}</Label>
                 <PasswordInput
                     id="current_password"
                     name="current_password"
                     class="mt-1 block w-full"
                     autocomplete="current-password"
-                    :placeholder="translate('settings.security.current_password_placeholder', locale)"
+                    :placeholder="i18n.global.t('settings.security.current_password_placeholder')"
                 />
                 <InputError :message="errors.current_password" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="password">{{ translate('settings.security.new_password', locale) }}</Label>
+                <Label for="password">{{ i18n.global.t('settings.security.new_password') }}</Label>
                 <PasswordInput
                     id="password"
                     name="password"
                     class="mt-1 block w-full"
                     autocomplete="new-password"
-                    :placeholder="translate('settings.security.new_password_placeholder', locale)"
+                    :placeholder="i18n.global.t('settings.security.new_password_placeholder')"
                     :passwordrules="props.passwordRules"
                 />
                 <InputError :message="errors.password" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="password_confirmation">{{ translate('settings.security.confirm_password', locale) }}</Label>
+                <Label for="password_confirmation">{{ i18n.global.t('settings.security.confirm_password') }}</Label>
                 <PasswordInput
                     id="password_confirmation"
                     name="password_confirmation"
                     class="mt-1 block w-full"
                     autocomplete="new-password"
-                    :placeholder="translate('settings.security.confirm_password_placeholder', locale)"
+                    :placeholder="i18n.global.t('settings.security.confirm_password_placeholder')"
                     :passwordrules="props.passwordRules"
                 />
                 <InputError :message="errors.password_confirmation" />
@@ -102,7 +101,7 @@ defineOptions({
                     :disabled="processing"
                     data-test="update-password-button"
                 >
-                    {{ translate('shared.actions.save', locale) }}
+                    {{ i18n.global.t('shared.actions.save') }}
                 </Button>
             </div>
         </Form>

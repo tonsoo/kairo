@@ -2,12 +2,8 @@
 import { Square, Play } from '@lucide/vue';
 import { computed, onMounted } from 'vue';
 import { useCurrentShiftState } from '@/composables/useCurrentShiftState';
-import {
-    getDashboardLocale,
-    translateDashboard,
-} from '@/lib/dashboardTranslations';
+import { i18n } from '@/lib/i18n';
 
-const locale = getDashboardLocale();
 const {
     currentShiftStateData,
     errorMessageKey,
@@ -54,13 +50,13 @@ const isBusy = computed(() => isLoading.value || isSubmitting.value);
         <span>
             {{
                 isBusy
-                    ? translateDashboard('dashboard.shift.loading', locale)
-                    : translateDashboard(buttonLabelKey, locale)
+                    ? i18n.global.t('dashboard.shift.loading')
+                    : i18n.global.t(buttonLabelKey)
             }}
         </span>
     </button>
 
     <p v-if="errorMessageKey" class="text-center text-xs text-rose-300">
-        {{ translateDashboard(errorMessageKey, locale) }}
+        {{ i18n.global.t(errorMessageKey) }}
     </p>
 </template>

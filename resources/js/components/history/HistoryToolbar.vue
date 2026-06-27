@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { CalendarDays, ChevronLeft, ChevronRight, Download, List } from '@lucide/vue';
 import { Button } from '@/components/ui/button';
-import { translateDashboard } from '@/lib/dashboardTranslations';
-import type { DashboardLocale } from '@/lib/dashboardTranslations';
 import type { HistoryView } from '@/lib/history';
+import { i18n } from '@/lib/i18n';
+import type { DashboardLocale } from '@/lib/i18n';
 
 const props = defineProps<{
     locale: DashboardLocale;
@@ -26,10 +26,10 @@ const emit = defineEmits<{
         <div class="space-y-3">
             <div class="space-y-2">
                 <h1 class="text-3xl font-semibold tracking-tight text-slate-50">
-                    {{ translateDashboard('history.page.title', props.locale) }}
+                    {{ i18n.global.t('history.page.title') }}
                 </h1>
                 <p class="max-w-2xl text-sm leading-6 text-slate-400">
-                    {{ translateDashboard('history.page.description', props.locale) }}
+                    {{ i18n.global.t('history.page.description') }}
                 </p>
             </div>
 
@@ -67,7 +67,7 @@ const emit = defineEmits<{
                 @click="emit('export')"
             >
                 <Download class="size-4" />
-                {{ translateDashboard('exports.button', props.locale) }}
+                {{ i18n.global.t('exports.button') }}
             </Button>
 
             <div class="inline-flex items-center gap-2 rounded-full border border-[#313234] bg-[#18191a] p-1.5">
@@ -80,7 +80,7 @@ const emit = defineEmits<{
                     @click="emit('update:view', 'list')"
                 >
                     <List class="size-4" />
-                    <span>{{ translateDashboard('history.view.list', props.locale) }}</span>
+                    <span>{{ i18n.global.t('history.view.list') }}</span>
                 </button>
                 <button
                     type="button"
@@ -91,7 +91,7 @@ const emit = defineEmits<{
                     @click="emit('update:view', 'calendar')"
                 >
                     <CalendarDays class="size-4" />
-                    <span>{{ translateDashboard('history.view.calendar', props.locale) }}</span>
+                    <span>{{ i18n.global.t('history.view.calendar') }}</span>
                 </button>
             </div>
         </div>

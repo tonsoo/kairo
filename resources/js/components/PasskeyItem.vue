@@ -11,7 +11,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 import type { Passkey } from '@/types/auth';
 
 const props = defineProps<{
@@ -22,7 +22,6 @@ const emit = defineEmits<{
     remove: [id: number, onError: () => void];
 }>();
 
-const locale = getAppLocale();
 const isDeleting = ref(false);
 
 const handleDelete = () => {
@@ -52,10 +51,10 @@ const handleDelete = () => {
                     </span>
                 </div>
                 <p class="text-sm text-muted-foreground">
-                    {{ translate('settings.passkeys.added', locale, { value: passkey.created_at_diff }) }}
+                    {{ i18n.global.t('settings.passkeys.added', { value: passkey.created_at_diff }) }}
                     <template v-if="passkey.last_used_at_diff">
                         <span class="mx-1 text-muted-foreground/50">/</span>
-                        {{ translate('settings.passkeys.last_used', locale, { value: passkey.last_used_at_diff }) }}
+                        {{ i18n.global.t('settings.passkeys.last_used', { value: passkey.last_used_at_diff }) }}
                     </template>
                 </p>
             </div>
@@ -69,25 +68,25 @@ const handleDelete = () => {
                     class="text-destructive hover:bg-destructive/10 hover:text-destructive"
                 >
                     <Trash2 class="h-4 w-4" />
-                    <span class="sr-only">{{ translate('settings.passkeys.remove_sr', locale) }}</span>
+                    <span class="sr-only">{{ i18n.global.t('settings.passkeys.remove_sr') }}</span>
                 </Button>
             </DialogTrigger>
 
             <DialogContent>
-                <DialogTitle>{{ translate('settings.passkeys.remove_title', locale) }}</DialogTitle>
+                <DialogTitle>{{ i18n.global.t('settings.passkeys.remove_title') }}</DialogTitle>
                 <DialogDescription>
-                    {{ translate('settings.passkeys.remove_description', locale, { name: passkey.name }) }}
+                    {{ i18n.global.t('settings.passkeys.remove_description', { name: passkey.name }) }}
                 </DialogDescription>
                 <DialogFooter class="gap-2">
                     <DialogClose as-child>
-                        <Button variant="secondary">{{ translate('shared.actions.cancel', locale) }}</Button>
+                        <Button variant="secondary">{{ i18n.global.t('shared.actions.cancel') }}</Button>
                     </DialogClose>
                     <Button
                         variant="destructive"
                         :disabled="isDeleting"
                         @click="handleDelete"
                     >
-                        {{ isDeleting ? translate('settings.passkeys.removing', locale) : translate('settings.passkeys.remove_confirm', locale) }}
+                        {{ isDeleting ? i18n.global.t('settings.passkeys.removing') : i18n.global.t('settings.passkeys.remove_confirm') }}
                     </Button>
                 </DialogFooter>
             </DialogContent>

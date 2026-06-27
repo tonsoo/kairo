@@ -8,7 +8,7 @@ import HomeHeader from '@/components/home/HomeHeader.vue';
 import HomeHero from '@/components/home/HomeHero.vue';
 import HomeHowItWorks from '@/components/home/HomeHowItWorks.vue';
 import HomeTimezoneFeature from '@/components/home/HomeTimezoneFeature.vue';
-import { translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 import { dashboard, login, register } from '@/routes';
 import type { User } from '@/types/auth';
 
@@ -25,7 +25,7 @@ const loginHref = login().url;
 const registerHref = register().url;
 const primaryHref = computed(() => isAuthenticated.value ? dashboardHref : registerHref);
 const secondaryHref = computed(() => isAuthenticated.value ? dashboardHref : loginHref);
-const primaryLabel = computed(() => isAuthenticated.value ? translate('home.hero.cta.primary_auth') : translate('home.hero.cta.primary_guest'));
+const primaryLabel = computed(() => isAuthenticated.value ? i18n.global.t('home.hero.cta.primary_auth') : i18n.global.t('home.hero.cta.primary_guest'));
 const currentYear = new Date().getFullYear();
 </script>
 

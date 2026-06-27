@@ -2,7 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { ArrowRight } from '@lucide/vue';
 import HomeHeroPreview from '@/components/home/HomeHeroPreview.vue';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 
 defineProps<{
     primaryHref: string;
@@ -10,7 +10,6 @@ defineProps<{
     primaryLabel: string;
 }>();
 
-const locale = getAppLocale();
 </script>
 
 <template>
@@ -19,13 +18,13 @@ const locale = getAppLocale();
 
         <div class="mx-auto max-w-5xl text-center">
             <h1 class="mb-8 text-5xl font-extrabold leading-[1.1] tracking-tight text-white md:text-6xl lg:text-7xl">
-                {{ translate('home.hero.title.line_1', locale) }} <br class="hidden md:block" />
-                {{ translate('home.hero.title.line_2_prefix', locale) }}
-                <span class="bg-gradient-to-r from-teal-400 to-emerald-300 bg-clip-text text-transparent">{{ translate('home.hero.title.line_2_emphasis', locale) }}</span>
+                {{ i18n.global.t('home.hero.title.line_1') }} <br class="hidden md:block" />
+                {{ i18n.global.t('home.hero.title.line_2_prefix') }}
+                <span class="bg-gradient-to-r from-teal-400 to-emerald-300 bg-clip-text text-transparent">{{ i18n.global.t('home.hero.title.line_2_emphasis') }}</span>
             </h1>
 
             <p class="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-slate-400 md:text-xl">
-                {{ translate('home.hero.description', locale) }}
+                {{ i18n.global.t('home.hero.description') }}
             </p>
 
             <div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -34,7 +33,7 @@ const locale = getAppLocale();
                 </Link>
             </div>
 
-            <h6 class="mt-4 text-sm font-medium text-slate-500">{{ translate('home.hero.free', locale) }}</h6>
+            <h6 class="mt-4 text-sm font-medium text-slate-500">{{ i18n.global.t('home.hero.free') }}</h6>
         </div>
 
         <div class="mx-auto mt-20 hidden max-w-5xl md:block">

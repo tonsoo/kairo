@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import type { DashboardLegendItem } from '@/components/dashboard/dashboardData';
-import {
-    getDashboardLocale,
-    translateDashboard,
-} from '@/lib/dashboardTranslations';
+import { i18n } from '@/lib/i18n';
 
-const locale = getDashboardLocale();
 
 defineProps<{
     items: DashboardLegendItem[];
@@ -26,7 +22,7 @@ defineProps<{
             class="flex items-center gap-2"
         >
             <span :class="['h-2 w-2 rounded-full', item.colorClass]" />
-            <span>{{ translateDashboard(item.labelKey, locale) }}</span>
+            <span>{{ i18n.global.t(item.labelKey) }}</span>
         </div>
     </div>
 </template>

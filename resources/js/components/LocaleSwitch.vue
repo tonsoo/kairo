@@ -1,12 +1,8 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import type { AppLocale } from '@/lib/translations';
-import {
-    getAppLocale,
-    localeSwitchOptions,
-    translate,
-} from '@/lib/translations';
+import { getAppLocale, i18n, localeSwitchOptions } from '@/lib/i18n';
+import type { AppLocale } from '@/lib/i18n';
 import { update as updateLocale } from '@/routes/locale';
 
 type Props = {
@@ -42,7 +38,7 @@ function switchLocale(nextLocale: AppLocale): void {
 
 <template>
     <div
-        :aria-label="translate('locale.switch.aria')"
+        :aria-label="i18n.global.t('locale.switch.aria')"
         class="inline-flex items-center gap-1 rounded-full border border-[#7fa08d] bg-[#1f2822] p-1"
         role="group"
     >

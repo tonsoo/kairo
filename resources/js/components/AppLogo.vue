@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { Clock3 } from '@lucide/vue';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 
-const locale = getAppLocale();
 </script>
 
 <template>
@@ -13,6 +12,6 @@ const locale = getAppLocale();
     </div>
     <div class="ml-1 grid flex-1 text-left text-sm leading-tight">
         <span class="truncate font-semibold">Shiftly</span>
-        <span class="truncate text-xs text-sidebar-foreground/60">{{ translate('app.logo.tagline', locale) }}</span>
+        <span class="truncate text-xs text-sidebar-foreground/60">{{ i18n.global.t('app.logo.tagline') }}</span>
     </div>
 </template>

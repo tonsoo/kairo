@@ -11,12 +11,8 @@ import DashboardLegend from '@/components/dashboard/DashboardLegend.vue';
 import DashboardPanel from '@/components/dashboard/DashboardPanel.vue';
 import DashboardStackedBarChart from '@/components/dashboard/DashboardStackedBarChart.vue';
 import { Button } from '@/components/ui/button';
-import {
-    getDashboardLocale,
-    translateDashboard,
-} from '@/lib/dashboardTranslations';
+import { i18n } from '@/lib/i18n';
 
-const locale = getDashboardLocale();
 const emit = defineEmits<{
     previous: [];
     next: [];
@@ -39,11 +35,11 @@ const mode = ref<'summary' | 'journey'>('summary');
 const views = computed(() => [
     {
         value: 'summary' as const,
-        label: translateDashboard('dashboard.hours.month.view.summary', locale),
+        label: i18n.global.t('dashboard.hours.month.view.summary'),
     },
     {
         value: 'journey' as const,
-        label: translateDashboard('dashboard.hours.month.view.journey', locale),
+        label: i18n.global.t('dashboard.hours.month.view.journey'),
     },
 ]);
 </script>
@@ -81,7 +77,7 @@ const views = computed(() => [
                     @click="emit('export')"
                 >
                     <Download class="size-4" />
-                    {{ translateDashboard('exports.button', locale) }}
+                    {{ i18n.global.t('exports.button') }}
                 </Button>
                 <button
                     v-for="view in views"

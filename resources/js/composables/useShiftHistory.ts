@@ -1,10 +1,10 @@
 import { useHttp } from '@inertiajs/vue3';
 import type { ComputedRef } from 'vue';
 import { computed, ref } from 'vue';
+import { destroy as removeBreak } from '@/actions/App/Http/Controllers/Api/ShiftBreakController';
 import {
     destroy,
     index as listShifts,
-    removeBreak,
     update,
 } from '@/actions/App/Http/Controllers/Api/ShiftController';
 import type { HoursSummaryApiData } from '@/composables/useHoursSummary';

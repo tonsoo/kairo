@@ -8,12 +8,8 @@ import DashboardLegend from '@/components/dashboard/DashboardLegend.vue';
 import DashboardPanel from '@/components/dashboard/DashboardPanel.vue';
 import DashboardStackedBarChart from '@/components/dashboard/DashboardStackedBarChart.vue';
 import { Button } from '@/components/ui/button';
-import {
-    getDashboardLocale,
-    translateDashboard,
-} from '@/lib/dashboardTranslations';
+import { i18n } from '@/lib/i18n';
 
-const locale = getDashboardLocale();
 
 defineEmits<{
     previous: [];
@@ -64,7 +60,7 @@ defineProps<{
                     @click="$emit('export')"
                 >
                     <Download class="size-4" />
-                    {{ translateDashboard('exports.button', locale) }}
+                    {{ i18n.global.t('exports.button') }}
                 </Button>
                 <DashboardLegend :items="legend" />
             </div>

@@ -3,7 +3,7 @@ import { Eye, EyeOff } from '@lucide/vue';
 import { ref, useTemplateRef } from 'vue';
 import type { HTMLAttributes } from 'vue';
 import { Input } from '@/components/ui/input';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 defineOptions({ inheritAttrs: false });
@@ -12,7 +12,6 @@ const props = defineProps<{
     class?: HTMLAttributes['class'];
 }>();
 
-const locale = getAppLocale();
 const showPassword = ref(false);
 const inputRef = useTemplateRef('inputRef');
 
@@ -38,7 +37,7 @@ defineExpose({
                     'absolute inset-y-0 right-0 flex items-center rounded-r-md px-3 text-muted-foreground hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none',
                 )
             "
-            :aria-label="showPassword ? translate('shared.password.hide', locale) : translate('shared.password.show', locale)"
+            :aria-label="showPassword ? i18n.global.t('shared.password.hide') : i18n.global.t('shared.password.show')"
             :tabindex="-1"
         >
             <EyeOff v-if="showPassword" class="size-4" />

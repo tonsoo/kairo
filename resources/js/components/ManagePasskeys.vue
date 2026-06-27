@@ -5,7 +5,7 @@ import { destroy } from '@/actions/Laravel/Passkeys/Http/Controllers/PasskeyRegi
 import Heading from '@/components/Heading.vue';
 import PasskeyItem from '@/components/PasskeyItem.vue';
 import PasskeyRegister from '@/components/PasskeyRegister.vue';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 import type { Passkey } from '@/types/auth';
 
 export type Props = {
@@ -18,7 +18,6 @@ withDefaults(defineProps<Props>(), {
     passkeys: () => [],
 });
 
-const locale = getAppLocale();
 
 const handleDelete = (id: number, onError: () => void) => {
     router.delete(destroy.url(id), {
@@ -36,8 +35,8 @@ const handleRegisterSuccess = () => {
     <div v-if="canManagePasskeys" class="space-y-6">
         <Heading
             variant="small"
-            :title="translate('settings.passkeys.heading', locale)"
-            :description="translate('settings.passkeys.description', locale)"
+            :title="i18n.global.t('settings.passkeys.heading')"
+            :description="i18n.global.t('settings.passkeys.description')"
         />
 
         <div class="overflow-hidden rounded-lg border border-border">
@@ -56,9 +55,9 @@ const handleRegisterSuccess = () => {
                 >
                     <KeyRound class="h-7 w-7 text-muted-foreground" />
                 </div>
-                <p class="font-medium">{{ translate('settings.passkeys.empty_title', locale) }}</p>
+                <p class="font-medium">{{ i18n.global.t('settings.passkeys.empty_title') }}</p>
                 <p class="mt-1 text-sm text-muted-foreground">
-                    {{ translate('settings.passkeys.empty_description', locale) }}
+                    {{ i18n.global.t('settings.passkeys.empty_description') }}
                 </p>
             </div>
         </div>

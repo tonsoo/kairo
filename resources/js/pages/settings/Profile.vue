@@ -2,14 +2,14 @@
 import { Form, Head, usePage } from '@inertiajs/vue3';
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import ProfileController from '@/actions/App/Http/Controllers/Panel/Settings/ProfileController';
 import DeleteUser from '@/components/DeleteUser.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
 
@@ -24,21 +24,20 @@ defineOptions({
     },
 });
 
-const locale = getAppLocale();
 const page = usePage();
 const user = computed(() => page.props.auth.user);
 </script>
 
 <template>
-    <Head :title="translate('settings.profile.page_title', locale)" />
+    <Head :title="i18n.global.t('settings.profile.page_title')" />
 
-    <h1 class="sr-only">{{ translate('settings.profile.page_title', locale) }}</h1>
+    <h1 class="sr-only">{{ i18n.global.t('settings.profile.page_title') }}</h1>
 
     <div class="flex flex-col space-y-6">
         <Heading
             variant="small"
-            :title="translate('settings.profile.heading', locale)"
-            :description="translate('settings.profile.description', locale)"
+            :title="i18n.global.t('settings.profile.heading')"
+            :description="i18n.global.t('settings.profile.description')"
         />
 
         <Form
@@ -47,7 +46,7 @@ const user = computed(() => page.props.auth.user);
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-2">
-                <Label for="name">{{ translate('settings.profile.name', locale) }}</Label>
+                <Label for="name">{{ i18n.global.t('settings.profile.name') }}</Label>
                 <Input
                     id="name"
                     class="mt-1 block w-full"
@@ -55,13 +54,13 @@ const user = computed(() => page.props.auth.user);
                     :default-value="user.name"
                     required
                     autocomplete="name"
-                    :placeholder="translate('settings.profile.name_placeholder', locale)"
+                    :placeholder="i18n.global.t('settings.profile.name_placeholder')"
                 />
                 <InputError class="mt-2" :message="errors.name" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="email">{{ translate('settings.profile.email', locale) }}</Label>
+                <Label for="email">{{ i18n.global.t('settings.profile.email') }}</Label>
                 <Input
                     id="email"
                     type="email"
@@ -70,20 +69,20 @@ const user = computed(() => page.props.auth.user);
                     :default-value="user.email"
                     required
                     autocomplete="username"
-                    :placeholder="translate('settings.profile.email_placeholder', locale)"
+                    :placeholder="i18n.global.t('settings.profile.email_placeholder')"
                 />
                 <InputError class="mt-2" :message="errors.email" />
             </div>
 
             <div v-if="page.props.mustVerifyEmail && !user.email_verified_at">
                 <p class="-mt-4 text-sm text-muted-foreground">
-                    {{ translate('settings.profile.email_unverified', locale) }}
+                    {{ i18n.global.t('settings.profile.email_unverified') }}
                     <Link
                         :href="send()"
                         as="button"
                         class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                     >
-                        {{ translate('settings.profile.email_resend', locale) }}
+                        {{ i18n.global.t('settings.profile.email_resend') }}
                     </Link>
                 </p>
 
@@ -91,12 +90,12 @@ const user = computed(() => page.props.auth.user);
                     v-if="page.props.status === 'verification-link-sent'"
                     class="mt-2 text-sm font-medium text-green-600"
                 >
-                    {{ translate('settings.profile.email_sent', locale) }}
+                    {{ i18n.global.t('settings.profile.email_sent') }}
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
-                <Button :disabled="processing" data-test="update-profile-button">{{ translate('shared.actions.save', locale) }}</Button>
+                <Button :disabled="processing" data-test="update-profile-button">{{ i18n.global.t('shared.actions.save') }}</Button>
             </div>
         </Form>
     </div>

@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue';
 import GoalHoursSelect from '@/components/weekly-schedule/GoalHoursSelect.vue';
-import {
-    getDashboardLocale,
-    translateDashboard,
-} from '@/lib/dashboardTranslations';
+import { getDashboardLocale, i18n } from '@/lib/i18n';
 import {
     isWeekendWeekday,
     weekdayLabel,
@@ -14,7 +11,6 @@ import type {
     WorkScheduleType,
 } from '@/lib/weeklySchedule';
 
-const locale = getDashboardLocale();
 const row = defineModel<WeeklyScheduleFormRow>('row', { required: true });
 
 defineProps<{
@@ -23,6 +19,8 @@ defineProps<{
     endsAtError?: string | null;
 }>();
 
+const locale = getDashboardLocale();
+
 const dayTypeOptions: Array<{ value: WorkScheduleType; labelKey: string }> = [
     { value: 'day_off', labelKey: 'weekly_schedule.type.day_off' },
     { value: 'total_time', labelKey: 'weekly_schedule.type.total_time' },
@@ -30,7 +28,7 @@ const dayTypeOptions: Array<{ value: WorkScheduleType; labelKey: string }> = [
 ];
 
 const label = computed(() => weekdayLabel(row.value.weekday, locale));
-const subtitle = computed(() => translateDashboard(
+const subtitle = computed(() => i18n.global.t(
     isWeekendWeekday(row.value.weekday)
         ? 'weekly_schedule.day.weekend'
         : 'weekly_schedule.day.weekday',
@@ -65,7 +63,7 @@ watch(() => row.value.type, (type) => {
         </div>
 
         <div class="space-y-2">
-            <span class="text-sm text-slate-300">{{ translateDashboard('weekly_schedule.field.day_type', locale) }}</span>
+            <span class="text-sm text-slate-300">{{ i18n.global.t('weekly_schedule.field.day_type') }}</span>
             <div class="grid grid-cols-3 gap-2">
                 <button
                     v-for="option in dayTypeOptions"
@@ -77,7 +75,7 @@ watch(() => row.value.type, (type) => {
                         : 'border-[#3a3b3c] bg-[#18191a] text-slate-300 hover:border-slate-500 hover:text-slate-100'"
                     @click="row.type = option.value"
                 >
-                    {{ translateDashboard(option.labelKey, locale) }}
+                    {{ i18n.global.t(option.labelKey) }}
                 </button>
             </div>
         </div>
@@ -87,7 +85,7 @@ watch(() => row.value.type, (type) => {
                 v-if="row.type === 'total_time'"
                 class="block space-y-2 text-sm text-slate-300"
             >
-                <span>{{ translateDashboard('weekly_schedule.field.goal_hours', locale) }}</span>
+                <span>{{ i18n.global.t('weekly_schedule.field.goal_hours') }}</span>
                 <GoalHoursSelect v-model="row.expected_time" />
                 <p v-if="expectedTimeError" class="text-xs text-rose-300">{{ expectedTimeError }}</p>
             </label>
@@ -97,7 +95,7 @@ watch(() => row.value.type, (type) => {
                 class="grid gap-4 rounded-2xl border border-[#2a2b2d] bg-[#18191a] p-4 md:grid-cols-2"
             >
                 <label class="space-y-2 text-sm text-slate-300">
-                    <span>{{ translateDashboard('weekly_schedule.field.starts_at', locale) }}</span>
+                    <span>{{ i18n.global.t('weekly_schedule.field.starts_at') }}</span>
                     <input
                         v-model="row.starts_at"
                         type="time"
@@ -108,7 +106,7 @@ watch(() => row.value.type, (type) => {
                 </label>
 
                 <label class="space-y-2 text-sm text-slate-300">
-                    <span>{{ translateDashboard('weekly_schedule.field.ends_at', locale) }}</span>
+                    <span>{{ i18n.global.t('weekly_schedule.field.ends_at') }}</span>
                     <input
                         v-model="row.ends_at"
                         type="time"
@@ -123,7 +121,7 @@ watch(() => row.value.type, (type) => {
                 v-else
                 class="rounded-2xl border border-dashed border-[#3a3b3c] bg-[#18191a] px-4 py-4 text-sm text-slate-400"
             >
-                {{ translateDashboard('weekly_schedule.day_off_hint', locale) }}
+                {{ i18n.global.t('weekly_schedule.day_off_hint') }}
             </div>
         </div>
     </div>

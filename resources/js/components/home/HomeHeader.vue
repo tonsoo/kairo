@@ -2,7 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { Clock3 } from '@lucide/vue';
 import LocaleSwitch from '@/components/LocaleSwitch.vue';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 
 defineProps<{
     dashboardHref: string;
@@ -11,7 +11,6 @@ defineProps<{
     isAuthenticated: boolean;
 }>();
 
-const locale = getAppLocale();
 </script>
 
 <template>
@@ -22,18 +21,18 @@ const locale = getAppLocale();
                 <span class="text-xl font-bold tracking-tight text-slate-200">Shiftly</span>
             </div>
 
-            <nav :aria-label="translate('home.header.nav.primary', locale)" class="hidden items-center gap-8 text-sm font-medium text-slate-400 md:flex">
-                <a href="#como-funciona" class="transition-colors hover:text-teal-400">{{ translate('home.header.nav.how_it_works', locale) }}</a>
-                <a href="#recursos" class="transition-colors hover:text-teal-400">{{ translate('home.header.nav.features', locale) }}</a>
+            <nav :aria-label="i18n.global.t('home.header.nav.primary')" class="hidden items-center gap-8 text-sm font-medium text-slate-400 md:flex">
+                <a href="#como-funciona" class="transition-colors hover:text-teal-400">{{ i18n.global.t('home.header.nav.how_it_works') }}</a>
+                <a href="#recursos" class="transition-colors hover:text-teal-400">{{ i18n.global.t('home.header.nav.features') }}</a>
             </nav>
 
             <div class="flex items-center gap-4">
                 <LocaleSwitch compact />
                 <Link :hidden="isAuthenticated" :href="isAuthenticated ? dashboardHref : loginHref" class="text-sm font-medium text-slate-300 transition-colors hover:text-white">
-                    {{ translate('home.header.action.login', locale) }}
+                    {{ i18n.global.t('home.header.action.login') }}
                 </Link>
                 <Link :href="isAuthenticated ? dashboardHref : registerHref" class="rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-teal-500">
-                    {{ isAuthenticated ? translate('home.header.action.open_panel', locale) : translate('home.header.action.create_account', locale) }}
+                    {{ isAuthenticated ? i18n.global.t('home.header.action.open_panel') : i18n.global.t('home.header.action.create_account') }}
                 </Link>
             </div>
         </div>

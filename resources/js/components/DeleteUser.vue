@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Form } from '@inertiajs/vue3';
 import { useTemplateRef } from 'vue';
-import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import ProfileController from '@/actions/App/Http/Controllers/Panel/Settings/ProfileController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
@@ -17,9 +17,8 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 
-const locale = getAppLocale();
 const passwordInput = useTemplateRef('passwordInput');
 </script>
 
@@ -27,21 +26,21 @@ const passwordInput = useTemplateRef('passwordInput');
     <div class="space-y-6">
         <Heading
             variant="small"
-            :title="translate('settings.delete.heading', locale)"
-            :description="translate('settings.delete.description', locale)"
+            :title="i18n.global.t('settings.delete.heading')"
+            :description="i18n.global.t('settings.delete.description')"
         />
         <div
             class="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10"
         >
             <div class="relative space-y-0.5 text-red-600 dark:text-red-100">
-                <p class="font-medium">{{ translate('settings.delete.warning_title', locale) }}</p>
+                <p class="font-medium">{{ i18n.global.t('settings.delete.warning_title') }}</p>
                 <p class="text-sm">
-                    {{ translate('settings.delete.warning_description', locale) }}
+                    {{ i18n.global.t('settings.delete.warning_description') }}
                 </p>
             </div>
             <Dialog>
                 <DialogTrigger as-child>
-                    <Button variant="destructive" data-test="delete-user-button">{{ translate('settings.delete.open_button', locale) }}</Button>
+                    <Button variant="destructive" data-test="delete-user-button">{{ i18n.global.t('settings.delete.open_button') }}</Button>
                 </DialogTrigger>
                 <DialogContent>
                     <Form
@@ -55,19 +54,19 @@ const passwordInput = useTemplateRef('passwordInput');
                         v-slot="{ errors, processing, reset, clearErrors }"
                     >
                         <DialogHeader class="space-y-3">
-                            <DialogTitle>{{ translate('settings.delete.confirm_title', locale) }}</DialogTitle>
+                            <DialogTitle>{{ i18n.global.t('settings.delete.confirm_title') }}</DialogTitle>
                             <DialogDescription>
-                                {{ translate('settings.delete.confirm_description', locale) }}
+                                {{ i18n.global.t('settings.delete.confirm_description') }}
                             </DialogDescription>
                         </DialogHeader>
 
                         <div class="grid gap-2">
-                            <Label for="password" class="sr-only">{{ translate('settings.delete.password', locale) }}</Label>
+                            <Label for="password" class="sr-only">{{ i18n.global.t('settings.delete.password') }}</Label>
                             <PasswordInput
                                 id="password"
                                 name="password"
                                 ref="passwordInput"
-                                :placeholder="translate('settings.delete.password', locale)"
+                                :placeholder="i18n.global.t('settings.delete.password')"
                             />
                             <InputError :message="errors.password" />
                         </div>
@@ -83,7 +82,7 @@ const passwordInput = useTemplateRef('passwordInput');
                                         }
                                     "
                                 >
-                                    {{ translate('shared.actions.cancel', locale) }}
+                                    {{ i18n.global.t('shared.actions.cancel') }}
                                 </Button>
                             </DialogClose>
 
@@ -93,7 +92,7 @@ const passwordInput = useTemplateRef('passwordInput');
                                 :disabled="processing"
                                 data-test="confirm-delete-user-button"
                             >
-                                {{ translate('settings.delete.confirm_button', locale) }}
+                                {{ i18n.global.t('settings.delete.confirm_button') }}
                             </Button>
                         </DialogFooter>
                     </Form>

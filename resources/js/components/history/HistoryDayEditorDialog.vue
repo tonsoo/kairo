@@ -9,13 +9,13 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import type { ShiftInRange } from '@/composables/useShiftsInRange';
-import { translateDashboard } from '@/lib/dashboardTranslations';
-import type { DashboardLocale } from '@/lib/dashboardTranslations';
 import {
     formatHistoryDayHeading,
     formatHistoryDaySubheading,
 } from '@/lib/history';
 import type { HistoryDaySummary } from '@/lib/history';
+import { i18n } from '@/lib/i18n';
+import type { DashboardLocale } from '@/lib/i18n';
 import { formatDurationMinutes } from '@/lib/time';
 
 const props = defineProps<{
@@ -75,7 +75,7 @@ function getBreakDurationMinutes(
                         </DialogTitle>
                         <DialogDescription class="text-slate-400">
                             {{ daySubheading }} •
-                            {{ translateDashboard('history.dialog.description', props.locale) }}
+                            {{ i18n.global.t('history.dialog.description') }}
                         </DialogDescription>
                     </div>
 
@@ -83,7 +83,7 @@ function getBreakDurationMinutes(
                         v-if="props.selectedDaySummary !== null"
                         class="rounded-full border border-teal-500/20 bg-teal-500/10 px-4 py-2 text-sm text-teal-200"
                     >
-                        {{ translateDashboard('history.day.worked', props.locale) }}
+                        {{ i18n.global.t('history.day.worked') }}
                         <span class="ml-2 font-semibold text-slate-100">
                             {{ formatDurationMinutes(props.selectedDaySummary.workedMinutes, { suffix: true }) }}
                         </span>
@@ -96,18 +96,18 @@ function getBreakDurationMinutes(
                     v-if="props.errorMessageKey"
                     class="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
                 >
-                    {{ translateDashboard(props.errorMessageKey, props.locale) }}
+                    {{ i18n.global.t(props.errorMessageKey) }}
                 </p>
 
                 <p
                     v-if="props.isLoading"
                     class="rounded-2xl border border-[#2f3033] bg-[#1b1c1f] px-4 py-3 text-sm text-slate-400"
                 >
-                    {{ translateDashboard('history.dialog.loading', props.locale) }}
+                    {{ i18n.global.t('history.dialog.loading') }}
                 </p>
 
                 <div v-else-if="props.shifts.length === 0" class="rounded-2xl border border-dashed border-[#343538] px-4 py-10 text-center text-sm text-slate-400">
-                    {{ translateDashboard('history.dialog.empty', props.locale) }}
+                    {{ i18n.global.t('history.dialog.empty') }}
                 </div>
 
                 <div v-else class="max-h-[65vh] space-y-4 overflow-y-auto pr-1">
@@ -134,14 +134,14 @@ function getBreakDurationMinutes(
                                     nextShiftId: props.shifts[index + 1].id,
                                 })"
                             >
-                                <span>{{ translateDashboard('history.dialog.break', props.locale) }}</span>
+                                <span>{{ i18n.global.t('history.dialog.break') }}</span>
                                 <span class="font-medium">
                                     {{ formatDurationMinutes(getBreakDurationMinutes(shift, props.shifts[index + 1]), { suffix: true }) }}
                                 </span>
                                 <span>
                                     {{ props.removingBreakKey === `${shift.id}:${props.shifts[index + 1].id}`
-                                        ? translateDashboard('history.dialog.removing_break', props.locale)
-                                        : translateDashboard('history.dialog.remove_break', props.locale) }}
+                                        ? i18n.global.t('history.dialog.removing_break')
+                                        : i18n.global.t('history.dialog.remove_break') }}
                                 </span>
                             </button>
                         </div>

@@ -21,7 +21,7 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { useAppearance } from '@/composables/useAppearance';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 import { confirm } from '@/routes/two-factor';
 import type { TwoFactorConfigContent } from '@/types';
 
@@ -35,7 +35,6 @@ const { resolvedAppearance } = useAppearance();
 const props = defineProps<Props>();
 const isOpen = defineModel<boolean>('isOpen');
 
-const locale = getAppLocale();
 const { copy, copied } = useClipboard();
 const { qrCodeSvg, manualSetupKey, clearSetupData, fetchSetupData, errors } =
     useTwoFactorAuth();
@@ -48,24 +47,24 @@ const pinInputContainerRef = useTemplateRef('pinInputContainerRef');
 const modalConfig = computed<TwoFactorConfigContent>(() => {
     if (props.twoFactorEnabled) {
         return {
-            title: translate('settings.two_factor.modal.enabled_title', locale),
-            description: translate('settings.two_factor.modal.enabled_description', locale),
-            buttonText: translate('settings.two_factor.modal.close', locale),
+            title: i18n.global.t('settings.two_factor.modal.enabled_title'),
+            description: i18n.global.t('settings.two_factor.modal.enabled_description'),
+            buttonText: i18n.global.t('settings.two_factor.modal.close'),
         };
     }
 
     if (showVerificationStep.value) {
         return {
-            title: translate('settings.two_factor.modal.verify_title', locale),
-            description: translate('settings.two_factor.modal.verify_description', locale),
-            buttonText: translate('settings.two_factor.modal.continue', locale),
+            title: i18n.global.t('settings.two_factor.modal.verify_title'),
+            description: i18n.global.t('settings.two_factor.modal.verify_description'),
+            buttonText: i18n.global.t('settings.two_factor.modal.continue'),
         };
     }
 
     return {
-        title: translate('settings.two_factor.modal.enable_title', locale),
-        description: translate('settings.two_factor.modal.enable_description', locale),
-        buttonText: translate('settings.two_factor.modal.continue', locale),
+        title: i18n.global.t('settings.two_factor.modal.enable_title'),
+        description: i18n.global.t('settings.two_factor.modal.enable_description'),
+        buttonText: i18n.global.t('settings.two_factor.modal.continue'),
     };
 });
 
@@ -196,7 +195,7 @@ watch(
                             <div
                                 class="absolute inset-0 top-1/2 h-px w-full bg-border"
                             />
-                            <span class="relative bg-card px-2 py-1">{{ translate('settings.two_factor.modal.manual_entry', locale) }}</span>
+                            <span class="relative bg-card px-2 py-1">{{ i18n.global.t('settings.two_factor.modal.manual_entry') }}</span>
                         </div>
 
                         <div
@@ -277,14 +276,14 @@ watch(
                                     @click="showVerificationStep = false"
                                     :disabled="processing"
                                 >
-                                    {{ translate('settings.two_factor.modal.back', locale) }}
+                                    {{ i18n.global.t('settings.two_factor.modal.back') }}
                                 </Button>
                                 <Button
                                     type="submit"
                                     class="w-auto flex-1"
                                     :disabled="processing || code.length < 6"
                                 >
-                                    {{ translate('settings.two_factor.modal.confirm', locale) }}
+                                    {{ i18n.global.t('settings.two_factor.modal.confirm') }}
                                 </Button>
                             </div>
                         </div>

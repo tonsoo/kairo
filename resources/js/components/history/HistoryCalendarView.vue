@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { HoursSummaryItem } from '@/composables/useHoursSummary';
-import type { DashboardLocale } from '@/lib/dashboardTranslations';
 import {
     buildHistoryCalendarDays,
     buildWeekdayLabels,
 } from '@/lib/history';
+import type { DashboardLocale } from '@/lib/i18n';
 import { formatDurationMinutes } from '@/lib/time';
 
 const props = defineProps<{

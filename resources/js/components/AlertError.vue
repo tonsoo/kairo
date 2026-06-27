@@ -2,19 +2,18 @@
 import { AlertCircle } from '@lucide/vue';
 import { computed } from 'vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 
 type Props = {
     errors: string[];
     title?: string;
 };
 
-const locale = getAppLocale();
 const props = withDefaults(defineProps<Props>(), {
     title: undefined,
 });
 
-const resolvedTitle = computed(() => props.title ?? translate('shared.error.title', locale));
+const resolvedTitle = computed(() => props.title ?? i18n.global.t('shared.error.title'));
 const uniqueErrors = computed(() => Array.from(new Set(props.errors)));
 </script>
 

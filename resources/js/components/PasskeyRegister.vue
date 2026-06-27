@@ -5,13 +5,12 @@ import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 
 const emit = defineEmits<{
     success: [];
 }>();
 
-const locale = getAppLocale();
 
 const getDefaultPasskeyName = () => {
     const ua = navigator.userAgent;
@@ -56,11 +55,11 @@ const handleCancel = () => {
 
 <template>
     <div v-if="!isSupported" class="text-sm text-muted-foreground">
-        {{ translate('settings.passkeys.unsupported', locale) }}
+        {{ i18n.global.t('settings.passkeys.unsupported') }}
     </div>
 
     <Button v-else-if="!showForm" variant="outline" @click="showForm = true">
-        {{ translate('settings.passkeys.add', locale) }}
+        {{ i18n.global.t('settings.passkeys.add') }}
     </Button>
 
     <form
@@ -69,17 +68,17 @@ const handleCancel = () => {
         class="space-y-4 rounded-lg border border-border bg-muted/50 p-4"
     >
         <div class="grid gap-2">
-            <Label for="passkey-name">{{ translate('settings.passkeys.name', locale) }}</Label>
+            <Label for="passkey-name">{{ i18n.global.t('settings.passkeys.name') }}</Label>
             <Input
                 id="passkey-name"
                 type="text"
                 v-model="name"
-                :placeholder="translate('settings.passkeys.placeholder', locale)"
+                :placeholder="i18n.global.t('settings.passkeys.placeholder')"
                 class="mt-1 block w-full border-foreground/20"
                 autofocus
             />
             <p class="text-xs text-muted-foreground">
-                {{ translate('settings.passkeys.name_hint', locale) }}
+                {{ i18n.global.t('settings.passkeys.name_hint') }}
             </p>
         </div>
 
@@ -87,10 +86,10 @@ const handleCancel = () => {
 
         <div class="flex gap-2">
             <Button type="submit" :disabled="isLoading || !name.trim()">
-                {{ isLoading ? translate('settings.passkeys.registering', locale) : translate('settings.passkeys.register', locale) }}
+                {{ isLoading ? i18n.global.t('settings.passkeys.registering') : i18n.global.t('settings.passkeys.register') }}
             </Button>
             <Button type="button" variant="ghost" @click="handleCancel">
-                {{ translate('shared.actions.cancel', locale) }}
+                {{ i18n.global.t('shared.actions.cancel') }}
             </Button>
         </div>
     </form>

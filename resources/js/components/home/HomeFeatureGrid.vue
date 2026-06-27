@@ -1,24 +1,23 @@
 <script setup lang="ts">
 import { CalendarDays, History, User } from '@lucide/vue';
 import { computed } from 'vue';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 
-const locale = getAppLocale();
 
 const features = computed(() => [
     {
-        title: translate('home.features.flexible.title', locale),
-        description: translate('home.features.flexible.description', locale),
+        title: i18n.global.t('home.features.flexible.title'),
+        description: i18n.global.t('home.features.flexible.description'),
         icon: CalendarDays,
     },
     {
-        title: translate('home.features.history.title', locale),
-        description: translate('home.features.history.description', locale),
+        title: i18n.global.t('home.features.history.title'),
+        description: i18n.global.t('home.features.history.description'),
         icon: History,
     },
     {
-        title: translate('home.features.privacy.title', locale),
-        description: translate('home.features.privacy.description', locale),
+        title: i18n.global.t('home.features.privacy.title'),
+        description: i18n.global.t('home.features.privacy.description'),
         icon: User,
     },
 ]);
@@ -28,8 +27,8 @@ const features = computed(() => [
     <section id="recursos" class="border-t border-[#2e2f30] bg-[#18191a] px-6 py-24">
         <div class="mx-auto max-w-6xl">
             <div class="mb-16 text-center">
-                <h2 class="mb-4 text-3xl font-bold text-white">{{ translate('home.features.title', locale) }}</h2>
-                <p class="mx-auto max-w-2xl text-slate-400">{{ translate('home.features.description', locale) }}</p>
+                <h2 class="mb-4 text-3xl font-bold text-white">{{ i18n.global.t('home.features.title') }}</h2>
+                <p class="mx-auto max-w-2xl text-slate-400">{{ i18n.global.t('home.features.description') }}</p>
             </div>
 
             <div class="grid grid-cols-1 gap-6 md:grid-cols-3">

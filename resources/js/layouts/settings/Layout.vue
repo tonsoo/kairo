@@ -4,7 +4,7 @@ import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 import { toUrl } from '@/lib/utils';
 import { edit as editAppSettings } from '@/routes/app-settings';
 import { edit as editAppearance } from '@/routes/appearance';
@@ -12,23 +12,22 @@ import { edit as editProfile } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
 
-const locale = getAppLocale();
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: translate('settings.nav.profile', locale),
+        title: i18n.global.t('settings.nav.profile'),
         href: editProfile(),
     },
     {
-        title: translate('settings.nav.security', locale),
+        title: i18n.global.t('settings.nav.security'),
         href: editSecurity(),
     },
     {
-        title: translate('settings.nav.app', locale),
+        title: i18n.global.t('settings.nav.app'),
         href: editAppSettings(),
     },
     {
-        title: translate('settings.nav.appearance', locale),
+        title: i18n.global.t('settings.nav.appearance'),
         href: editAppearance(),
     },
 ];
@@ -39,15 +38,15 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
 <template>
     <div class="px-4 py-6">
         <Heading
-            :title="translate('settings.layout.title', locale)"
-            :description="translate('settings.layout.description', locale)"
+            :title="i18n.global.t('settings.layout.title')"
+            :description="i18n.global.t('settings.layout.description')"
         />
 
         <div class="flex flex-col lg:flex-row lg:space-x-12">
             <aside class="w-full max-w-xl lg:w-48">
                 <nav
                     class="flex flex-col space-y-1 space-x-0"
-                    :aria-label="translate('settings.layout.navigation', locale)"
+                    :aria-label="i18n.global.t('settings.layout.navigation')"
                 >
                     <Button
                         v-for="item in sidebarNavItems"

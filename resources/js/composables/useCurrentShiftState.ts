@@ -1,7 +1,7 @@
 import { useHttp } from '@inertiajs/vue3';
 import type { ComputedRef } from 'vue';
 import { computed, ref } from 'vue';
-import { continueMethod, end, start } from '@/actions/App/Http/Controllers/Api/ShiftController';
+import { end, resume as continueMethod, start } from '@/actions/App/Http/Controllers/Api/CurrentShiftActionsController';
 import { useHoursSummary } from '@/composables/useHoursSummary';
 import {
     getCurrentClientDateTimeAtom,

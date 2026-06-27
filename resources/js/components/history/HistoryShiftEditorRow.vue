@@ -8,8 +8,8 @@ import {
     formatDateTimeLocalValue,
     getClientDateTimeAtomFromLocalValue,
 } from '@/lib/clientDateTime';
-import { translateDashboard } from '@/lib/dashboardTranslations';
-import type { DashboardLocale } from '@/lib/dashboardTranslations';
+import { i18n } from '@/lib/i18n';
+import type { DashboardLocale } from '@/lib/i18n';
 import { formatDurationMinutes } from '@/lib/time';
 
 const props = defineProps<{
@@ -70,14 +70,14 @@ function saveShift(): void {
         <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div class="space-y-1">
                 <p class="text-sm font-medium text-slate-100">
-                    {{ translateDashboard('history.dialog.shift', props.locale) }} #{{ props.shift.id }}
+                    {{ i18n.global.t('history.dialog.shift') }} #{{ props.shift.id }}
                 </p>
                 <p class="text-xs text-slate-500">
                     <span v-if="props.shift.duration_minutes !== null">
                         {{ formatDurationMinutes(props.shift.duration_minutes, { suffix: true }) }}
                     </span>
                     <span v-else>
-                        {{ translateDashboard('history.dialog.ongoing', props.locale) }}
+                        {{ i18n.global.t('history.dialog.ongoing') }}
                     </span>
                 </p>
             </div>
@@ -92,15 +92,15 @@ function saveShift(): void {
                 <Trash2 class="size-4" />
                 <span>
                     {{ props.isDeleting
-                        ? translateDashboard('history.dialog.deleting', props.locale)
-                        : translateDashboard('history.dialog.delete', props.locale) }}
+                        ? i18n.global.t('history.dialog.deleting')
+                        : i18n.global.t('history.dialog.delete') }}
                 </span>
             </Button>
         </div>
 
         <div class="grid gap-4 md:grid-cols-2">
             <label class="space-y-2 text-sm text-slate-300">
-                <span>{{ translateDashboard('history.dialog.start', props.locale) }}</span>
+                <span>{{ i18n.global.t('history.dialog.start') }}</span>
                 <Input
                     v-model="startedAt"
                     type="datetime-local"
@@ -109,7 +109,7 @@ function saveShift(): void {
             </label>
 
             <label class="space-y-2 text-sm text-slate-300">
-                <span>{{ translateDashboard('history.dialog.end', props.locale) }}</span>
+                <span>{{ i18n.global.t('history.dialog.end') }}</span>
                 <Input
                     v-model="endedAt"
                     type="datetime-local"
@@ -122,7 +122,7 @@ function saveShift(): void {
             v-if="localErrorKey"
             class="rounded-xl border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-200"
         >
-            {{ translateDashboard(localErrorKey, props.locale) }}
+            {{ i18n.global.t(localErrorKey) }}
         </p>
 
         <div class="flex justify-end">
@@ -133,8 +133,8 @@ function saveShift(): void {
                 @click="saveShift"
             >
                 {{ props.isSaving
-                    ? translateDashboard('history.dialog.saving', props.locale)
-                    : translateDashboard('history.dialog.save', props.locale) }}
+                    ? i18n.global.t('history.dialog.saving')
+                    : i18n.global.t('history.dialog.save') }}
             </Button>
         </div>
     </article>

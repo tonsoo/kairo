@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Inertia\Testing\AssertableInertia as Assert;
 
 test('users can switch the active locale', function () {
     $response = $this->from(route('home'))
@@ -28,6 +29,20 @@ test('the selected locale applies to authenticated panel pages', function () {
 
     $response->assertOk();
     $response->assertSee('lang="pt-BR"', false);
+});
+
+test('the selected locale is shared with inertia pages without sending a translation payload', function () {
+    $this->withoutVite();
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->withCookie('locale', 'pt-BR')
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('locale', 'pt-BR')
+            ->missing('translations'));
 });
 
 test('unsupported locales are not accepted', function () {

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { Clock3 } from '@lucide/vue';
-import { getAppLocale, translate } from '@/lib/translations';
+import { i18n } from '@/lib/i18n';
 
 defineProps<{
     year: number;
 }>();
 
-const locale = getAppLocale();
 </script>
 
 <template>
@@ -18,24 +17,24 @@ const locale = getAppLocale();
                     <h3 class="text-xl font-bold text-slate-200">Shiftly</h3>
                 </div>
                 <p class="max-w-sm text-sm leading-relaxed text-slate-500">
-                    {{ translate('home.footer.description', locale) }}
+                    {{ i18n.global.t('home.footer.description') }}
                 </p>
             </div>
             <div>
-                <h4 class="mb-4 font-semibold text-slate-200">{{ translate('home.footer.product', locale) }}</h4>
+                <h4 class="mb-4 font-semibold text-slate-200">{{ i18n.global.t('home.footer.product') }}</h4>
                 <ul class="space-y-3 text-sm text-slate-500">
-                    <li><a href="#recursos" class="transition-colors hover:text-teal-400">{{ translate('home.footer.product.features', locale) }}</a></li>
-                    <li><a href="#como-funciona" class="transition-colors hover:text-teal-400">{{ translate('home.footer.product.how-it-works', locale) }}</a></li>
+                    <li><a href="#recursos" class="transition-colors hover:text-teal-400">{{ i18n.global.t('home.footer.product.features') }}</a></li>
+                    <li><a href="#como-funciona" class="transition-colors hover:text-teal-400">{{ i18n.global.t('home.footer.product.how-it-works') }}</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-[#2e2f30] pt-8 text-sm text-slate-500 md:flex-row">
-            <p>&copy; {{ year }} Shiftly. {{ translate('home.footer.rights', locale) }}</p>
+            <p>&copy; {{ year }} Shiftly. {{ i18n.global.t('home.footer.rights') }}</p>
             <div class="flex items-center gap-6">
                 <div class="flex items-center gap-2">
                     <span class="size-2 rounded-full bg-emerald-500" />
-                    <h5 class="text-sm font-medium text-slate-400">{{ translate('home.footer.systems', locale) }}</h5>
+                    <h5 class="text-sm font-medium text-slate-400">{{ i18n.global.t('home.footer.systems') }}</h5>
                 </div>
             </div>
         </div>
