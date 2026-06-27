@@ -23,7 +23,7 @@ final readonly class CreateDefaultWorkSchedulesForUser
             foreach (range(1, 5) as $weekday) {
                 ($this->upsertWorkSchedule)($user, WorkScheduleData::totalTime(
                     $weekday,
-                    8 * 60 * 60,
+                    8 * 60,
                     $effectiveFrom->setTime(9, 0),
                 ));
             }

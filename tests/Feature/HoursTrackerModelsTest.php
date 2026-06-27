@@ -56,10 +56,10 @@ test('new users receive default weekly work schedules', function () {
     $saturdaySchedule = $schedules->get(6);
 
     expect($schedules)->toHaveCount(7)
-        ->and($mondaySchedule?->type)->toBe(WorkScheduleType::timeRange)
-        ->and($mondaySchedule?->expected_minutes)->toBe(480)
-        ->and($mondaySchedule?->starts_at)->toBe('09:00:00')
-        ->and($mondaySchedule?->ends_at)->toBe('17:00:00')
+        ->and($mondaySchedule?->type)->toBe(WorkScheduleType::totalTime)
+        ->and($mondaySchedule?->expected_minutes)->toBe(8 * 60)
+        ->and($mondaySchedule?->starts_at)->toBe(null)
+        ->and($mondaySchedule?->ends_at)->toBe(null)
         ->and($saturdaySchedule?->type)->toBe(WorkScheduleType::dayOff)
         ->and($saturdaySchedule?->expected_minutes)->toBe(0)
         ->and($saturdaySchedule?->starts_at)->toBeNull()

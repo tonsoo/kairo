@@ -169,10 +169,10 @@ test('snapshot daily work schedules for date creates snapshots for all users', f
 
     expect($snapshottedUsers)->toBe(1)
         ->and($snapshot)->not->toBeNull()
-        ->and($snapshot?->type)->toBe(WorkScheduleType::timeRange)
+        ->and($snapshot?->type)->toBe(WorkScheduleType::totalTime)
         ->and($snapshot?->expected_minutes)->toBe(480)
-        ->and($snapshot?->starts_at)->toBe('09:00:00')
-        ->and($snapshot?->ends_at)->toBe('17:00:00');
+        ->and($snapshot?->starts_at)->toBe(null)
+        ->and($snapshot?->ends_at)->toBe(null);
 });
 
 test('snapshot daily work schedules at current local midnight only snapshots users in the first local hour of the day', function () {
