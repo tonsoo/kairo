@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue';
+import { toRef, watch } from 'vue';
 import InputError from '@/components/InputError.vue';
+import { useShiftExportDialog } from '@/components/shift-export/useShiftExportDialog';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -19,13 +20,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import {
-    getCurrentClientLocalDate,
-    getCurrentClientTimezone,
-} from '@/lib/clientDateTime';
 import { i18n } from '@/lib/i18n';
 import type { DashboardLocale } from '@/lib/i18n';
-import { downloadShiftExportFile } from '@/lib/shiftExport';
 import type { ShiftExportFormatOption } from '@/lib/shiftExport';
 
 const props = defineProps<{
@@ -43,144 +39,34 @@ const emit = defineEmits<{
     'update:open': [value: boolean];
 }>();
 
-const selectedType = ref('');
-const from = ref('');
-const to = ref('');
-const isDownloading = ref(false);
-const generalErrorMessage = ref<string | null>(null);
-const errors = reactive<{
-    type: string | null;
-    from: string | null;
-    to: string | null;
-}>({
-    type: null,
-    from: null,
-    to: null,
-});
-
-const formattedRange = computed(() => {
-    return `${formatLocalDate(props.initialFrom, props.locale)} - ${formatLocalDate(props.initialTo, props.locale)}`;
+const {
+    selectedType,
+    from,
+    to,
+    isDownloading,
+    generalErrorMessage,
+    errors,
+    formattedRange,
+    resetForm,
+    handleDownload,
+} = useShiftExportDialog({
+    locale: toRef(props, 'locale'),
+    formats: toRef(props, 'formats'),
+    initialFrom: toRef(props, 'initialFrom'),
+    initialTo: toRef(props, 'initialTo'),
+    editableRange: toRef(props, 'editableRange'),
+    closeDialog: () => emit('update:open', false),
 });
 
 watch(
     () => props.open,
     (isOpen) => {
-        if (! isOpen) {
-            return;
+        if (isOpen) {
+            resetForm();
         }
-
-        selectedType.value = props.formats[0]?.key ?? '';
-        from.value = props.initialFrom;
-        to.value = props.initialTo;
-        resetErrors();
     },
     { immediate: true },
 );
-
-async function handleDownload(): Promise<void> {
-    resetErrors();
-
-    if (! validate()) {
-        return;
-    }
-
-    isDownloading.value = true;
-
-    const result = await downloadShiftExportFile({
-        type: selectedType.value,
-        from: from.value,
-        to: to.value,
-        timezone: getCurrentClientTimezone(),
-    });
-
-    isDownloading.value = false;
-
-    if (! result.success) {
-        generalErrorMessage.value = result.message ?? i18n.global.t('exports.error.generic');
-        errors.type = result.errors.type ?? null;
-        errors.from = result.errors.from ?? null;
-        errors.to = result.errors.to ?? null;
-
-        return;
-    }
-
-    emit('update:open', false);
-}
-
-function validate(): boolean {
-    let isValid = true;
-    const today = getCurrentClientLocalDate();
-
-    if (selectedType.value.length === 0) {
-        errors.type = i18n.global.t('exports.error.type_required');
-        isValid = false;
-    }
-
-    if (from.value.length === 0) {
-        errors.from = i18n.global.t('exports.error.from_required');
-        isValid = false;
-    }
-
-    if (to.value.length === 0) {
-        errors.to = i18n.global.t('exports.error.to_required');
-        isValid = false;
-    }
-
-    if (! isValid) {
-        return false;
-    }
-
-    if (to.value < from.value) {
-        errors.to = i18n.global.t('exports.error.range_order');
-        isValid = false;
-    }
-
-    if (from.value > today) {
-        errors.from = i18n.global.t('exports.error.range_future');
-        isValid = false;
-    }
-
-    if (to.value > today) {
-        errors.to = i18n.global.t('exports.error.range_future');
-        isValid = false;
-    }
-
-    if (props.editableRange && isRangeLongerThanSixMonths(from.value, to.value)) {
-        errors.to = i18n.global.t('exports.error.range_limit');
-        isValid = false;
-    }
-
-    return isValid;
-}
-
-function resetErrors(): void {
-    generalErrorMessage.value = null;
-    errors.type = null;
-    errors.from = null;
-    errors.to = null;
-}
-
-function isRangeLongerThanSixMonths(fromDate: string, toDate: string): boolean {
-    const startsAt = new Date(`${fromDate}T00:00:00`);
-    const endsAt = new Date(`${toDate}T00:00:00`);
-    const latestAllowedDate = new Date(`${fromDate}T00:00:00`);
-
-    latestAllowedDate.setMonth(latestAllowedDate.getMonth() + 6);
-
-    return endsAt > latestAllowedDate || startsAt.toString() === 'Invalid Date' || endsAt.toString() === 'Invalid Date';
-}
-
-function formatLocalDate(value: string, locale: DashboardLocale): string {
-    const [year, month, day] = value.split('-').map(Number);
-    const date = new Date(Date.UTC(year, month - 1, day));
-
-    return new Intl.DateTimeFormat(locale, {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        timeZone: 'UTC',
-    }).format(date);
-}
 </script>
 
 <template>
