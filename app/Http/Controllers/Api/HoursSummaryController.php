@@ -22,7 +22,7 @@ final class HoursSummaryController extends Controller
 
         /** @var array{at?: string|null, month?: string|null, semester_start?: string|null, timezone?: string|null} $validated */
         $validated = $request->validated();
-        $timezone = $this->resolveTimezone($validated['timezone'] ?? null, $user);
+        $timezone = $validated['timezone'] ?? $user->timezone;
         $referenceMoment = ($validated['at'] ?? null) === null
             ? DateParser::nowInTimezone($timezone)
             : DateParser::parseAtomDateTime($validated['at'], 'at');
@@ -42,10 +42,5 @@ final class HoursSummaryController extends Controller
                 $timezone,
             ),
         );
-    }
-
-    private function resolveTimezone(?string $timezone, User $user): string
-    {
-        return $timezone ?? $user->timezone;
     }
 }
