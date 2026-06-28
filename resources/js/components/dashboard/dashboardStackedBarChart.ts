@@ -5,9 +5,11 @@ import {
     resolveChartMaxMinutes,
 } from '@/components/dashboard/dashboardData';
 import { i18n } from '@/lib/i18n';
+import type { ResolvedAppearance } from '@/types';
 
 type BuildDashboardStackedBarChartOptions = {
     items: DashboardBarItem[];
+    appearance: ResolvedAppearance;
     compact: boolean;
     maxMinutes?: number;
     stepCount: number;
@@ -34,11 +36,15 @@ export function buildDashboardStackedBarChartSeries(
 
 export function buildDashboardStackedBarChartOptions({
     items,
+    appearance,
     compact,
     maxMinutes,
     stepCount,
 }: BuildDashboardStackedBarChartOptions): ApexOptions {
     const chartMaxMinutes = maxMinutes ?? resolveChartMaxMinutes(items);
+    const isDark = appearance === 'dark';
+    const foregroundColor = isDark ? '#94a3b8' : '#737373';
+    const borderColor = isDark ? '#334155' : '#e5e5e5';
 
     return {
         chart: {
@@ -54,7 +60,7 @@ export function buildDashboardStackedBarChartOptions({
                 enabled: false,
             },
             parentHeightOffset: 0,
-            foreColor: '#94a3b8',
+            foreColor: foregroundColor,
         },
         colors: ['#0d9488', '#be123c', '#a8a3c5'],
         dataLabels: {
@@ -71,7 +77,7 @@ export function buildDashboardStackedBarChartOptions({
             },
         },
         grid: {
-            borderColor: '#334155',
+            borderColor,
             strokeDashArray: 4,
             xaxis: {
                 lines: {
@@ -97,7 +103,7 @@ export function buildDashboardStackedBarChartOptions({
             enabled: true,
             shared: true,
             intersect: false,
-            theme: 'dark',
+            theme: isDark ? 'dark' : 'light',
             y: {
                 formatter(value: number): string {
                     return formatDurationMinutes(Math.round(value));
@@ -114,7 +120,7 @@ export function buildDashboardStackedBarChartOptions({
             },
             labels: {
                 style: {
-                    colors: '#94a3b8',
+                    colors: foregroundColor,
                     fontSize: compact ? '10px' : '12px',
                 },
             },
@@ -129,7 +135,7 @@ export function buildDashboardStackedBarChartOptions({
                     return formatDashboardAxisMinutes(value);
                 },
                 style: {
-                    colors: '#94a3b8',
+                    colors: foregroundColor,
                     fontSize: '11px',
                 },
             },

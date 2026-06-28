@@ -25,11 +25,11 @@ const iconComponent = computed(() =>
 const buttonClass = computed(() => {
     switch (currentShiftStateData.value?.next_action) {
         case 'end':
-            return 'border-rose-400/25 bg-rose-500/12 text-rose-300 hover:bg-rose-500/22';
+            return 'border-rose-400/25 bg-rose-500/10 text-rose-700 hover:bg-rose-500/15 dark:text-rose-300 dark:hover:bg-rose-500/22';
         case 'continue':
-            return 'border-sky-400/25 bg-sky-500/12 text-sky-300 hover:bg-sky-500/22';
+            return 'border-sky-400/25 bg-sky-500/10 text-sky-700 hover:bg-sky-500/15 dark:text-sky-300 dark:hover:bg-sky-500/22';
         default:
-            return 'border-emerald-400/25 bg-emerald-500/12 text-emerald-300 hover:bg-emerald-500/22';
+            return 'border-emerald-400/25 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-300 dark:hover:bg-emerald-500/22';
     }
 });
 
@@ -56,7 +56,7 @@ const isBusy = computed(() => isLoading.value || isSubmitting.value);
         </span>
     </button>
 
-    <p v-if="errorMessageKey" class="text-center text-xs text-rose-300">
+    <p v-if="errorMessageKey" class="text-center text-xs text-rose-600 dark:text-rose-300">
         {{ i18n.global.t(errorMessageKey) }}
     </p>
 </template>

@@ -44,7 +44,7 @@ const {
         <div class="space-y-6">
             <p
                 v-if="errorMessageKey"
-                class="rounded-md border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+                class="rounded-md border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-200"
             >
                 {{ i18n.global.t(errorMessageKey) }}
             </p>
@@ -98,7 +98,7 @@ const {
 
             <p
                 v-if="isLoading"
-                class="rounded-md border border-[#2f3033] bg-[#18191a] px-4 py-3 text-sm text-slate-400"
+                class="rounded-md border border-border bg-card px-4 py-3 text-sm text-muted-foreground"
             >
                 {{ i18n.global.t('dashboard.hours.loading') }}
             </p>

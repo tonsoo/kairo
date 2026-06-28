@@ -19,17 +19,17 @@ const user = computed(() => usePage().props.auth.user as User);
         <DropdownMenuTrigger as-child>
             <button
                 type="button"
-                class="flex w-full items-center gap-3 rounded-xl border border-[#2e2f30] bg-[#242526] px-3 py-2 text-left transition hover:bg-[#2a2b2d]"
+                class="flex w-full items-center gap-3 rounded-xl border border-border bg-card px-3 py-2 text-left transition hover:bg-accent"
             >
                 <UserInfo :user="user" />
-                <ChevronsUpDown class="ml-auto size-4 text-slate-500" />
+                <ChevronsUpDown class="ml-auto size-4 text-muted-foreground" />
             </button>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
             align="start"
             side="top"
-            class="w-64 rounded-xl border-[#2e2f30] bg-[#1f2022] p-1 text-slate-100 shadow-2xl"
+            class="w-64 rounded-xl border-border bg-popover p-1 text-popover-foreground shadow-xl"
         >
             <UserMenuContent :user="user" />
         </DropdownMenuContent>

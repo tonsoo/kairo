@@ -46,19 +46,19 @@ const selectedMinutes = computed({
     <div class="space-y-2">
         <div class="grid gap-3 sm:grid-cols-2">
             <div class="space-y-2">
-                <span class="text-xs font-medium tracking-[0.18em] text-slate-500 uppercase">
+                <span class="text-xs font-medium tracking-[0.18em] text-muted-foreground uppercase">
                     {{ i18n.global.t('weekly_schedule.field.goal_hours_hours') }}
                 </span>
                 <Select v-model="selectedHours">
-                    <SelectTrigger class="h-11 w-full rounded-xl border-[#3a3b3c] bg-[#18191a] px-3 text-sm text-slate-100">
+                    <SelectTrigger class="h-11 w-full rounded-xl px-3 text-sm">
                         <SelectValue :placeholder="i18n.global.t('weekly_schedule.field.goal_hours_hours')" />
                     </SelectTrigger>
-                    <SelectContent class="border-[#2e2f30] bg-[#18191a] text-slate-100">
+                    <SelectContent class="rounded-xl">
                         <SelectItem
                             v-for="hoursOption in goalHoursOptions"
                             :key="hoursOption"
                             :value="hoursOption"
-                            class="focus:bg-white/8 focus:text-slate-100"
+
                         >
                             {{ hoursOption }}h
                         </SelectItem>
@@ -67,19 +67,19 @@ const selectedMinutes = computed({
             </div>
 
             <div class="space-y-2">
-                <span class="text-xs font-medium tracking-[0.18em] text-slate-500 uppercase">
+                <span class="text-xs font-medium tracking-[0.18em] text-muted-foreground uppercase">
                     {{ i18n.global.t('weekly_schedule.field.goal_hours_minutes') }}
                 </span>
                 <Select v-model="selectedMinutes">
-                    <SelectTrigger class="h-11 w-full rounded-xl border-[#3a3b3c] bg-[#18191a] px-3 text-sm text-slate-100">
+                    <SelectTrigger class="h-11 w-full rounded-xl px-3 text-sm">
                         <SelectValue :placeholder="i18n.global.t('weekly_schedule.field.goal_hours_minutes')" />
                     </SelectTrigger>
-                    <SelectContent class="border-[#2e2f30] bg-[#18191a] text-slate-100">
+                    <SelectContent class="rounded-xl">
                         <SelectItem
                             v-for="minutesOption in minutesOptions"
                             :key="minutesOption"
                             :value="minutesOption"
-                            class="focus:bg-white/8 focus:text-slate-100"
+
                         >
                             {{ minutesOption }}m
                         </SelectItem>

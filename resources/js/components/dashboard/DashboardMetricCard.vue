@@ -29,10 +29,10 @@ withDefaults(
     <DashboardPanel class="p-5">
         <div class="flex items-start justify-between gap-4">
             <div class="flex flex-wrap items-center gap-2">
-                <h2 class="text-sm font-medium text-slate-200">
+                <h2 class="text-sm font-medium text-muted-foreground">
                     {{ title }}
                 </h2>
-                <span class="text-sm font-semibold text-slate-100">
+                <span class="text-sm font-semibold text-foreground">
                     {{ highlight }}
                 </span>
             </div>
@@ -52,7 +52,7 @@ withDefaults(
         <button
             v-if="footerText"
             type="button"
-            class="mt-4 text-center text-sm font-medium text-teal-400 transition hover:text-teal-300"
+            class="mt-4 text-center text-sm font-medium text-teal-600 transition hover:text-teal-500 dark:text-teal-400 dark:hover:text-teal-300"
         >
             {{ footerText }}
         </button>

@@ -20,16 +20,16 @@ const props = defineProps<{
     <Select v-model="value">
         <SelectTrigger
             :id="props.id"
-            class="h-11 w-full rounded-xl border-[#3a3b3c] bg-[#18191a] px-3 text-sm text-slate-100"
+            class="h-11 w-full rounded-xl px-3 text-sm"
         >
             <SelectValue :placeholder="i18n.global.t('settings.app.timezone_placeholder')" />
         </SelectTrigger>
-        <SelectContent class="max-h-80 border-[#2e2f30] bg-[#18191a] text-slate-100">
+        <SelectContent class="max-h-80 rounded-xl">
             <SelectItem
                 v-for="timezoneOption in props.options"
                 :key="timezoneOption"
                 :value="timezoneOption"
-                class="focus:bg-white/8 focus:text-slate-100"
+
             >
                 {{ timezoneOption }}
             </SelectItem>

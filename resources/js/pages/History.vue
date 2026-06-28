@@ -90,14 +90,14 @@ function handleDialogOpenChange(isOpen: boolean): void {
 
             <p
                 v-if="errorMessageKey"
-                class="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+                class="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-200"
             >
                 {{ i18n.global.t(errorMessageKey) }}
             </p>
 
             <p
                 v-else-if="isLoadingMonth && monthSummary === null"
-                class="rounded-2xl border border-[#2f3033] bg-[#18191a] px-4 py-3 text-sm text-slate-400"
+                class="rounded-2xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground"
             >
                 {{ i18n.global.t('history.loading') }}
             </p>

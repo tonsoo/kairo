@@ -43,7 +43,7 @@ function getSegmentStyle(
 <template>
     <div class="grid h-full grid-cols-[auto_minmax(0,1fr)] gap-4">
         <div
-            class="flex h-full flex-col justify-between text-[11px] text-slate-500"
+            class="flex h-full flex-col justify-between text-[11px] text-muted-foreground"
         >
             <span v-for="hour in hourLabels" :key="hour">{{ hour }}H</span>
         </div>
@@ -56,7 +56,7 @@ function getSegmentStyle(
                     <div
                         v-for="hour in hourLabels"
                         :key="`line-${hour}`"
-                        class="border-t border-dashed border-[#334155]"
+                        class="border-t border-dashed border-border/70"
                     />
                 </div>
 
@@ -67,7 +67,7 @@ function getSegmentStyle(
                     <div
                         v-for="item in props.items"
                         :key="`grid-${item.label}`"
-                        class="border-r border-[#334155]/50 last:border-r-0"
+                        class="border-r border-border/60 last:border-r-0"
                     />
                 </div>
 
@@ -94,7 +94,7 @@ function getSegmentStyle(
             </div>
 
             <div
-                class="grid text-[10px] text-slate-500"
+                class="grid text-[10px] text-muted-foreground"
                 :style="{ gridTemplateColumns: `repeat(${props.items.length}, minmax(0, 1fr))` }"
             >
                 <span

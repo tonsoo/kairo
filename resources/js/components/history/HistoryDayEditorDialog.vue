@@ -66,14 +66,14 @@ function getBreakDurationMinutes(
 
 <template>
     <Dialog :open="props.open" @update:open="emit('update:open', $event)">
-        <DialogContent class="max-w-4xl border-[#2f3033] bg-[#161719] text-slate-100 sm:max-w-4xl pt-12">
+        <DialogContent class="max-w-4xl border-border bg-background pt-12 text-foreground sm:max-w-4xl">
             <DialogHeader class="space-y-3 text-left">
                 <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                     <div class="space-y-1">
-                        <DialogTitle class="text-xl font-semibold text-slate-50">
+                        <DialogTitle class="text-xl font-semibold text-foreground">
                             {{ dayHeading }}
                         </DialogTitle>
-                        <DialogDescription class="text-slate-400">
+                        <DialogDescription class="text-muted-foreground">
                             {{ daySubheading }} •
                             {{ i18n.global.t('history.dialog.description') }}
                         </DialogDescription>
@@ -81,10 +81,10 @@ function getBreakDurationMinutes(
 
                     <div
                         v-if="props.selectedDaySummary !== null"
-                        class="rounded-full border border-teal-500/20 bg-teal-500/10 px-4 py-2 text-sm text-teal-200"
+                        class="rounded-full border border-teal-500/20 bg-teal-500/10 px-4 py-2 text-sm text-teal-700 dark:text-teal-200"
                     >
                         {{ i18n.global.t('history.day.worked') }}
-                        <span class="ml-2 font-semibold text-slate-100">
+                        <span class="ml-2 font-semibold text-foreground">
                             {{ formatDurationMinutes(props.selectedDaySummary.workedMinutes, { suffix: true }) }}
                         </span>
                     </div>
@@ -94,19 +94,19 @@ function getBreakDurationMinutes(
             <div class="space-y-4">
                 <p
                     v-if="props.errorMessageKey"
-                    class="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+                    class="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-200"
                 >
                     {{ i18n.global.t(props.errorMessageKey) }}
                 </p>
 
                 <p
                     v-if="props.isLoading"
-                    class="rounded-2xl border border-[#2f3033] bg-[#1b1c1f] px-4 py-3 text-sm text-slate-400"
+                    class="rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground"
                 >
                     {{ i18n.global.t('history.dialog.loading') }}
                 </p>
 
-                <div v-else-if="props.shifts.length === 0" class="rounded-2xl border border-dashed border-[#343538] px-4 py-10 text-center text-sm text-slate-400">
+                <div v-else-if="props.shifts.length === 0" class="rounded-2xl border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground">
                     {{ i18n.global.t('history.dialog.empty') }}
                 </div>
 
@@ -127,7 +127,7 @@ function getBreakDurationMinutes(
                         >
                             <button
                                 type="button"
-                                class="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-sm text-amber-100 transition-colors hover:bg-amber-500/20"
+                                class="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-sm text-amber-700 transition-colors hover:bg-amber-500/20 dark:text-amber-100"
                                 :disabled="props.removingBreakKey === `${shift.id}:${props.shifts[index + 1].id}`"
                                 @click="emit('remove-break', {
                                     previousShiftId: shift.id,

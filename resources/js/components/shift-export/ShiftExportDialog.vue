@@ -71,12 +71,12 @@ watch(
 
 <template>
     <Dialog :open="props.open" @update:open="emit('update:open', $event)">
-        <DialogContent class="border-[#2f3033] bg-[#161719] text-slate-100 sm:max-w-lg">
+        <DialogContent class="border-border bg-background text-foreground sm:max-w-lg">
             <DialogHeader class="space-y-2 text-left">
-                <DialogTitle class="text-xl font-semibold text-slate-50">
+                <DialogTitle class="text-xl font-semibold text-foreground">
                     {{ i18n.global.t(props.titleKey) }}
                 </DialogTitle>
-                <DialogDescription class="text-slate-400">
+                <DialogDescription class="text-muted-foreground">
                     {{ i18n.global.t(props.descriptionKey) }}
                 </DialogDescription>
             </DialogHeader>
@@ -84,7 +84,7 @@ watch(
             <div class="space-y-5">
                 <p
                     v-if="generalErrorMessage"
-                    class="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+                    class="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-200"
                 >
                     {{ generalErrorMessage }}
                 </p>
@@ -92,15 +92,15 @@ watch(
                 <div class="grid gap-2">
                     <Label for="shift-export-type">{{ i18n.global.t('exports.field.type') }}</Label>
                     <Select v-model="selectedType">
-                        <SelectTrigger id="shift-export-type" class="h-11 w-full rounded-xl border-[#3a3b3c] bg-[#18191a] px-3 text-sm text-slate-100">
+                        <SelectTrigger id="shift-export-type" class="h-11 w-full rounded-xl px-3 text-sm">
                             <SelectValue :placeholder="i18n.global.t('exports.field.type_placeholder')" />
                         </SelectTrigger>
-                        <SelectContent class="border-[#2e2f30] bg-[#18191a] text-slate-100">
+                        <SelectContent class="rounded-xl">
                             <SelectItem
                                 v-for="format in props.formats"
                                 :key="format.key"
                                 :value="format.key"
-                                class="focus:bg-white/8 focus:text-slate-100"
+
                             >
                                 {{ i18n.global.t(format.label_key) }}
                             </SelectItem>
@@ -112,22 +112,22 @@ watch(
                 <div v-if="props.editableRange" class="grid gap-4 sm:grid-cols-2">
                     <div class="grid gap-2">
                         <Label for="shift-export-from">{{ i18n.global.t('exports.field.from') }}</Label>
-                        <Input id="shift-export-from" v-model="from" type="date" class="border-[#3a3b3c] bg-[#18191a] text-slate-100" />
+                        <Input id="shift-export-from" v-model="from" type="date" class="border-border bg-background text-foreground" />
                         <InputError :message="errors.from ?? undefined" />
                     </div>
 
                     <div class="grid gap-2">
                         <Label for="shift-export-to">{{ i18n.global.t('exports.field.to') }}</Label>
-                        <Input id="shift-export-to" v-model="to" type="date" class="border-[#3a3b3c] bg-[#18191a] text-slate-100" />
+                        <Input id="shift-export-to" v-model="to" type="date" class="border-border bg-background text-foreground" />
                         <InputError :message="errors.to ?? undefined" />
                     </div>
                 </div>
 
-                <div v-else class="space-y-2 rounded-2xl border border-[#313234] bg-[#18191a] px-4 py-3">
-                    <p class="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">
+                <div v-else class="space-y-2 rounded-2xl border border-border bg-muted/40 px-4 py-3">
+                    <p class="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                         {{ i18n.global.t('exports.field.fixed_range') }}
                     </p>
-                    <p class="text-sm text-slate-100">
+                    <p class="text-sm text-foreground">
                         {{ formattedRange }}
                     </p>
                 </div>
@@ -137,7 +137,7 @@ watch(
                 <Button
                     type="button"
                     variant="ghost"
-                    class="border border-[#313234] bg-[#18191a] text-slate-300 hover:bg-[#242526] hover:text-slate-100"
+                    class="border border-border bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                     @click="emit('update:open', false)"
                 >
                     {{ i18n.global.t('shared.actions.cancel') }}

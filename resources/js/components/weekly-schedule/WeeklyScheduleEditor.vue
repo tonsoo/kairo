@@ -36,11 +36,11 @@ function fieldError(index: number, field: 'expected_minutes' | 'starts_at' | 'en
 
 <template>
     <DashboardPanel class="p-6">
-        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#2e2f30] pb-5">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-5">
             <div class="space-y-2">
-                <h1 class="text-xl font-semibold text-slate-100">{{ i18n.global.t('weekly_schedule.title') }}</h1>
-                <p class="max-w-2xl text-sm text-slate-400">{{ i18n.global.t('weekly_schedule.description') }}</p>
-                <div class="flex flex-wrap gap-3 text-xs uppercase tracking-[0.18em] text-slate-500">
+                <h1 class="text-xl font-semibold text-foreground">{{ i18n.global.t('weekly_schedule.title') }}</h1>
+                <p class="max-w-2xl text-sm text-muted-foreground">{{ i18n.global.t('weekly_schedule.description') }}</p>
+                <div class="flex flex-wrap gap-3 text-xs uppercase tracking-[0.18em] text-muted-foreground">
                     <span>{{ i18n.global.t('weekly_schedule.effective_from') }}: {{ effectiveFrom }}</span>
                     <span>{{ i18n.global.t('weekly_schedule.timezone') }}: {{ timezone }}</span>
                 </div>
@@ -49,13 +49,13 @@ function fieldError(index: number, field: 'expected_minutes' | 'starts_at' | 'en
             <div class="flex items-center gap-3">
                 <span
                     v-if="recentlySuccessful"
-                    class="rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs font-medium text-teal-300"
+                    class="rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs font-medium text-teal-700 dark:text-teal-300"
                 >
                     {{ i18n.global.t('weekly_schedule.saved') }}
                 </span>
                 <button
                     type="button"
-                    class="rounded-xl bg-teal-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-400 disabled:cursor-not-allowed disabled:opacity-60"
+                    class="rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
                     :disabled="isLoading || isSubmitting || !isDirty"
                     @click="emit('submit')"
                 >
@@ -64,11 +64,11 @@ function fieldError(index: number, field: 'expected_minutes' | 'starts_at' | 'en
             </div>
         </div>
 
-        <p v-if="errorMessageKey" class="mt-4 rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+        <p v-if="errorMessageKey" class="mt-4 rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-200">
             {{ i18n.global.t(errorMessageKey) }}
         </p>
 
-        <p v-if="isLoading" class="mt-6 text-sm text-slate-400">
+        <p v-if="isLoading" class="mt-6 text-sm text-muted-foreground">
             {{ i18n.global.t('weekly_schedule.loading') }}
         </p>
 

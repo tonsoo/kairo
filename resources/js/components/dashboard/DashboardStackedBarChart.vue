@@ -6,6 +6,7 @@ import {
     buildDashboardStackedBarChartOptions,
     buildDashboardStackedBarChartSeries,
 } from '@/components/dashboard/dashboardStackedBarChart';
+import { useAppearance } from '@/composables/useAppearance';
 
 const props = withDefaults(
     defineProps<{
@@ -21,6 +22,8 @@ const props = withDefaults(
     },
 );
 
+const { resolvedAppearance } = useAppearance();
+
 const chartSeries = computed(() =>
     buildDashboardStackedBarChartSeries(props.items),
 );
@@ -28,6 +31,7 @@ const chartSeries = computed(() =>
 const chartOptions = computed(() =>
     buildDashboardStackedBarChartOptions({
         items: props.items,
+        appearance: resolvedAppearance.value,
         compact: props.compact,
         maxMinutes: props.maxMinutes,
         stepCount: props.stepCount,

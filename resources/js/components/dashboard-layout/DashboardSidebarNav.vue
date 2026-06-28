@@ -52,7 +52,7 @@ const sections: Array<{ title: string; items: SidebarItem[] }> = [
             class="space-y-2"
         >
             <p
-                class="px-2 text-[11px] font-semibold tracking-[0.28em] text-slate-500 uppercase"
+                class="px-2 text-[11px] font-semibold tracking-[0.28em] text-muted-foreground uppercase"
             >
                 {{ section.title }}
             </p>
@@ -65,8 +65,8 @@ const sections: Array<{ title: string; items: SidebarItem[] }> = [
                     :class="[
                         'flex items-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium transition-all',
                         isCurrentUrl(item.href)
-                            ? 'border-teal-500/25 bg-teal-500/10 text-teal-300'
-                            : 'border-transparent text-slate-400 hover:border-[#343538] hover:bg-[#222325] hover:text-slate-200',
+                            ? 'border-teal-500/25 bg-teal-500/10 text-teal-700 dark:text-teal-300'
+                            : 'border-transparent text-muted-foreground hover:border-border hover:bg-accent hover:text-accent-foreground',
                     ]"
                 >
                     <component :is="item.icon" class="size-4" />

@@ -12,7 +12,7 @@ const props = defineProps<{
     <Card
         :class="
             cn(
-                'gap-0 rounded-xl border border-[#2e2f30] bg-[#242526] py-0 text-slate-200 shadow-sm',
+                'gap-0 rounded-xl border border-border bg-card py-0 text-card-foreground shadow-sm',
                 props.class,
             )
         "

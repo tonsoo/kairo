@@ -25,34 +25,34 @@ const emit = defineEmits<{
             v-for="day in props.days"
             :key="day.date"
             type="button"
-            class="flex w-full flex-col gap-4 rounded-2xl border border-[#2e2f30] bg-[#18191a] px-5 py-4 text-left transition-colors hover:border-[#3c3d40] hover:bg-[#1c1d1f] md:flex-row md:items-center md:justify-between"
+            class="flex w-full flex-col gap-4 rounded-2xl border border-border bg-card px-5 py-4 text-left transition-colors hover:border-ring/30 hover:bg-accent/30 md:flex-row md:items-center md:justify-between"
             @click="emit('select', day.date)"
         >
             <div class="flex items-center gap-4">
-                <div class="flex size-12 items-center justify-center rounded-2xl border border-[#313234] bg-[#222325] text-lg font-semibold text-slate-100">
+                <div class="flex size-12 items-center justify-center rounded-2xl border border-border bg-muted text-lg font-semibold text-foreground">
                     {{ day.date.slice(-2) }}
                 </div>
 
                 <div class="space-y-1">
-                    <p class="text-sm font-medium text-slate-100">
+                    <p class="text-sm font-medium text-foreground">
                         {{ formatHistoryDayHeading(day.date, props.locale) }}
                     </p>
-                    <p class="text-xs uppercase tracking-[0.2em] text-slate-500">
+                    <p class="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                         {{ formatHistoryDaySubheading(day.date, props.locale) }}
                     </p>
                 </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-3 md:justify-end">
-                <div class="inline-flex items-center gap-2 rounded-full border border-teal-500/15 bg-teal-500/10 px-3 py-1.5 text-sm text-teal-200">
+                <div class="inline-flex items-center gap-2 rounded-full border border-teal-500/15 bg-teal-500/10 px-3 py-1.5 text-sm text-teal-700 dark:text-teal-200">
                     <Clock3 class="size-4 text-teal-400" />
                     <span>{{ i18n.global.t('history.day.worked') }}</span>
-                    <span class="font-semibold text-slate-100">{{ formatDurationMinutes(day.workedMinutes) }}</span>
+                    <span class="font-semibold text-foreground">{{ formatDurationMinutes(day.workedMinutes) }}</span>
                 </div>
 
                 <div
                     v-if="day.extraMinutes > 0"
-                    class="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-200"
+                    class="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-200"
                 >
                     {{ i18n.global.t('history.day.extra') }}
                     {{ formatDurationMinutes(day.extraMinutes) }}
@@ -60,24 +60,24 @@ const emit = defineEmits<{
 
                 <div
                     v-if="day.missingMinutes > 0"
-                    class="rounded-full border border-slate-500/20 bg-slate-500/10 px-3 py-1 text-xs font-medium text-slate-300"
+                    class="rounded-full border border-border bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground"
                 >
                     {{ i18n.global.t('history.day.missing') }}
                     {{ formatDurationMinutes(day.missingMinutes) }}
                 </div>
 
-                <ArrowUpRight class="size-4 text-slate-500" />
+                <ArrowUpRight class="size-4 text-muted-foreground" />
             </div>
         </button>
 
         <div
             v-if="props.days.length === 0"
-            class="rounded-2xl border border-dashed border-[#343538] bg-[#18191a] px-6 py-12 text-center"
+            class="rounded-2xl border border-dashed border-border bg-muted/30 px-6 py-12 text-center"
         >
-            <p class="text-base font-medium text-slate-100">
+            <p class="text-base font-medium text-foreground">
                 {{ i18n.global.t('history.empty.title') }}
             </p>
-            <p class="mt-2 text-sm text-slate-400">
+            <p class="mt-2 text-sm text-muted-foreground">
                 {{ i18n.global.t('history.empty.description') }}
             </p>
         </div>
