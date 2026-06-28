@@ -243,11 +243,11 @@
     "home.cta.title": "Start tracking hours with Kairo.",
     "home.cta.description": "Use a focused time tracker for work hours, shift logs, and overtime balance. Open your account and keep the record exact.",
     "home.footer.description": "Kairo is a precision time tracker for work hours, shift logs, and private overtime balance control.",
-    "home.footer.product": "Product",
     "home.footer.product.features": "Features",
     "home.footer.product.how-it-works": "How it works",
     "home.footer.rights": "All rights reserved.",
     "home.footer.systems": "Systems operational",
     "home.meta.title": "Time Tracker for Shifts and Work Hours",
-    "home.meta.description": "Kairo is a precise time tracker and hours tracker for work hours, shift logs, overtime balance, and daily hour tracking."
+    "home.meta.description": "Kairo is a precise time tracker and hours tracker for work hours, shift logs, overtime balance, and daily hour tracking.",
+    "home.footer.product_label": "Product"
 }

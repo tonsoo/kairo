@@ -26,7 +26,7 @@ defineProps<{
             </div>
             <div>
                 <h4 class="mb-4 font-semibold text-slate-200">
-                    {{ i18n.global.t('home.footer.product') }}
+                    {{ i18n.global.t('home.footer.product_label') }}
                 </h4>
                 <ul class="space-y-3 text-sm text-slate-500">
                     <li>

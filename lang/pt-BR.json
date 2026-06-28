@@ -246,11 +246,11 @@
     "home.cta.title": "Comece seu controle de horas com Kairo.",
     "home.cta.description": "Use um controle de horas direto para turnos, banco de horas e controle de ponto. Abra sua conta e mantenha o registro exato.",
     "home.footer.description": "Kairo e um controle de horas preciso para turnos, controle de ponto e banco de horas pessoal.",
-    "home.footer.product": "Produto",
     "home.footer.product.features": "Funcionalidades",
     "home.footer.product.how-it-works": "Como funciona",
     "home.footer.rights": "Todos os direitos reservados.",
     "home.footer.systems": "Sistemas operacionais",
     "home.meta.title": "Controle de Horas e Ponto para Turnos",
-    "home.meta.description": "Kairo e um controle de horas e controle de ponto preciso para turnos, banco de horas, horas extras e rotina de trabalho."
+    "home.meta.description": "Kairo e um controle de horas e controle de ponto preciso para turnos, banco de horas, horas extras e rotina de trabalho.",
+    "home.footer.product_label": "Produto"
 }
