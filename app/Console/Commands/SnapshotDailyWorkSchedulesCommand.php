@@ -11,7 +11,7 @@ use Illuminate\Console\Command;
 
 final class SnapshotDailyWorkSchedulesCommand extends Command
 {
-    protected $signature = 'hours-tracker:snapshot-daily-work-schedules {--date= : Local date in Y-m-d format}';
+    protected $signature = 'kairo:snapshot-daily-work-schedules {--date= : Local date in Y-m-d format}';
 
     protected $description = 'Create daily work schedule snapshots for users.';
 

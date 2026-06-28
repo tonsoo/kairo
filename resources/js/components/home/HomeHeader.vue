@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { Clock3 } from '@lucide/vue';
+import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import HomeLocaleSwitch from '@/components/home/HomeLocaleSwitch.vue';
 import { i18n } from '@/lib/i18n';
 
@@ -19,10 +19,10 @@ defineProps<{
         <div
             class="mx-auto flex h-16 max-w-7xl items-center justify-between px-6"
         >
-            <div class="flex items-center gap-2">
-                <Clock3 class="size-6 text-teal-500" />
+            <div class="flex items-center gap-3">
+                <AppLogoIcon class="size-8 shrink-0" />
                 <span class="text-xl font-bold tracking-tight text-slate-200"
-                    >Shiftly</span
+                    >Kairo</span
                 >
             </div>
 

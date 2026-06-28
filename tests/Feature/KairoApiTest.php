@@ -12,7 +12,7 @@ use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 uses(LazilyRefreshDatabase::class);
 
-test('guests cannot access the hours tracker api', function () {
+test('guests cannot access the kairo api', function () {
     $this->getJson(route('api.me.current-shift-state'))
         ->assertUnauthorized();
 
@@ -99,7 +99,7 @@ test('dashboard hours summary prefers daily work schedule snapshots over updated
 
     CarbonImmutable::setTestNow();
 
-    $this->artisan('hours-tracker:snapshot-daily-work-schedules', [
+    $this->artisan('kairo:snapshot-daily-work-schedules', [
         '--date' => '2026-06-26',
     ])->assertSuccessful();
 

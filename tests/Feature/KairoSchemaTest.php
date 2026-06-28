@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Schema;
 
 uses(LazilyRefreshDatabase::class);
 
-test('hours tracker tables and columns exist', function () {
+test('kairo tables and columns exist', function () {
     expect(Schema::hasTable('work_schedules'))->toBeTrue();
     expect(Schema::hasTable('daily_work_schedules'))->toBeTrue();
     expect(Schema::hasTable('shifts'))->toBeTrue();

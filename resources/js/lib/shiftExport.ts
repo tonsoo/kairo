@@ -14,13 +14,13 @@ export type ShiftExportDownloadPayload = {
 
 export type ShiftExportDownloadResult =
     | {
-        success: true;
-    }
+          success: true;
+      }
     | {
-        success: false;
-        message: string | null;
-        errors: Partial<Record<'from' | 'to' | 'type', string>>;
-    };
+          success: false;
+          message: string | null;
+          errors: Partial<Record<'from' | 'to' | 'type', string>>;
+      };
 
 export async function downloadShiftExportFile(
     payload: ShiftExportDownloadPayload,
@@ -35,7 +35,7 @@ export async function downloadShiftExportFile(
         },
     );
 
-    if (! response.ok) {
+    if (!response.ok) {
         const fallbackResult: ShiftExportDownloadResult = {
             success: false,
             message: null,
@@ -43,7 +43,7 @@ export async function downloadShiftExportFile(
         };
         const contentType = response.headers.get('content-type') ?? '';
 
-        if (! contentType.includes('application/json')) {
+        if (!contentType.includes('application/json')) {
             return fallbackResult;
         }
 
@@ -68,7 +68,9 @@ export async function downloadShiftExportFile(
     const link = document.createElement('a');
 
     link.href = downloadUrl;
-    link.download = resolveDownloadFilename(response.headers.get('content-disposition'));
+    link.download = resolveDownloadFilename(
+        response.headers.get('content-disposition'),
+    );
     document.body.append(link);
     link.click();
     link.remove();
@@ -81,14 +83,14 @@ export async function downloadShiftExportFile(
 
 function resolveDownloadFilename(contentDisposition: string | null): string {
     if (contentDisposition === null) {
-        return 'hours-tracker-export.txt';
+        return 'kairo-export.txt';
     }
 
     const matchedFilename = contentDisposition.match(/filename="?([^";]+)"?/i);
 
     if (matchedFilename === null) {
-        return 'hours-tracker-export.txt';
+        return 'kairo-export.txt';
     }
 
-    return matchedFilename[1] ?? 'hours-tracker-export.txt';
+    return matchedFilename[1] ?? 'kairo-export.txt';
 }

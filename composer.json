@@ -1,11 +1,12 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/vue-starter-kit",
+    "name": "tonsoo/kairo",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Kairo is a personal time tracking app built with Laravel.",
     "keywords": [
+        "kairo",
         "laravel",
-        "framework"
+        "time-tracking"
     ],
     "license": "MIT",
     "require": {

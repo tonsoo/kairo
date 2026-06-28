@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Clock3, Play } from '@lucide/vue';
 import { i18n } from '@/lib/i18n';
-
 </script>
 
 <template>

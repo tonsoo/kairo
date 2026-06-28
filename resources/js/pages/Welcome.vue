@@ -23,16 +23,26 @@ const isAuthenticated = computed(() => page.props.auth.user !== null);
 const dashboardHref = dashboard().url;
 const loginHref = login().url;
 const registerHref = register().url;
-const primaryHref = computed(() => isAuthenticated.value ? dashboardHref : registerHref);
-const secondaryHref = computed(() => isAuthenticated.value ? dashboardHref : loginHref);
-const primaryLabel = computed(() => isAuthenticated.value ? i18n.global.t('home.hero.cta.primary_auth') : i18n.global.t('home.hero.cta.primary_guest'));
+const primaryHref = computed(() =>
+    isAuthenticated.value ? dashboardHref : registerHref,
+);
+const secondaryHref = computed(() =>
+    isAuthenticated.value ? dashboardHref : loginHref,
+);
+const primaryLabel = computed(() =>
+    isAuthenticated.value
+        ? i18n.global.t('home.hero.cta.primary_auth')
+        : i18n.global.t('home.hero.cta.primary_guest'),
+);
 const currentYear = new Date().getFullYear();
 </script>
 
 <template>
-    <Head title="Shiftly" />
+    <Head title="Kairo" />
 
-    <div class="min-h-screen bg-[#1e1f20] font-sans text-slate-300 selection:bg-teal-500/30 selection:text-white">
+    <div
+        class="min-h-screen bg-[#1e1f20] font-sans text-slate-300 selection:bg-teal-500/30 selection:text-white"
+    >
         <HomeHeader
             :dashboard-href="dashboardHref"
             :login-href="loginHref"

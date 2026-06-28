@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 uses(LazilyRefreshDatabase::class);
 
-test('user exposes hours tracker relationships', function () {
+test('user exposes kairo relationships', function () {
     CarbonImmutable::setTestNow('2026-06-01 00:00:00 UTC');
 
     $user = User::factory()->create();
@@ -66,7 +66,7 @@ test('new users receive default weekly work schedules', function () {
         ->and($saturdaySchedule?->ends_at)->toBeNull();
 });
 
-test('hours tracker models cast temporal fields and expose shift scopes', function () {
+test('kairo models cast temporal fields and expose shift scopes', function () {
     $workSchedule = WorkSchedule::factory()->create([
         'effective_from' => '2026-06-01',
     ]);

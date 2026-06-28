@@ -14,10 +14,10 @@ final class RateLimitServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        $this->configureHoursTrackerLimiters();
+        $this->configureRateLimiters();
     }
 
-    private function configureHoursTrackerLimiters(): void
+    private function configureRateLimiters(): void
     {
         $this->forUserOrIp(RateLimiterType::read, 250);
         $this->forUserOrIp(RateLimiterType::write, 150);

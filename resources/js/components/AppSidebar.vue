@@ -2,8 +2,8 @@
 import { Link } from '@inertiajs/vue3';
 import AppLogo from '@/components/AppLogo.vue';
 import NavUser from '@/components/NavUser.vue';
-import HoursTrackerSidebarAction from '@/components/sidebar/HoursTrackerSidebarAction.vue';
-import HoursTrackerSidebarNav from '@/components/sidebar/HoursTrackerSidebarNav.vue';
+import KairoSidebarAction from '@/components/sidebar/KairoSidebarAction.vue';
+import KairoSidebarNav from '@/components/sidebar/KairoSidebarNav.vue';
 import {
     Sidebar,
     SidebarContent,
@@ -31,11 +31,11 @@ import { dashboard } from '@/routes';
         </SidebarHeader>
 
         <SidebarContent>
-            <HoursTrackerSidebarNav />
+            <KairoSidebarNav />
         </SidebarContent>
 
         <SidebarFooter class="gap-3">
-            <HoursTrackerSidebarAction />
+            <KairoSidebarAction />
             <NavUser />
         </SidebarFooter>
     </Sidebar>

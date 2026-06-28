@@ -13,7 +13,7 @@ return [
         'sheet_name' => 'Horas',
         'period' => 'Período',
         'timezone' => 'Fuso horário',
-        'footer' => 'Gerado por Shiftly • shiftly.alysson-thoaldo.com.br',
+        'footer' => 'Gerado por Kairo',
         'headings' => [
             'weekday' => 'Dia',
             'date' => 'Data',
