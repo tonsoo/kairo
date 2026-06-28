@@ -16,9 +16,11 @@ type WelcomePageProps = {
     auth: {
         user: User | null;
     };
+    locale: 'en' | 'pt-BR';
 };
 
 const page = usePage<WelcomePageProps>();
+const canonicalUrl = 'https://kairo.alysson-thoaldo.com.br/';
 const isAuthenticated = computed(() => page.props.auth.user !== null);
 const dashboardHref = dashboard().url;
 const loginHref = login().url;
@@ -34,11 +36,63 @@ const primaryLabel = computed(() =>
         ? i18n.global.t('home.hero.cta.primary_auth')
         : i18n.global.t('home.hero.cta.primary_guest'),
 );
+const currentLocale = computed(() =>
+    page.props.locale === 'pt-BR' ? 'pt-BR' : 'en',
+);
+const metaTitle = computed(() => i18n.global.t('home.meta.title'));
+const metaDescription = computed(() => i18n.global.t('home.meta.description'));
+const metaTitleContent = computed(() => `${metaTitle.value} - Kairo`);
+const ogLocale = computed(() =>
+    currentLocale.value === 'pt-BR' ? 'pt_BR' : 'en_US',
+);
+const alternateOgLocale = computed(() =>
+    ogLocale.value === 'pt_BR' ? 'en_US' : 'pt_BR',
+);
+const structuredData = computed(() =>
+    JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: 'Kairo',
+        applicationCategory: 'BusinessApplication',
+        operatingSystem: 'Web',
+        url: canonicalUrl,
+        inLanguage: currentLocale.value,
+        description: metaDescription.value,
+        offers: {
+            '@type': 'Offer',
+            price: '0',
+            priceCurrency: 'USD',
+        },
+    }),
+);
 const currentYear = new Date().getFullYear();
 </script>
 
 <template>
-    <Head title="Kairo" />
+    <Head :title="metaTitle">
+        <meta name="description" :content="metaDescription" />
+        <meta
+            name="robots"
+            content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
+        />
+        <meta name="application-name" content="Kairo" />
+        <link rel="canonical" :href="canonicalUrl" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Kairo" />
+        <meta property="og:title" :content="metaTitleContent" />
+        <meta property="og:description" :content="metaDescription" />
+        <meta property="og:url" :content="canonicalUrl" />
+        <meta property="og:locale" :content="ogLocale" />
+        <meta property="og:locale:alternate" :content="alternateOgLocale" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" :content="metaTitleContent" />
+        <meta name="twitter:description" :content="metaDescription" />
+        <component
+            :is="'script'"
+            type="application/ld+json"
+            v-text="structuredData"
+        />
+    </Head>
 
     <div
         class="min-h-screen bg-[#1e1f20] font-sans text-slate-300 selection:bg-teal-500/30 selection:text-white"

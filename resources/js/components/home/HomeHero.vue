@@ -18,7 +18,7 @@ defineProps<{
 
         <div class="mx-auto max-w-5xl text-center">
             <h1 class="mb-8 text-5xl font-extrabold leading-[1.1] tracking-tight text-white md:text-6xl lg:text-7xl">
-                {{ i18n.global.t('home.hero.title.line_1') }} <br class="hidden md:block" />
+                {{ i18n.global.t('home.hero.title.line_1') }}
                 {{ i18n.global.t('home.hero.title.line_2_prefix') }}
                 <span class="bg-gradient-to-r from-teal-400 to-emerald-300 bg-clip-text text-transparent">{{ i18n.global.t('home.hero.title.line_2_emphasis') }}</span>
             </h1>
