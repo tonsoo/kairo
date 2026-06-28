@@ -11,8 +11,11 @@ const emit = defineEmits<{
     success: [];
 }>();
 
-
 const getDefaultPasskeyName = () => {
+    if (typeof navigator === 'undefined') {
+        return '';
+    }
+
     const ua = navigator.userAgent;
 
     const browser = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera'].find(
@@ -68,7 +71,9 @@ const handleCancel = () => {
         class="space-y-4 rounded-lg border border-border bg-muted/50 p-4"
     >
         <div class="grid gap-2">
-            <Label for="passkey-name">{{ i18n.global.t('settings.passkeys.name') }}</Label>
+            <Label for="passkey-name">{{
+                i18n.global.t('settings.passkeys.name')
+            }}</Label>
             <Input
                 id="passkey-name"
                 type="text"
@@ -86,7 +91,11 @@ const handleCancel = () => {
 
         <div class="flex gap-2">
             <Button type="submit" :disabled="isLoading || !name.trim()">
-                {{ isLoading ? i18n.global.t('settings.passkeys.registering') : i18n.global.t('settings.passkeys.register') }}
+                {{
+                    isLoading
+                        ? i18n.global.t('settings.passkeys.registering')
+                        : i18n.global.t('settings.passkeys.register')
+                }}
             </Button>
             <Button type="button" variant="ghost" @click="handleCancel">
                 {{ i18n.global.t('shared.actions.cancel') }}

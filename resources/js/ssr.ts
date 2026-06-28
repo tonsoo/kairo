@@ -1,12 +1,10 @@
 import { createInertiaApp } from '@inertiajs/vue3';
-import { initializeTheme } from '@/composables/useAppearance';
 import {
     configureInertiaApp,
     inertiaProgress,
     inertiaTitle,
     resolveInertiaLayout,
 } from '@/inertia';
-import { initializeFlashToast } from '@/lib/flashToast';
 
 createInertiaApp({
     title: inertiaTitle,
@@ -14,7 +12,3 @@ createInertiaApp({
     progress: inertiaProgress,
     withApp: configureInertiaApp,
 });
-
-initializeTheme();
-
-initializeFlashToast();

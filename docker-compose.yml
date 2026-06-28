@@ -1,62 +1,88 @@
 services:
-    php:
-        build:
-            dockerfile: local.Dockerfile
-        restart: unless-stopped
-        environment:
-            SERVER_NAME: ":80"
-        depends_on:
-            - mysql
-        volumes:
-            - .:/app
-        ports:
-            - "19941:80"
-            - "5173"
+  php:
+    build:
+      dockerfile: local.Dockerfile
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: ':80'
+    depends_on:
+      - mysql
+    volumes:
+      - .:/app
+    ports:
+      - '19941:80'
+      - '5173'
 
-    queue:
-        build:
-            dockerfile: local.Dockerfile
-        restart: unless-stopped
-        depends_on:
-            - mysql
-        command: [ "php", "artisan", "queue:work", "--sleep=1", "--tries=3", "--timeout=360", "--max-jobs=100" ]
-        volumes:
-            - .:/app
+  queue:
+    build:
+      dockerfile: local.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    command:
+      [
+        'php',
+        'artisan',
+        'queue:work',
+        '--sleep=1',
+        '--tries=3',
+        '--timeout=360',
+        '--max-jobs=100',
+      ]
+    volumes:
+      - .:/app
 
-    scheduler:
-        build:
-            dockerfile: local.Dockerfile
-        restart: unless-stopped
-        depends_on:
-            - mysql
-        command: [ "php", "artisan", "schedule:work" ]
-        volumes:
-            - .:/app
+  scheduler:
+    build:
+      dockerfile: local.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    command: ['php', 'artisan', 'schedule:work']
+    volumes:
+      - .:/app
 
-    mysql:
-        image: mysql:8.4
-        restart: unless-stopped
-        environment:
-            MYSQL_ROOT_PASSWORD: "root_password"
-            MYSQL_DATABASE: hours_tracker
-            MYSQL_USER: hours_tracker
-            MYSQL_PASSWORD: password
-        volumes:
-            - mysql-data:/var/lib/mysql
+  ssr:
+    build:
+      dockerfile: local.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - php
+    command:
+      [
+        'php',
+        'artisan',
+        'inertia:start-ssr',
+        '--runtime=node',
+        '--no-interaction',
+      ]
+    volumes:
+      - .:/app
 
-    phpmyadmin:
-        image: phpmyadmin/phpmyadmin
-        restart: unless-stopped
-        depends_on:
-            - mysql
-        environment:
-            PMA_HOST: mysql
-            PMA_USER: root
-            PMA_PASSWORD: root_password
-            PMA_ARBITRARY: 1
-        ports:
-            - "19942:80"
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root_password'
+      MYSQL_DATABASE: hours_tracker
+      MYSQL_USER: hours_tracker
+      MYSQL_PASSWORD: password
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: root_password
+      PMA_ARBITRARY: 1
+    ports:
+      - '19942:80'
 
 volumes:
-    mysql-data:
-        driver: local
+  mysql-data:
+    driver: local
