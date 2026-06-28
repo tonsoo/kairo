@@ -87,10 +87,9 @@ const currentYear = new Date().getFullYear();
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" :content="metaTitleContent" />
         <meta name="twitter:description" :content="metaDescription" />
-        <component
-            :is="'script'"
+        <script
             type="application/ld+json"
-            v-text="structuredData"
+            v-html="structuredData"
         />
     </Head>
 
