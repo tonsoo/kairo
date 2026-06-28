@@ -45,6 +45,17 @@ test('the selected locale is shared with inertia pages without sending a transla
             ->missing('translations'));
 });
 
+test('the selected locale is shared with the public home inertia page without sending a translation payload', function () {
+    $this->withoutVite();
+
+    $this->withCookie('locale', 'pt-BR')
+        ->get(route('home'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('locale', 'pt-BR')
+            ->missing('translations'));
+});
+
 test('unsupported locales are not accepted', function () {
     $response = $this->patch('/locale/es');
 

@@ -2,21 +2,13 @@
 import { useLocaleSwitch } from '@/composables/useLocaleSwitch';
 import { i18n, localeSwitchOptions } from '@/lib/i18n';
 
-type Props = {
-    compact?: boolean;
-};
-
-const props = withDefaults(defineProps<Props>(), {
-    compact: false,
-});
-
 const { currentLocale, isSwitching, switchLocale } = useLocaleSwitch();
 </script>
 
 <template>
     <div
         :aria-label="i18n.global.t('locale.switch.aria')"
-        class="inline-flex items-center gap-1 rounded-full border border-border bg-card/80 p-1"
+        class="inline-flex items-center gap-1 rounded-xl border border-[#2f3336] bg-[#17191b] p-1"
         role="group"
     >
         <button
@@ -26,11 +18,10 @@ const { currentLocale, isSwitching, switchLocale } = useLocaleSwitch();
             :disabled="isSwitching"
             :aria-pressed="currentLocale === option.value"
             :class="[
-                'rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.02em] transition-colors disabled:cursor-not-allowed disabled:opacity-70',
-                props.compact ? 'px-3 py-1.5 text-[11px]' : '',
+                'rounded-lg border px-3 py-1.5 text-[11px] font-semibold tracking-[0.02em] transition-colors disabled:cursor-not-allowed disabled:opacity-70',
                 currentLocale === option.value
-                    ? 'border-teal-500/25 bg-teal-500/10 text-teal-700 dark:text-teal-300'
-                    : 'border-transparent text-muted-foreground hover:border-border hover:bg-accent hover:text-accent-foreground',
+                    ? 'border-teal-500/25 bg-teal-500/10 text-teal-300'
+                    : 'border-transparent text-[#8fa29a] hover:border-[#2a2d30] hover:bg-[#1f2225] hover:text-slate-200',
             ]"
             @click="switchLocale(option.value)"
         >
