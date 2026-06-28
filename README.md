@@ -7,13 +7,9 @@ Personal Time Tracking
 Clean, self-hosted time tracking for work hours, shifts, and hour balance.
 </div>
 
----
-
 Kairo helps you track your own working time without spreadsheets, manual math, or heavy HR software.
 
 It is built for individuals who want a simple place to start a shift, stop a shift, review the day, and understand whether their hours are balanced.
-
----
 
 ## What You Can Do
 
@@ -28,8 +24,6 @@ It is built for individuals who want a simple place to start a shift, stop a shi
 
 Kairo is not built for employee monitoring or team surveillance. It is meant to be your personal time workspace.
 
----
-
 ## How It Works
 
 1. Configure your usual work schedule.
@@ -39,8 +33,6 @@ Kairo is not built for employee monitoring or team surveillance. It is meant to 
 5. Review your dashboard to see your totals and balance.
 
 Kairo compares the time you actually recorded with the schedule you configured, so you can quickly tell whether you are ahead, behind, or on track.
-
----
 
 ## Self-Hosting
 
@@ -131,8 +123,6 @@ A typical deployment can run the same image with different commands for each pro
 
 Adjust the web command to match your Docker image or hosting platform.
 
----
-
 ## Development
 
 Run the test suite:
@@ -153,15 +143,11 @@ Build frontend assets:
 docker compose exec -T php sh -lc 'cd /app && npm run build'
 ```
 
----
-
 ## Contributing
 
 Issues and pull requests are welcome.
 
 For pull requests, please keep changes focused, include relevant tests when behavior changes, and make sure the app still builds before submitting.
-
----
 
 ## License
 
