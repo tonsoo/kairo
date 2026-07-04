@@ -96,25 +96,26 @@ export const chartLegend: DashboardLegendItem[] = [
 export function buildBalanceSegments(
     balance: HoursSummaryApiData['balance'],
 ): DashboardMeterSegment[] {
-    if (balance.positive_minutes === 0 && balance.negative_minutes === 0) {
-        return [
-            {
-                ...dashboardLegendConfig.missing,
-                value: 0.0001,
-            },
-        ];
-    }
-
     return [
         {
-            ...dashboardLegendConfig.positive,
-            value: balance.positive_minutes,
-        },
-        {
-            ...dashboardLegendConfig.negative,
-            value: balance.negative_minutes,
+            ...resolveBalanceSegmentSetting(balance),
+            value: balance.balance_minutes === 0
+                ? 0.01
+                : Math.abs(balance.balance_minutes),
         },
     ];
+}
+
+function resolveBalanceSegmentSetting(
+    balance: HoursSummaryApiData['balance'],
+) {
+    if (balance.balance_minutes === 0) {
+        return dashboardLegendConfig.missing;
+    }
+
+    return balance.balance_minutes > 0
+        ? dashboardLegendConfig.positive
+        : dashboardLegendConfig.negative;
 }
 
 export function buildTodaySegments(
@@ -152,9 +153,11 @@ export function buildTodaySegments(
         0,
     );
 
+    let targetMissingMinutes = 0.01;
+
     if (today.expected_minutes > 0) {
-        const targetMinutes = Math.max(today.expected_minutes, consumedMinutes);
-        const missingMinutes = targetMinutes - consumedMinutes;
+        targetMissingMinutes = Math.max(today.expected_minutes, consumedMinutes);
+        const missingMinutes = targetMissingMinutes - consumedMinutes;
 
         if (missingMinutes > 0) {
             segments.push({
@@ -162,15 +165,15 @@ export function buildTodaySegments(
                 value: missingMinutes,
             });
         }
+    }
 
-        if (segments.length === 0) {
-            return [
-                {
-                    ...dashboardLegendConfig.missing,
-                    value: targetMinutes,
-                },
-            ];
-        }
+    if (segments.length === 0) {
+        return [
+            {
+                ...dashboardLegendConfig.missing,
+                value: targetMissingMinutes,
+            },
+        ];
     }
 
     return segments.filter((segment) => segment.value > 0);

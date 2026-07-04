@@ -81,18 +81,12 @@ export const useDashboardPage = () => {
 
         const { balance } = hoursSummaryData.value;
         const status = resolveBalanceStatus(balance.balance_minutes);
-        const varianceMinutes =
-            status === 'positive'
-                ? balance.positive_minutes
-                : status === 'negative'
-                    ? balance.negative_minutes
-                    : 0;
 
         return {
             highlight: formatDurationMinutes(balance.balance_minutes, {
                 signed: true,
             }),
-            meterValue: formatDurationMinutes(varianceMinutes),
+            meterValue: formatDurationMinutes(balance.balance_minutes),
             meterCaption: i18n.global.t(getBalanceStatusLabelKey(status)),
             segments: buildBalanceSegments(balance),
         };
