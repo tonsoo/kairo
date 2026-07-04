@@ -24,11 +24,8 @@ final readonly class SitemapController
         $sitemap = Sitemap::create();
 
         foreach ($this->pages() as $page) {
-            $name = $page['name'] ?? null;
-            assert($name !== null, 'Page name cannot be null');
-
             $urls = $this->resolveUrlsForSitemap(
-                name: $name,
+                name: $page['name'],
                 isLocalized: $page['localized'] ?? false,
                 parameters: $page['parameters'] ?? [],
             );
