@@ -6,14 +6,9 @@ use App\Models\User;
 use App\Support\Localization\LocalizedUrlGenerator;
 use Inertia\Testing\AssertableInertia as Assert;
 
-test('the root path serves the default localized home route', function () {
-    $this->withoutVite();
-
+test('the root path redirects to the default localized home route', function () {
     $this->get('/')
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('Welcome')
-            ->where('locale', 'en'));
+        ->assertRedirect(route('home', absolute: false));
 });
 
 test('the selected locale changes the html lang attribute', function () {

@@ -28,12 +28,18 @@ test('homepage exposes portuguese locale in its localized url', function () {
         ->assertInertia(fn (Assert $page) => $page->component('Welcome'));
 });
 
-test('public seo files use the kairo production domain', function () {
-    expect(File::get(public_path('sitemap.xml')))
-        ->toContain('https://kairo.alysson-thoaldo.com.br/')
-        ->toContain('<lastmod>2026-06-28T00:00:00+00:00</lastmod>');
+test('public seo endpoints expose localized sitemap urls and host-agnostic robots metadata', function () {
+    $localizedUrlGenerator = app(LocalizedUrlGenerator::class);
+
+    $this->get(route('sitemap'))
+        ->assertOk()
+        ->assertHeader('content-type', 'application/xml; charset=UTF-8')
+        ->assertSee($localizedUrlGenerator->url('home', 'en'), false)
+        ->assertSee($localizedUrlGenerator->url('home', 'pt-BR'), false)
+        ->assertSee('hreflang="en"', false)
+        ->assertSee('hreflang="pt-BR"', false);
 
     expect(File::get(public_path('robots.txt')))
-        ->toContain('Sitemap: https://kairo.alysson-thoaldo.com.br/sitemap.xml')
+        ->toContain('Sitemap: /sitemap.xml')
         ->toContain('Disallow: /dashboard');
 });
