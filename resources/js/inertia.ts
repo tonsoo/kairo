@@ -14,7 +14,7 @@ export const inertiaProgress = {
 };
 
 export function inertiaTitle(title: string): string {
-    return title ? `${title} - ${appName}` : appName;
+    return title || appName;
 }
 
 export function resolveInertiaLayout(name: string): unknown {
