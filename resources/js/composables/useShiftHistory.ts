@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useShiftHistoryDay } from '@/composables/useShiftHistoryDay';
 import type {
     RemoveBreakPayload,
-    UpdateShiftPayload,
+    SaveHistoryDayPayload,
     UseShiftHistoryDayReturn,
 } from '@/composables/useShiftHistoryDay';
 import { useShiftHistoryMonth } from '@/composables/useShiftHistoryMonth';
@@ -16,12 +16,12 @@ export type UseShiftHistoryReturn = {
     selectedDate: UseShiftHistoryDayReturn['selectedDate'];
     selectedDaySummary: ComputedRef<HistoryDaySummary | null>;
     dayShifts: UseShiftHistoryDayReturn['dayShifts'];
+    dayDailyWorkSchedule: UseShiftHistoryDayReturn['dayDailyWorkSchedule'];
     errorMessageKey: ReturnType<typeof useShiftHistoryMonth>['errorMessageKey'];
     dayErrorMessageKey: UseShiftHistoryDayReturn['dayErrorMessageKey'];
     isLoadingMonth: ReturnType<typeof useShiftHistoryMonth>['isLoadingMonth'];
     isLoadingDay: UseShiftHistoryDayReturn['isLoadingDay'];
-    savingShiftId: UseShiftHistoryDayReturn['savingShiftId'];
-    deletingShiftId: UseShiftHistoryDayReturn['deletingShiftId'];
+    isSavingDay: UseShiftHistoryDayReturn['isSavingDay'];
     removingBreakKey: UseShiftHistoryDayReturn['removingBreakKey'];
     canGoToNextMonth: ComputedRef<boolean>;
     fetchMonthSummary: () => Promise<void>;
@@ -29,8 +29,7 @@ export type UseShiftHistoryReturn = {
     showNextMonth: () => Promise<void>;
     openDay: (date: string) => Promise<void>;
     closeDay: () => void;
-    saveShift: (payload: UpdateShiftPayload) => Promise<void>;
-    deleteShift: (shiftId: number) => Promise<void>;
+    saveDay: (payload: SaveHistoryDayPayload) => Promise<void>;
     removeShiftBreak: (payload: RemoveBreakPayload) => Promise<void>;
 };
 
@@ -68,12 +67,12 @@ export const useShiftHistory = (): UseShiftHistoryReturn => {
         selectedDate: dayHistory.selectedDate,
         selectedDaySummary,
         dayShifts: dayHistory.dayShifts,
+        dayDailyWorkSchedule: dayHistory.dayDailyWorkSchedule,
         errorMessageKey: monthHistory.errorMessageKey,
         dayErrorMessageKey: dayHistory.dayErrorMessageKey,
         isLoadingMonth: monthHistory.isLoadingMonth,
         isLoadingDay: dayHistory.isLoadingDay,
-        savingShiftId: dayHistory.savingShiftId,
-        deletingShiftId: dayHistory.deletingShiftId,
+        isSavingDay: dayHistory.isSavingDay,
         removingBreakKey: dayHistory.removingBreakKey,
         canGoToNextMonth: monthHistory.canGoToNextMonth,
         fetchMonthSummary: monthHistory.fetchMonthSummary,
@@ -81,8 +80,7 @@ export const useShiftHistory = (): UseShiftHistoryReturn => {
         showNextMonth: monthHistory.showNextMonth,
         openDay: dayHistory.openDay,
         closeDay: dayHistory.closeDay,
-        saveShift: dayHistory.saveShift,
-        deleteShift: dayHistory.deleteShift,
+        saveDay: dayHistory.saveDay,
         removeShiftBreak: dayHistory.removeShiftBreak,
     };
 };

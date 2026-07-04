@@ -1,33 +1,100 @@
 import type { HoursSummaryItem } from '@/composables/useHoursSummary';
+import type { WorkScheduleType } from '@/lib/weeklySchedule';
 
 export type HistoryView = 'list' | 'calendar';
 
 export type HistoryDaySummary = {
     date: string;
+    hasSchedule: boolean;
     workedMinutes: number;
+    expectedMinutes: number;
     extraMinutes: number;
     missingMinutes: number;
 };
 
-export type HistoryCalendarDay = {
+export type HistoryMonthDay = {
     date: string;
     dayOfMonth: number;
     isCurrentMonth: boolean;
     isToday: boolean;
+    isFuture: boolean;
     summary: HistoryDaySummary | null;
+};
+
+export type HistoryCalendarDay = HistoryMonthDay;
+
+export type HistoryDayEditorTab = 'daily-schedule' | 'shifts';
+
+export type DailyWorkScheduleApiData = {
+    id: number;
+    date: string;
+    weekday: number;
+    type: WorkScheduleType;
+    expected_minutes: number;
+    starts_at: string | null;
+    ends_at: string | null;
+};
+
+export type HistoryDailyScheduleDraft = {
+    enabled: boolean;
+    type: WorkScheduleType;
+    expectedTime: string;
+    startsAt: string;
+    endsAt: string;
+};
+
+export type HistoryShiftDraft = {
+    id: number | null;
+    key: string;
+    started_at: string;
+    ended_at: string;
 };
 
 export function buildHistoryDaySummaries(
     items: HoursSummaryItem[],
 ): HistoryDaySummary[] {
     return items
-        .filter((item) => item.worked_minutes > 0)
-        .map((item) => ({
-            date: item.date,
-            workedMinutes: item.worked_minutes,
-            extraMinutes: item.extra_minutes,
-            missingMinutes: item.missing_minutes,
-        }))
+        .filter((item) => item.worked_minutes > 0 || item.missing_minutes > 0)
+        .map(buildHistoryDaySummary)
+        .sort((left, right) => right.date.localeCompare(left.date));
+}
+
+export function buildHistoryMonthDays(
+    monthStart: string,
+    items: HoursSummaryItem[],
+    todayDate: string,
+): HistoryMonthDay[] {
+    const monthDate = createUtcDate(monthStart);
+    const daysInMonth = new Date(
+        Date.UTC(monthDate.getUTCFullYear(), monthDate.getUTCMonth() + 1, 0),
+    ).getUTCDate();
+    const summaryMap = new Map(
+        items.map((item) => [item.date, buildHistoryDaySummary(item)]),
+    );
+
+    return Array.from({ length: daysInMonth }, (_, index) => {
+        const date = new Date(
+            Date.UTC(
+                monthDate.getUTCFullYear(),
+                monthDate.getUTCMonth(),
+                index + 1,
+            ),
+        );
+        const year = date.getUTCFullYear();
+        const month = date.getUTCMonth() + 1;
+        const day = date.getUTCDate();
+        const formattedDate = `${year}-${padDateUnit(month)}-${padDateUnit(day)}`;
+
+        return {
+            date: formattedDate,
+            dayOfMonth: day,
+            isCurrentMonth: true,
+            isToday: formattedDate === todayDate,
+            isFuture: formattedDate > todayDate,
+            summary: summaryMap.get(formattedDate) ?? null,
+        };
+    })
+        .filter((day) => !day.isFuture)
         .sort((left, right) => right.date.localeCompare(left.date));
 }
 
@@ -38,6 +105,10 @@ export function buildHistoryCalendarDays(
 ): HistoryCalendarDay[] {
     const monthDate = createUtcDate(monthStart);
     const startOffset = (monthDate.getUTCDay() + 6) % 7;
+    const daysInMonth = new Date(
+        Date.UTC(monthDate.getUTCFullYear(), monthDate.getUTCMonth() + 1, 0),
+    ).getUTCDate();
+    const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
     const gridStart = new Date(
         Date.UTC(
             monthDate.getUTCFullYear(),
@@ -46,10 +117,10 @@ export function buildHistoryCalendarDays(
         ),
     );
     const summaryMap = new Map(
-        buildHistoryDaySummaries(items).map((item) => [item.date, item]),
+        items.map((item) => [item.date, buildHistoryDaySummary(item)]),
     );
 
-    return Array.from({ length: 42 }, (_, index) => {
+    return Array.from({ length: totalCells }, (_, index) => {
         const date = new Date(
             Date.UTC(
                 gridStart.getUTCFullYear(),
@@ -61,13 +132,16 @@ export function buildHistoryCalendarDays(
         const month = date.getUTCMonth() + 1;
         const day = date.getUTCDate();
         const formattedDate = `${year}-${padDateUnit(month)}-${padDateUnit(day)}`;
+        const isCurrentMonth = month === monthDate.getUTCMonth() + 1;
+        const isFuture = formattedDate > todayDate;
 
         return {
             date: formattedDate,
             dayOfMonth: day,
-            isCurrentMonth: month === monthDate.getUTCMonth() + 1,
+            isCurrentMonth,
             isToday: formattedDate === todayDate,
-            summary: summaryMap.get(formattedDate) ?? null,
+            isFuture,
+            summary: isFuture ? null : (summaryMap.get(formattedDate) ?? null),
         };
     });
 }
@@ -126,6 +200,17 @@ export function getCurrentMonthStart(): string {
     return `${now.getFullYear()}-${padDateUnit(now.getMonth() + 1)}-01`;
 }
 
+function buildHistoryDaySummary(item: HoursSummaryItem): HistoryDaySummary {
+    return {
+        date: item.date,
+        hasSchedule: item.has_schedule,
+        workedMinutes: item.worked_minutes,
+        expectedMinutes: item.expected_minutes,
+        extraMinutes: item.extra_minutes,
+        missingMinutes: item.missing_minutes,
+    };
+}
+
 function createUtcDate(date: string): Date {
     const { day, month, year } = parseLocalDate(date);
 
@@ -135,7 +220,7 @@ function createUtcDate(date: string): Date {
 function parseLocalDate(date: string): { day: number; month: number; year: number } {
     const [year, month, day] = date.split('-').map(Number);
 
-    if (! year || ! month || ! day) {
+    if (!year || !month || !day) {
         throw new Error(`Invalid local date: ${date}`);
     }
 

@@ -1,68 +1,38 @@
 <script setup lang="ts">
 import { Trash2 } from '@lucide/vue';
-import { computed, ref, watch } from 'vue';
+import { computed } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { ShiftInRange } from '@/composables/useShiftsInRange';
-import {
-    formatDateTimeLocalValue,
-    getClientDateTimeAtomFromLocalValue,
-} from '@/lib/clientDateTime';
+import type { HistoryShiftDraft } from '@/lib/history';
 import { i18n } from '@/lib/i18n';
-import type { DashboardLocale } from '@/lib/i18n';
 import { formatDurationMinutes } from '@/lib/time';
 
-const props = defineProps<{
-    shift: ShiftInRange;
-    locale: DashboardLocale;
-    isSaving: boolean;
-    isDeleting: boolean;
+const shift = defineModel<HistoryShiftDraft>('shift', { required: true });
+
+defineProps<{
+    isDisabled: boolean;
 }>();
 
 const emit = defineEmits<{
-    save: [payload: { shiftId: number; startedAt: string; endedAt: string | null }];
-    delete: [shiftId: number];
+    remove: [];
 }>();
 
-const startedAt = ref('');
-const endedAt = ref('');
-const localErrorKey = ref<string | null>(null);
-
-const originalStartedAt = computed(() => formatDateTimeLocalValue(props.shift.started_at));
-const originalEndedAt = computed(() =>
-    props.shift.ended_at === null ? '' : formatDateTimeLocalValue(props.shift.ended_at),
-);
-const isDirty = computed(() =>
-    startedAt.value !== originalStartedAt.value || endedAt.value !== originalEndedAt.value,
-);
-
-watch(
-    () => props.shift,
-    (shift) => {
-        startedAt.value = formatDateTimeLocalValue(shift.started_at);
-        endedAt.value = shift.ended_at === null ? '' : formatDateTimeLocalValue(shift.ended_at);
-        localErrorKey.value = null;
-    },
-    { immediate: true, deep: true },
-);
-
-function saveShift(): void {
-    if (endedAt.value !== '' && endedAt.value <= startedAt.value) {
-        localErrorKey.value = 'history.dialog.invalid_period';
-
-        return;
+const durationLabel = computed(() => {
+    if (shift.value.ended_at === '') {
+        return i18n.global.t('history.dialog.ongoing');
     }
 
-    localErrorKey.value = null;
+    const startedAt = new Date(shift.value.started_at).getTime();
+    const endedAt = new Date(shift.value.ended_at).getTime();
 
-    emit('save', {
-        shiftId: props.shift.id,
-        startedAt: getClientDateTimeAtomFromLocalValue(startedAt.value),
-        endedAt: endedAt.value === ''
-            ? null
-            : getClientDateTimeAtomFromLocalValue(endedAt.value),
+    if (Number.isNaN(startedAt) || Number.isNaN(endedAt) || endedAt <= startedAt) {
+        return i18n.global.t('history.dialog.invalid_period');
+    }
+
+    return formatDurationMinutes(Math.floor((endedAt - startedAt) / 60000), {
+        suffix: true,
     });
-}
+});
 </script>
 
 <template>
@@ -70,15 +40,12 @@ function saveShift(): void {
         <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div class="space-y-1">
                 <p class="text-sm font-medium text-foreground">
-                    {{ i18n.global.t('history.dialog.shift') }} #{{ props.shift.id }}
+                    {{ shift.id === null
+                        ? i18n.global.t('history.dialog.new_shift')
+                        : `${i18n.global.t('history.dialog.shift')} #${shift.id}` }}
                 </p>
                 <p class="text-xs text-muted-foreground">
-                    <span v-if="props.shift.duration_minutes !== null">
-                        {{ formatDurationMinutes(props.shift.duration_minutes, { suffix: true }) }}
-                    </span>
-                    <span v-else>
-                        {{ i18n.global.t('history.dialog.ongoing') }}
-                    </span>
+                    {{ durationLabel }}
                 </p>
             </div>
 
@@ -86,15 +53,11 @@ function saveShift(): void {
                 variant="destructive"
                 size="sm"
                 class="rounded-full"
-                :disabled="props.isDeleting || props.isSaving"
-                @click="emit('delete', props.shift.id)"
+                :disabled="isDisabled"
+                @click="emit('remove')"
             >
                 <Trash2 class="size-4" />
-                <span>
-                    {{ props.isDeleting
-                        ? i18n.global.t('history.dialog.deleting')
-                        : i18n.global.t('history.dialog.delete') }}
-                </span>
+                <span>{{ i18n.global.t('history.dialog.remove_shift') }}</span>
             </Button>
         </div>
 
@@ -102,40 +65,22 @@ function saveShift(): void {
             <label class="space-y-2 text-sm text-muted-foreground">
                 <span>{{ i18n.global.t('history.dialog.start') }}</span>
                 <Input
-                    v-model="startedAt"
+                    v-model="shift.started_at"
                     type="datetime-local"
                     class="border-border bg-background text-foreground"
+                    :disabled="isDisabled"
                 />
             </label>
 
             <label class="space-y-2 text-sm text-muted-foreground">
                 <span>{{ i18n.global.t('history.dialog.end') }}</span>
                 <Input
-                    v-model="endedAt"
+                    v-model="shift.ended_at"
                     type="datetime-local"
                     class="border-border bg-background text-foreground"
+                    :disabled="isDisabled"
                 />
             </label>
-        </div>
-
-        <p
-            v-if="localErrorKey"
-            class="rounded-xl border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-700 dark:text-rose-200"
-        >
-            {{ i18n.global.t(localErrorKey) }}
-        </p>
-
-        <div class="flex justify-end">
-            <Button
-                size="sm"
-                class="rounded-full"
-                :disabled="! isDirty || props.isSaving || props.isDeleting"
-                @click="saveShift"
-            >
-                {{ props.isSaving
-                    ? i18n.global.t('history.dialog.saving')
-                    : i18n.global.t('history.dialog.save') }}
-            </Button>
         </div>
     </article>
 </template>

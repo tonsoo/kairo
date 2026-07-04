@@ -3,6 +3,7 @@
 use App\Enums\RateLimiterType;
 use App\Http\Controllers\Api\CurrentShiftActionsController;
 use App\Http\Controllers\Api\CurrentShiftStateController;
+use App\Http\Controllers\Api\DailyWorkScheduleController;
 use App\Http\Controllers\Api\HoursSummaryController;
 use App\Http\Controllers\Api\ShiftBreakController;
 use App\Http\Controllers\Api\ShiftController;
@@ -26,6 +27,11 @@ Route::middleware(['web', 'auth', 'verified'])
         Route::get('shifts', [ShiftController::class, 'index'])
             ->middleware($readThrottle)
             ->name('api.me.shifts.index');
+
+        Route::post('shifts', [ShiftController::class, 'store'])
+            ->middleware($writeThrottle)
+            ->block()
+            ->name('api.me.shifts.store');
 
         Route::post('shifts/start', [CurrentShiftActionsController::class, 'start'])
             ->middleware($writeThrottle)
@@ -65,4 +71,13 @@ Route::middleware(['web', 'auth', 'verified'])
             ->middleware($writeThrottle)
             ->block()
             ->name('api.me.work-schedules.replace');
+
+        Route::get('daily-work-schedules/{date}', [DailyWorkScheduleController::class, 'show'])
+            ->middleware($readThrottle)
+            ->name('api.me.daily-work-schedules.show');
+
+        Route::put('daily-work-schedules/{date}', [DailyWorkScheduleController::class, 'upsert'])
+            ->middleware($writeThrottle)
+            ->block()
+            ->name('api.me.daily-work-schedules.upsert');
     });

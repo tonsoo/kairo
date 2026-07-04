@@ -1,22 +1,31 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import HistoryShiftEditorRow from '@/components/history/HistoryShiftEditorRow.vue';
+import HistoryDailySchedulePanel from '@/components/history/HistoryDailySchedulePanel.vue';
+import HistoryDayEditorTabs from '@/components/history/HistoryDayEditorTabs.vue';
+import HistoryShiftsPanel from '@/components/history/HistoryShiftsPanel.vue';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { useHistoryDayEditor } from '@/composables/useHistoryDayEditor';
 import type { ShiftInRange } from '@/composables/useShiftsInRange';
 import {
     formatHistoryDayHeading,
     formatHistoryDaySubheading,
 } from '@/lib/history';
-import type { HistoryDaySummary } from '@/lib/history';
+import type {
+    DailyWorkScheduleApiData,
+    HistoryDaySummary,
+} from '@/lib/history';
 import { i18n } from '@/lib/i18n';
 import type { DashboardLocale } from '@/lib/i18n';
 import { formatDurationMinutes } from '@/lib/time';
+import type { WorkScheduleType } from '@/lib/weeklySchedule';
 
 const props = defineProps<{
     open: boolean;
@@ -24,17 +33,24 @@ const props = defineProps<{
     selectedDate: string | null;
     selectedDaySummary: HistoryDaySummary | null;
     shifts: ShiftInRange[];
+    dailyWorkSchedule: DailyWorkScheduleApiData | null;
     isLoading: boolean;
-    savingShiftId: number | null;
-    deletingShiftId: number | null;
+    isSavingDay: boolean;
     removingBreakKey: string | null;
     errorMessageKey: string | null;
 }>();
 
 const emit = defineEmits<{
     'update:open': [value: boolean];
-    'save-shift': [payload: { shiftId: number; startedAt: string; endedAt: string | null }];
-    'delete-shift': [shiftId: number];
+    'save-day': [payload: {
+        shifts: Array<{ id: number | null; startedAt: string; endedAt: string | null }>;
+        dailyWorkSchedule: {
+            type: WorkScheduleType;
+            expectedMinutes: number | null;
+            startsAt: string | null;
+            endsAt: string | null;
+        } | null;
+    }];
     'remove-break': [payload: { previousShiftId: number; nextShiftId: number }];
 }>();
 
@@ -49,18 +65,26 @@ const daySubheading = computed(() =>
         : formatHistoryDaySubheading(props.selectedDate, props.locale),
 );
 
-function getBreakDurationMinutes(
-    previousShift: ShiftInRange,
-    nextShift: ShiftInRange,
-): number {
-    if (previousShift.ended_at === null) {
-        return 0;
+const {
+    activeTab,
+    shiftDrafts,
+    dailyScheduleDraft,
+    localErrorKey,
+    hasPersistedDailyWorkSchedule,
+    hasUnsavedShiftChanges,
+    hasUnsavedChanges,
+    canRemoveBreaks,
+    buildSavePayload,
+} = useHistoryDayEditor(props);
+
+function saveDay(): void {
+    const payload = buildSavePayload();
+
+    if (payload === null) {
+        return;
     }
 
-    const previousEndedAt = new Date(previousShift.ended_at).getTime();
-    const nextStartedAt = new Date(nextShift.started_at).getTime();
-
-    return Math.max(0, Math.floor((nextStartedAt - previousEndedAt) / 60000));
+    emit('save-day', payload);
 }
 </script>
 
@@ -100,54 +124,61 @@ function getBreakDurationMinutes(
                 </p>
 
                 <p
+                    v-if="localErrorKey"
+                    class="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-200"
+                >
+                    {{ i18n.global.t(localErrorKey) }}
+                </p>
+
+                <p
                     v-if="props.isLoading"
                     class="rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground"
                 >
                     {{ i18n.global.t('history.dialog.loading') }}
                 </p>
 
-                <div v-else-if="props.shifts.length === 0" class="rounded-2xl border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground">
-                    {{ i18n.global.t('history.dialog.empty') }}
-                </div>
+                <div v-else class="space-y-6">
+                    <HistoryDayEditorTabs
+                        v-model:active-tab="activeTab"
+                        :is-saving-day="props.isSavingDay"
+                    />
 
-                <div v-else class="max-h-[65vh] space-y-4 overflow-y-auto pr-1">
-                    <template v-for="(shift, index) in props.shifts" :key="shift.id">
-                        <HistoryShiftEditorRow
-                            :shift="shift"
-                            :locale="props.locale"
-                            :is-saving="props.savingShiftId === shift.id"
-                            :is-deleting="props.deletingShiftId === shift.id"
-                            @save="emit('save-shift', $event)"
-                            @delete="emit('delete-shift', $event)"
-                        />
+                    <HistoryDailySchedulePanel
+                        v-if="activeTab === 'daily-schedule'"
+                        v-model:draft="dailyScheduleDraft"
+                        :has-persisted-daily-work-schedule="hasPersistedDailyWorkSchedule"
+                        :is-saving-day="props.isSavingDay"
+                    />
 
-                        <div
-                            v-if="index < props.shifts.length - 1"
-                            class="flex justify-center"
-                        >
-                            <button
-                                type="button"
-                                class="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-sm text-amber-700 transition-colors hover:bg-amber-500/20 dark:text-amber-100"
-                                :disabled="props.removingBreakKey === `${shift.id}:${props.shifts[index + 1].id}`"
-                                @click="emit('remove-break', {
-                                    previousShiftId: shift.id,
-                                    nextShiftId: props.shifts[index + 1].id,
-                                })"
-                            >
-                                <span>{{ i18n.global.t('history.dialog.break') }}</span>
-                                <span class="font-medium">
-                                    {{ formatDurationMinutes(getBreakDurationMinutes(shift, props.shifts[index + 1]), { suffix: true }) }}
-                                </span>
-                                <span>
-                                    {{ props.removingBreakKey === `${shift.id}:${props.shifts[index + 1].id}`
-                                        ? i18n.global.t('history.dialog.removing_break')
-                                        : i18n.global.t('history.dialog.remove_break') }}
-                                </span>
-                            </button>
-                        </div>
-                    </template>
+                    <HistoryShiftsPanel
+                        v-else
+                        v-model:shift-drafts="shiftDrafts"
+                        :selected-date="props.selectedDate"
+                        :shifts="props.shifts"
+                        :is-saving-day="props.isSavingDay"
+                        :removing-break-key="props.removingBreakKey"
+                        :can-remove-breaks="canRemoveBreaks"
+                        :has-unsaved-shift-changes="hasUnsavedShiftChanges"
+                        @remove-break="emit('remove-break', $event)"
+                    />
                 </div>
             </div>
+
+            <DialogFooter class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+                <p v-if="hasUnsavedChanges" class="text-sm text-muted-foreground sm:mr-auto">
+                    {{ i18n.global.t('history.dialog.unsaved_changes') }}
+                </p>
+                <Button
+                    type="button"
+                    class="rounded-full"
+                    :disabled="props.isLoading || props.isSavingDay || !hasUnsavedChanges"
+                    @click="saveDay"
+                >
+                    {{ props.isSavingDay
+                        ? i18n.global.t('history.dialog.saving_day')
+                        : i18n.global.t('history.dialog.save_day') }}
+                </Button>
+            </DialogFooter>
         </DialogContent>
     </Dialog>
 </template>

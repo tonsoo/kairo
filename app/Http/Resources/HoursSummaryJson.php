@@ -59,7 +59,9 @@ class HoursSummaryJson extends JsonResource
         foreach ($items as $item) {
             $transformed[] = [
                 'date' => $item->date->toDateString(),
+                'has_schedule' => $item->hasSchedule,
                 'worked_minutes' => $item->workedMinutes,
+                'expected_minutes' => $item->expectedMinutes,
                 'regular_minutes' => $item->regularMinutes,
                 'extra_minutes' => $item->extraMinutes,
                 'missing_minutes' => $item->missingMinutes,

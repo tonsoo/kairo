@@ -118,6 +118,30 @@ export function weekdayLabel(
     return formatted.charAt(0).toLocaleUpperCase(locale) + formatted.slice(1);
 }
 
+export function minutesToDuration(minutes: number): string {
+    const hours = Math.floor(minutes / 60);
+    const remainder = minutes % 60;
+
+    return `${String(hours).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`;
+}
+
+export function durationToMinutes(value: string): number | null {
+    const match = value.match(/^(\d{2}):(\d{2})$/);
+
+    if (match === null) {
+        return null;
+    }
+
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+
+    if (! Number.isInteger(hours) || ! Number.isInteger(minutes)) {
+        return null;
+    }
+
+    return (hours * 60) + minutes;
+}
+
 function resolveActiveSchedules(
     schedules: WorkScheduleApiData[],
     effectiveFrom: string,
@@ -149,28 +173,4 @@ function resolvePart(
     }
 
     return part.value;
-}
-
-function minutesToDuration(minutes: number): string {
-    const hours = Math.floor(minutes / 60);
-    const remainder = minutes % 60;
-
-    return `${String(hours).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`;
-}
-
-function durationToMinutes(value: string): number | null {
-    const match = value.match(/^(\d{2}):(\d{2})$/);
-
-    if (match === null) {
-        return null;
-    }
-
-    const hours = Number(match[1]);
-    const minutes = Number(match[2]);
-
-    if (! Number.isInteger(hours) || ! Number.isInteger(minutes)) {
-        return null;
-    }
-
-    return (hours * 60) + minutes;
 }

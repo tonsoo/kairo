@@ -9,7 +9,7 @@ import ShiftExportDialog from '@/components/shift-export/ShiftExportDialog.vue';
 import { useShiftHistory } from '@/composables/useShiftHistory';
 import { getCurrentClientLocalDate } from '@/lib/clientDateTime';
 import {
-    buildHistoryDaySummaries,
+    buildHistoryMonthDays,
     formatHistoryMonthHeading,
 } from '@/lib/history';
 import type { HistoryView } from '@/lib/history';
@@ -28,12 +28,12 @@ const {
     selectedDate,
     selectedDaySummary,
     dayShifts,
+    dayDailyWorkSchedule,
     errorMessageKey,
     dayErrorMessageKey,
     isLoadingMonth,
     isLoadingDay,
-    savingShiftId,
-    deletingShiftId,
+    isSavingDay,
     removingBreakKey,
     canGoToNextMonth,
     fetchMonthSummary,
@@ -41,13 +41,15 @@ const {
     showNextMonth,
     openDay,
     closeDay,
-    saveShift,
-    deleteShift,
+    saveDay,
     removeShiftBreak,
 } = useShiftHistory();
 
-const daySummaries = computed(() =>
-    monthSummary.value === null ? [] : buildHistoryDaySummaries(monthSummary.value.items),
+const todayDate = getCurrentClientLocalDate();
+const monthDays = computed(() =>
+    monthSummary.value === null
+        ? []
+        : buildHistoryMonthDays(monthSummary.value.starts_at, monthSummary.value.items, todayDate),
 );
 const monthHeading = computed(() =>
     monthSummary.value === null
@@ -58,14 +60,13 @@ const exportRange = computed(() => ({
     from: monthSummary.value?.starts_at ?? '',
     to: monthSummary.value?.ends_at ?? '',
 }));
-const todayDate = getCurrentClientLocalDate();
 
 onMounted(() => {
     void fetchMonthSummary();
 });
 
 function handleDialogOpenChange(isOpen: boolean): void {
-    if (! isOpen) {
+    if (!isOpen) {
         closeDay();
     }
 }
@@ -104,7 +105,7 @@ function handleDialogOpenChange(isOpen: boolean): void {
 
             <HistoryListView
                 v-if="currentView === 'list'"
-                :days="daySummaries"
+                :days="monthDays"
                 :locale="locale"
                 @select="void openDay($event)"
             />
@@ -125,14 +126,13 @@ function handleDialogOpenChange(isOpen: boolean): void {
             :selected-date="selectedDate"
             :selected-day-summary="selectedDaySummary"
             :shifts="dayShifts"
+            :daily-work-schedule="dayDailyWorkSchedule"
             :is-loading="isLoadingDay"
-            :saving-shift-id="savingShiftId"
-            :deleting-shift-id="deletingShiftId"
+            :is-saving-day="isSavingDay"
             :removing-break-key="removingBreakKey"
             :error-message-key="dayErrorMessageKey"
             @update:open="handleDialogOpenChange"
-            @save-shift="void saveShift($event)"
-            @delete-shift="void deleteShift($event)"
+            @save-day="void saveDay($event)"
             @remove-break="void removeShiftBreak($event)"
         />
 

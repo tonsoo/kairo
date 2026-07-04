@@ -20,7 +20,9 @@ final readonly class BuildDashboardMonthItems
             ->map(
                 fn (DashboardDayData $day) => new DashboardPeriodItemData(
                     date: $day->date,
+                    hasSchedule: $day->hasSchedule,
                     workedMinutes: $day->workedMinutes,
+                    expectedMinutes: $day->expectedMinutes,
                     regularMinutes: $day->regularMinutes,
                     extraMinutes: $day->extraMinutes,
                     missingMinutes: $day->missingMinutes,

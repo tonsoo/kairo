@@ -6,6 +6,7 @@ namespace App\Domain\WorkSchedule\Actions;
 
 use App\Models\DailyWorkSchedule;
 use App\Models\User;
+use App\Models\WorkSchedule;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
@@ -27,7 +28,8 @@ final readonly class CreateDailyWorkScheduleSnapshot
             return $existingDailyWorkSchedule;
         }
 
-        $workSchedule = ($this->getEffectiveWorkScheduleForDate)($user, $referenceDate);
+        $workSchedule = ($this->getEffectiveWorkScheduleForDate)($user, $referenceDate)
+            ?? $this->findEarliestWorkScheduleForWeekday($user, $referenceDate);
 
         if ($workSchedule === null) {
             return null;
@@ -49,5 +51,14 @@ final readonly class CreateDailyWorkScheduleSnapshot
                 ],
             )->fresh();
         });
+    }
+
+    private function findEarliestWorkScheduleForWeekday(User $user, CarbonImmutable $date): ?WorkSchedule
+    {
+        return WorkSchedule::query()
+            ->where('user_id', $user->id)
+            ->where('weekday', $date->dayOfWeekIso)
+            ->orderBy('effective_from')
+            ->first();
     }
 }

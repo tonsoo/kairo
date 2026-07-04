@@ -24,8 +24,14 @@ final readonly class BuildDashboardSemesterItems
 
                 return new DashboardPeriodItemData(
                     date: $firstDay->date->startOfMonth(),
+                    hasSchedule: $monthDays->contains(
+                        fn (DashboardDayData $day): bool => $day->hasSchedule,
+                    ),
                     workedMinutes: $monthDays->sum(
                         fn (DashboardDayData $day): int => $day->workedMinutes,
+                    ),
+                    expectedMinutes: $monthDays->sum(
+                        fn (DashboardDayData $day): int => $day->expectedMinutes,
                     ),
                     regularMinutes: $monthDays->sum(
                         fn (DashboardDayData $day): int => $day->regularMinutes,

@@ -10,6 +10,7 @@ final readonly class DashboardDayData
 {
     public function __construct(
         public CarbonImmutable $date,
+        public bool $hasSchedule,
         public int $workedMinutes,
         public int $expectedMinutes,
         public int $regularMinutes,

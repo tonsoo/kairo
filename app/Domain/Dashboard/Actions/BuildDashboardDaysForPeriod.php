@@ -19,6 +19,7 @@ final readonly class BuildDashboardDaysForPeriod
         private ListDashboardRelevantDailyWorkSchedulesForPeriod $listDashboardRelevantDailyWorkSchedulesForPeriod,
         private ListDashboardRelevantWorkSchedulesForPeriod $listDashboardRelevantWorkSchedulesForPeriod,
         private ResolveDashboardExpectedMinutesForDate $getDashboardExpectedMinutesForDate,
+        private ResolveDashboardHasScheduleForDate $getDashboardHasScheduleForDate,
         private ResolveDashboardWorkedMinutesForDate $getDashboardWorkedMinutesForDate,
     ) {}
 
@@ -84,8 +85,15 @@ final readonly class BuildDashboardDaysForPeriod
             $date,
         );
 
+        $hasSchedule = ($this->getDashboardHasScheduleForDate)(
+            $dailyWorkSchedulesByDate,
+            $workSchedulesByWeekday,
+            $date,
+        );
+
         return new DashboardDayData(
             date: $date,
+            hasSchedule: $hasSchedule,
             workedMinutes: $workedMinutes,
             expectedMinutes: $expectedMinutes,
             regularMinutes: min($workedMinutes, $expectedMinutes),

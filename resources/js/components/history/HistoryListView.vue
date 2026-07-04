@@ -4,13 +4,13 @@ import {
     formatHistoryDayHeading,
     formatHistoryDaySubheading,
 } from '@/lib/history';
-import type { HistoryDaySummary } from '@/lib/history';
+import type { HistoryMonthDay } from '@/lib/history';
 import { i18n } from '@/lib/i18n';
 import type { DashboardLocale } from '@/lib/i18n';
 import { formatDurationMinutes } from '@/lib/time';
 
 const props = defineProps<{
-    days: HistoryDaySummary[];
+    days: HistoryMonthDay[];
     locale: DashboardLocale;
 }>();
 
@@ -44,26 +44,52 @@ const emit = defineEmits<{
             </div>
 
             <div class="flex flex-wrap items-center gap-3 md:justify-end">
-                <div class="inline-flex items-center gap-2 rounded-full border border-teal-500/15 bg-teal-500/10 px-3 py-1.5 text-sm text-teal-700 dark:text-teal-200">
-                    <Clock3 class="size-4 text-teal-400" />
-                    <span>{{ i18n.global.t('history.day.worked') }}</span>
-                    <span class="font-semibold text-foreground">{{ formatDurationMinutes(day.workedMinutes) }}</span>
-                </div>
+                <template v-if="day.summary !== null">
+                    <div
+                        v-if="day.summary.workedMinutes > 0"
+                        class="inline-flex items-center gap-2 rounded-full border border-teal-500/15 bg-teal-500/10 px-3 py-1.5 text-sm text-teal-700 dark:text-teal-200"
+                    >
+                        <Clock3 class="size-4 text-teal-400" />
+                        <span>{{ i18n.global.t('history.day.worked') }}</span>
+                        <span class="font-semibold text-foreground">{{ formatDurationMinutes(day.summary.workedMinutes) }}</span>
+                    </div>
+
+                    <div
+                        v-if="day.summary.extraMinutes > 0"
+                        class="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-200"
+                    >
+                        {{ i18n.global.t('history.day.extra') }}
+                        {{ formatDurationMinutes(day.summary.extraMinutes) }}
+                    </div>
+
+                    <div
+                        v-if="day.summary.missingMinutes > 0"
+                        class="rounded-full border border-border bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground"
+                    >
+                        {{ i18n.global.t('history.day.missing') }}
+                        {{ formatDurationMinutes(day.summary.missingMinutes) }}
+                    </div>
+
+                    <div
+                        v-if="!day.summary.hasSchedule"
+                        class="rounded-full border border-dashed border-border bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground"
+                    >
+                        {{ i18n.global.t('history.dialog.daily_schedule_empty') }}
+                    </div>
+
+                    <div
+                        v-else-if="day.summary.expectedMinutes === 0"
+                        class="rounded-full border border-dashed border-border bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground"
+                    >
+                        {{ i18n.global.t('weekly_schedule.type.day_off') }}
+                    </div>
+                </template>
 
                 <div
-                    v-if="day.extraMinutes > 0"
-                    class="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-200"
+                    v-else
+                    class="rounded-full border border-dashed border-border bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground"
                 >
-                    {{ i18n.global.t('history.day.extra') }}
-                    {{ formatDurationMinutes(day.extraMinutes) }}
-                </div>
-
-                <div
-                    v-if="day.missingMinutes > 0"
-                    class="rounded-full border border-border bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground"
-                >
-                    {{ i18n.global.t('history.day.missing') }}
-                    {{ formatDurationMinutes(day.missingMinutes) }}
+                    {{ i18n.global.t('history.dialog.daily_schedule_empty') }}
                 </div>
 
                 <ArrowUpRight class="size-4 text-muted-foreground" />

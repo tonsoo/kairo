@@ -1,11 +1,11 @@
 import type { Page } from '@inertiajs/core';
 import type { App as VueApp } from 'vue';
-import { addUrlDefault } from './wayfinder';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { i18n, syncAppLocale } from '@/lib/i18n';
+import { addUrlDefault } from './wayfinder';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -41,9 +41,9 @@ export function configureInertiaApp(
     if (typeof routeDefaults === 'object' && routeDefaults !== null) {
         for (const [key, value] of Object.entries(routeDefaults)) {
             if (
-                typeof value === 'string' ||
-                typeof value === 'number' ||
-                typeof value === 'boolean'
+                typeof value === 'string'
+                || typeof value === 'number'
+                || typeof value === 'boolean'
             ) {
                 addUrlDefault(key, value);
             }

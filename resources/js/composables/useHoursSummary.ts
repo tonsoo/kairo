@@ -8,7 +8,9 @@ import { hoursSummary } from '@/routes/api/me';
 
 export type HoursSummaryItem = {
     date: string;
+    has_schedule: boolean;
     worked_minutes: number;
+    expected_minutes: number;
     regular_minutes: number;
     extra_minutes: number;
     missing_minutes: number;
