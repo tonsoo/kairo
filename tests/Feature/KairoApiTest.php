@@ -118,7 +118,6 @@ test('dashboard hours summary prefers daily work schedule snapshots over updated
         ->assertJsonPath('data.today.missing_minutes', 480);
 });
 
-
 test('dashboard hours summary isolates overnight shift minutes using the requested timezone', function () {
     $user = User::factory()->create([
         'timezone' => 'UTC',
@@ -316,7 +315,6 @@ test('authenticated users can list shifts within a date range including ongoing 
         ->assertJsonPath('data.2.started_at', '2026-06-25T09:00:00-03:00')
         ->assertJsonPath('data.2.ended_at', '2026-06-25T18:00:00-03:00');
 });
-
 
 test('authenticated users can list overnight shifts within a local date range', function () {
     $user = User::factory()->create([

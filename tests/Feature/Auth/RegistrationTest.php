@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Laravel\Fortify\Features;
 
 beforeEach(function () {
@@ -33,6 +34,6 @@ test('new users can register with a timezone', function () {
         'timezone' => 'America/Sao_Paulo',
     ]);
 
-    expect(\App\Models\User::query()->where('email', 'timezone@example.com')->first()?->timezone)
+    expect(User::query()->where('email', 'timezone@example.com')->first()?->timezone)
         ->toBe('America/Sao_Paulo');
 });

@@ -12,6 +12,7 @@ use Throwable;
 final class DateParser
 {
     public const string localDateFormat = 'Y-m-d';
+
     public const string localTimeFormat = 'H:i';
 
     public static function nowInTimezone(string $timezone): CarbonImmutable

@@ -10,7 +10,7 @@ use Carbon\CarbonImmutable;
 final readonly class ResolveDashboardBalanceStartsDate
 {
     public function __construct(
-        private ResolveDashboardEarliestShiftDate        $getDashboardEarliestShiftDate,
+        private ResolveDashboardEarliestShiftDate $getDashboardEarliestShiftDate,
         private ResolveDashboardEarliestWorkScheduleDate $getDashboardEarliestWorkScheduleDate,
     ) {}
 

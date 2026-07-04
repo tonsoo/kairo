@@ -5,7 +5,6 @@ use App\Models\DailyWorkSchedule;
 use App\Models\Shift;
 use App\Models\User;
 use App\Models\WorkSchedule;
-use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
@@ -76,10 +75,10 @@ test('kairo models cast temporal fields and expose shift scopes', function () {
     $ongoingShift = Shift::factory()->ongoing()->create();
     $completedShift = Shift::factory()->create();
 
-    expect($workSchedule->effective_from)->toBeInstanceOf(\DateTimeInterface::class)
-        ->and($dailyWorkSchedule->date)->toBeInstanceOf(\DateTimeInterface::class)
-        ->and($ongoingShift->started_at)->toBeInstanceOf(\DateTimeInterface::class)
-        ->and($completedShift->ended_at)->toBeInstanceOf(\DateTimeInterface::class)
+    expect($workSchedule->effective_from)->toBeInstanceOf(DateTimeInterface::class)
+        ->and($dailyWorkSchedule->date)->toBeInstanceOf(DateTimeInterface::class)
+        ->and($ongoingShift->started_at)->toBeInstanceOf(DateTimeInterface::class)
+        ->and($completedShift->ended_at)->toBeInstanceOf(DateTimeInterface::class)
         ->and(Shift::query()->ongoing()->pluck('id')->all())->toContain($ongoingShift->id)
         ->and(Shift::query()->completed()->pluck('id')->all())->toContain($completedShift->id)
         ->and(Shift::query()->completed()->pluck('id')->all())->not->toContain($ongoingShift->id);

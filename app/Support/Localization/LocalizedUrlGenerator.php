@@ -40,6 +40,9 @@ final readonly class LocalizedUrlGenerator
         return $request->fullUrl();
     }
 
+    /**
+     * @param  array<string, mixed>  $parameters
+     */
     public function url(string $routeName, ?string $locale = null, array $parameters = [], bool $absolute = true): string
     {
         $route = $this->router->getRoutes()->getByName($routeName);

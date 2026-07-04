@@ -7,7 +7,6 @@ namespace App\Domain\Shift\Actions;
 use App\Domain\Shift\Exceptions\InvalidShiftBreakRemoval;
 use App\Models\Shift;
 use App\Models\User;
-use Carbon\CarbonImmutable;
 
 final readonly class AssertShiftBreakCanBeRemoved
 {

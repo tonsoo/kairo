@@ -13,7 +13,7 @@ test('it builds typed replace work schedules data from validated input', functio
         'timezone' => 'America/Sao_Paulo',
     ]);
 
-    $data = (new BuildReplaceWorkSchedulesData())($user, [
+    $data = (new BuildReplaceWorkSchedulesData)($user, [
         'effective_from' => '2026-06-29',
         'schedules' => [
             [
@@ -50,7 +50,7 @@ test('it converts typed replacement data into domain work schedule data', functi
         'timezone' => 'America/Sao_Paulo',
     ]);
 
-    $replaceWorkSchedulesData = (new BuildReplaceWorkSchedulesData())($user, [
+    $replaceWorkSchedulesData = (new BuildReplaceWorkSchedulesData)($user, [
         'effective_from' => '2026-06-29',
         'schedules' => [
             [

@@ -50,6 +50,10 @@ final readonly class SitemapController
         return config('sitemap.routes', []);
     }
 
+    /**
+     * @param  array<string, mixed>  $parameters
+     * @return Collection<int, Url>
+     */
     private function resolveUrlsForSitemap(
         string $name,
         bool $isLocalized,
