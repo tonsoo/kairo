@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useLocaleSwitch } from '@/composables/useLocaleSwitch';
-import { i18n, localeSwitchOptions } from '@/lib/i18n';
+import { i18n } from '@/lib/i18n';
 
-const { currentLocale, isSwitching, switchLocale } = useLocaleSwitch();
+const { currentLocale, isSwitching, localeOptions, switchLocale } =
+    useLocaleSwitch();
 </script>
 
 <template>
@@ -12,20 +13,20 @@ const { currentLocale, isSwitching, switchLocale } = useLocaleSwitch();
         role="group"
     >
         <button
-            v-for="option in localeSwitchOptions"
-            :key="option.value"
+            v-for="option in localeOptions"
+            :key="option.code"
             type="button"
             :disabled="isSwitching"
-            :aria-pressed="currentLocale === option.value"
+            :aria-pressed="currentLocale === option.code"
             :class="[
                 'rounded-lg border px-3 py-1.5 text-[11px] font-semibold tracking-[0.02em] transition-colors disabled:cursor-not-allowed disabled:opacity-70',
-                currentLocale === option.value
+                currentLocale === option.code
                     ? 'border-teal-500/25 bg-teal-500/10 text-teal-300'
                     : 'border-transparent text-[#8fa29a] hover:border-[#2a2d30] hover:bg-[#1f2225] hover:text-slate-200',
             ]"
-            @click="switchLocale(option.value)"
+            @click="switchLocale(option)"
         >
-            {{ option.label }}
+            {{ option.code.toUpperCase() }}
         </button>
     </div>
 </template>

@@ -1,34 +1,37 @@
-import { router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 import type { AppLocale } from '@/lib/i18n';
-import { getAppLocale } from '@/lib/i18n';
-import { update as updateLocale } from '@/routes/locale';
+
+type LocaleOption = {
+    code: AppLocale;
+    url: string;
+};
+
+type SharedPageProps = {
+    locale: AppLocale;
+    localeOptions: LocaleOption[];
+};
 
 export function useLocaleSwitch() {
-    const currentLocale = ref<AppLocale>(getAppLocale());
+    const page = usePage<SharedPageProps>();
+    const currentLocale = computed<AppLocale>(() => page.props.locale);
+    const localeOptions = computed<LocaleOption[]>(
+        () => page.props.localeOptions,
+    );
     const isSwitching = ref(false);
 
-    function switchLocale(nextLocale: AppLocale): void {
-        if (nextLocale === currentLocale.value || isSwitching.value) {
+    function switchLocale(option: LocaleOption): void {
+        if (option.code === currentLocale.value || isSwitching.value) {
             return;
         }
 
         isSwitching.value = true;
-
-        router.visit(updateLocale(nextLocale), {
-            preserveScroll: true,
-            preserveState: true,
-            onSuccess: () => {
-                window.location.reload();
-            },
-            onFinish: () => {
-                isSwitching.value = false;
-            },
-        });
+        window.location.assign(option.url);
     }
 
     return {
         currentLocale,
+        localeOptions,
         isSwitching,
         switchLocale,
     };

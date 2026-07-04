@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useLocaleSwitch } from '@/composables/useLocaleSwitch';
-import { i18n, localeSwitchOptions } from '@/lib/i18n';
+import { i18n } from '@/lib/i18n';
 
 type Props = {
     compact?: boolean;
@@ -10,7 +10,8 @@ const props = withDefaults(defineProps<Props>(), {
     compact: false,
 });
 
-const { currentLocale, isSwitching, switchLocale } = useLocaleSwitch();
+const { currentLocale, isSwitching, localeOptions, switchLocale } =
+    useLocaleSwitch();
 </script>
 
 <template>
@@ -20,21 +21,21 @@ const { currentLocale, isSwitching, switchLocale } = useLocaleSwitch();
         role="group"
     >
         <button
-            v-for="option in localeSwitchOptions"
-            :key="option.value"
+            v-for="option in localeOptions"
+            :key="option.code"
             type="button"
             :disabled="isSwitching"
-            :aria-pressed="currentLocale === option.value"
+            :aria-pressed="currentLocale === option.code"
             :class="[
                 'rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.02em] transition-colors disabled:cursor-not-allowed disabled:opacity-70',
                 props.compact ? 'px-3 py-1.5 text-[11px]' : '',
-                currentLocale === option.value
+                currentLocale === option.code
                     ? 'border-teal-500/25 bg-teal-500/10 text-teal-700 dark:text-teal-300'
                     : 'border-transparent text-muted-foreground hover:border-border hover:bg-accent hover:text-accent-foreground',
             ]"
-            @click="switchLocale(option.value)"
+            @click="switchLocale(option)"
         >
-            {{ option.label }}
+            {{ option.code.toUpperCase() }}
         </button>
     </div>
 </template>

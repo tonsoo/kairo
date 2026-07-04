@@ -26,7 +26,7 @@ export async function downloadShiftExportFile(
     payload: ShiftExportDownloadPayload,
 ): Promise<ShiftExportDownloadResult> {
     const response = await fetch(
-        downloadShiftExportRoute({ query: payload }).url,
+        downloadShiftExportRoute.url(undefined, { query: payload }),
         {
             headers: {
                 Accept: 'application/json',

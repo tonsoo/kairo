@@ -11,7 +11,6 @@ services:
       - .:/app
     ports:
       - '19941:80'
-      - '5173'
 
   queue:
     build:

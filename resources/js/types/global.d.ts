@@ -1,6 +1,5 @@
 import type { Auth } from '@/types/auth';
 
-// Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
     interface ImportMetaEnv {
         readonly VITE_APP_NAME: string;
@@ -17,7 +16,13 @@ declare module '@inertiajs/core' {
     export interface InertiaConfig {
         sharedPageProps: {
             name: string;
-            locale: 'en' | 'pt-BR';
+            locale: string;
+            localeOptions: Array<{
+                code: string;
+                url: string;
+            }>;
+            routeDefaults: Record<string, string>;
+            currentUrl: string;
             auth: Auth;
             sidebarOpen: boolean;
             [key: string]: unknown;

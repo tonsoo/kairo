@@ -18,9 +18,8 @@ withDefaults(defineProps<Props>(), {
     passkeys: () => [],
 });
 
-
 const handleDelete = (id: number, onError: () => void) => {
-    router.delete(destroy.url(id), {
+    router.delete(destroy.url({ passkey: id }), {
         preserveScroll: true,
         onError,
     });
@@ -55,7 +54,9 @@ const handleRegisterSuccess = () => {
                 >
                     <KeyRound class="h-7 w-7 text-muted-foreground" />
                 </div>
-                <p class="font-medium">{{ i18n.global.t('settings.passkeys.empty_title') }}</p>
+                <p class="font-medium">
+                    {{ i18n.global.t('settings.passkeys.empty_title') }}
+                </p>
                 <p class="mt-1 text-sm text-muted-foreground">
                     {{ i18n.global.t('settings.passkeys.empty_description') }}
                 </p>

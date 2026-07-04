@@ -12,16 +12,25 @@ import { i18n } from '@/lib/i18n';
 import { dashboard, login, register } from '@/routes';
 import type { User } from '@/types/auth';
 
+type LocaleOption = {
+    code: string;
+    url: string;
+};
+
 type WelcomePageProps = {
     auth: {
         user: User | null;
     };
-    locale: 'en' | 'pt-BR';
+    locale: string;
+    localeOptions: LocaleOption[];
+    currentUrl: string;
 };
 
 const page = usePage<WelcomePageProps>();
-const canonicalUrl = 'https://kairo.alysson-thoaldo.com.br/';
 const isAuthenticated = computed(() => page.props.auth.user !== null);
+const currentLocale = computed(() => page.props.locale);
+const currentUrl = computed(() => page.props.currentUrl);
+const localeOptions = computed(() => page.props.localeOptions);
 const dashboardHref = dashboard().url;
 const loginHref = login().url;
 const registerHref = register().url;
@@ -36,17 +45,12 @@ const primaryLabel = computed(() =>
         ? i18n.global.t('home.hero.cta.primary_auth')
         : i18n.global.t('home.hero.cta.primary_guest'),
 );
-const currentLocale = computed(() =>
-    page.props.locale === 'pt-BR' ? 'pt-BR' : 'en',
-);
 const metaTitle = computed(() => i18n.global.t('home.meta.title'));
 const metaDescription = computed(() => i18n.global.t('home.meta.description'));
-const metaTitleContent = computed(() => `${metaTitle.value} - Kairo`);
-const ogLocale = computed(() =>
-    currentLocale.value === 'pt-BR' ? 'pt_BR' : 'en_US',
-);
-const alternateOgLocale = computed(() =>
-    ogLocale.value === 'pt_BR' ? 'en_US' : 'pt_BR',
+const metaTitleContent = computed(() => `${metaTitle.value}`);
+const ogLocale = computed(() => toOpenGraphLocale(currentLocale.value));
+const alternateLocaleOptions = computed(() =>
+    localeOptions.value.filter((option) => option.code !== currentLocale.value),
 );
 const structuredData = computed(() =>
     JSON.stringify({
@@ -55,7 +59,7 @@ const structuredData = computed(() =>
         name: 'Kairo',
         applicationCategory: 'BusinessApplication',
         operatingSystem: 'Web',
-        url: canonicalUrl,
+        url: currentUrl.value,
         inLanguage: currentLocale.value,
         description: metaDescription.value,
         offers: {
@@ -66,6 +70,10 @@ const structuredData = computed(() =>
     }),
 );
 const currentYear = new Date().getFullYear();
+
+function toOpenGraphLocale(locale: string): string {
+    return locale.replace(/-/g, '_');
+}
 </script>
 
 <template>
@@ -76,21 +84,30 @@ const currentYear = new Date().getFullYear();
             content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
         />
         <meta name="application-name" content="Kairo" />
-        <link rel="canonical" :href="canonicalUrl" />
+        <link rel="canonical" :href="currentUrl" />
+        <link
+            v-for="option in localeOptions"
+            :key="option.code"
+            rel="alternate"
+            :hreflang="option.code"
+            :href="option.url"
+        />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Kairo" />
         <meta property="og:title" :content="metaTitleContent" />
         <meta property="og:description" :content="metaDescription" />
-        <meta property="og:url" :content="canonicalUrl" />
+        <meta property="og:url" :content="currentUrl" />
         <meta property="og:locale" :content="ogLocale" />
-        <meta property="og:locale:alternate" :content="alternateOgLocale" />
+        <meta
+            v-for="option in alternateLocaleOptions"
+            :key="option.code"
+            property="og:locale:alternate"
+            :content="toOpenGraphLocale(option.code)"
+        />
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" :content="metaTitleContent" />
         <meta name="twitter:description" :content="metaDescription" />
-        <script
-            type="application/ld+json"
-            v-html="structuredData"
-        />
+        <script type="application/ld+json" v-html="structuredData" />
     </Head>
 
     <div

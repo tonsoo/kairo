@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\Shift;
 use App\Models\User;
 use App\Models\WorkSchedule;
+use App\Support\Localization\LocalizedUrlGenerator;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx as XlsxReader;
 
 test('guests cannot download shift exports', function () {
@@ -17,6 +18,7 @@ test('guests cannot download shift exports', function () {
 });
 
 test('authenticated users can download a csv shift export', function () {
+    $localizedUrlGenerator = app(LocalizedUrlGenerator::class);
     $user = User::factory()->create([
         'timezone' => 'UTC',
     ]);
@@ -51,13 +53,12 @@ test('authenticated users can download a csv shift export', function () {
     ]);
 
     $this->actingAs($user)
-        ->withCookie('locale', 'pt-BR')
-        ->get(route('shift-exports.download', [
+        ->get($localizedUrlGenerator->url('shift-exports.download', 'pt-BR', [
             'type' => 'csv',
             'from' => '2026-05-04',
             'to' => '2026-05-05',
             'timezone' => 'UTC',
-        ]))
+        ], absolute: false))
         ->assertOk()
         ->assertDownload('shifts-2026-05-04_2026-05-05.csv')
         ->assertStreamed()
@@ -65,6 +66,7 @@ test('authenticated users can download a csv shift export', function () {
 });
 
 test('authenticated users can download an xlsx shift export', function () {
+    $localizedUrlGenerator = app(LocalizedUrlGenerator::class);
     $user = User::factory()->create([
         'timezone' => 'UTC',
     ]);
@@ -88,13 +90,12 @@ test('authenticated users can download an xlsx shift export', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->withCookie('locale', 'pt-BR')
-        ->get(route('shift-exports.download', [
+        ->get($localizedUrlGenerator->url('shift-exports.download', 'pt-BR', [
             'type' => 'xlsx',
             'from' => '2026-05-04',
             'to' => '2026-05-05',
             'timezone' => 'UTC',
-        ]));
+        ], absolute: false));
 
     $response
         ->assertOk()
@@ -111,7 +112,7 @@ test('authenticated users can download an xlsx shift export', function () {
 
     file_put_contents($path, $response->streamedContent());
 
-    $spreadsheet = (new XlsxReader())->load($path);
+    $spreadsheet = (new XlsxReader)->load($path);
     $sheet = $spreadsheet->getActiveSheet();
 
     expect($sheet->getCell('A1')->getValue())->toBe('Exportação de horas')
@@ -127,6 +128,7 @@ test('authenticated users can download an xlsx shift export', function () {
 });
 
 test('authenticated users can download a pdf shift export', function () {
+    $localizedUrlGenerator = app(LocalizedUrlGenerator::class);
     $user = User::factory()->create([
         'timezone' => 'UTC',
     ]);
@@ -146,13 +148,12 @@ test('authenticated users can download a pdf shift export', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->withCookie('locale', 'pt-BR')
-        ->get(route('shift-exports.download', [
+        ->get($localizedUrlGenerator->url('shift-exports.download', 'pt-BR', [
             'type' => 'pdf',
             'from' => '2026-05-04',
             'to' => '2026-05-04',
             'timezone' => 'UTC',
-        ]));
+        ], absolute: false));
 
     $response
         ->assertOk()

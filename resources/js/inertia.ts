@@ -1,5 +1,6 @@
 import type { Page } from '@inertiajs/core';
 import type { App as VueApp } from 'vue';
+import { addUrlDefault } from './wayfinder';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
@@ -35,6 +36,20 @@ export function configureInertiaApp(
     app: VueApp,
     { page }: { page: Page; ssr: boolean },
 ): void {
+    const routeDefaults = page.props.routeDefaults;
+
+    if (typeof routeDefaults === 'object' && routeDefaults !== null) {
+        for (const [key, value] of Object.entries(routeDefaults)) {
+            if (
+                typeof value === 'string' ||
+                typeof value === 'number' ||
+                typeof value === 'boolean'
+            ) {
+                addUrlDefault(key, value);
+            }
+        }
+    }
+
     syncAppLocale(
         typeof page.props.locale === 'string' ? page.props.locale : undefined,
     );

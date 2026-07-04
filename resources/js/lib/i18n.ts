@@ -1,14 +1,23 @@
 import { createI18n } from 'vue-i18n';
-import en from '../../../lang/en.json';
-import ptBR from '../../../lang/pt-BR.json';
 
-export type AppLocale = 'en' | 'pt-BR';
+type TranslationMessages = Record<string, string>;
+
+const messages = Object.fromEntries(
+    Object.entries(
+        import.meta.glob<{ default: TranslationMessages }>(
+            '../../../lang/*.json',
+            { eager: true },
+        ),
+    ).map(([path, module]) => [
+        path.split('/').pop()!.replace('.json', ''),
+        module.default,
+    ]),
+) as Record<string, TranslationMessages>;
+
+const fallbackLocale = Object.keys(messages).sort()[0] ?? 'en';
+
+export type AppLocale = string;
 export type DashboardLocale = AppLocale;
-
-export const localeSwitchOptions = [
-    { value: 'pt-BR', label: 'PT-BR' },
-    { value: 'en', label: 'EN' },
-] as const satisfies ReadonlyArray<{ value: AppLocale; label: string }>;
 
 export const getDashboardLocale = getAppLocale;
 
@@ -16,38 +25,27 @@ export const i18n = createI18n({
     legacy: false,
     globalInjection: false,
     locale: getAppLocale(),
-    fallbackLocale: 'en',
+    fallbackLocale,
     flatJson: true,
-    messages: {
-        en,
-        'pt-BR': ptBR,
-    },
+    messages,
 });
 
 export function getAppLocale(): AppLocale {
     if (typeof document === 'undefined') {
-        return 'en';
+        return fallbackLocale;
     }
 
-    return normalizeAppLocale(document.documentElement.lang);
+    return document.documentElement.lang || fallbackLocale;
 }
 
 export function syncAppLocale(locale?: string): AppLocale {
-    const normalizedLocale = normalizeAppLocale(locale);
+    const nextLocale = locale ?? getAppLocale();
 
-    i18n.global.locale.value = normalizedLocale;
+    i18n.global.locale.value = nextLocale;
 
     if (typeof document !== 'undefined') {
-        document.documentElement.lang = normalizedLocale;
+        document.documentElement.lang = nextLocale;
     }
 
-    return normalizedLocale;
-}
-
-function normalizeAppLocale(locale?: string): AppLocale {
-    if (typeof locale === 'string' && locale.toLowerCase().startsWith('pt')) {
-        return 'pt-BR';
-    }
-
-    return 'en';
+    return nextLocale;
 }

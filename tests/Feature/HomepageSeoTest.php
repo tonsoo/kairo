@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Support\Localization\LocalizedUrlGenerator;
 use Illuminate\Support\Facades\File;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -15,11 +16,12 @@ test('homepage exposes english locale by default', function () {
         ->assertInertia(fn (Assert $page) => $page->component('Welcome'));
 });
 
-test('homepage exposes portuguese locale when locale cookie is set', function () {
+test('homepage exposes portuguese locale in its localized url', function () {
     $this->withoutVite();
 
-    $this->withCookie('locale', 'pt-BR')
-        ->get(route('home'))
+    $localizedUrlGenerator = app(LocalizedUrlGenerator::class);
+
+    $this->get($localizedUrlGenerator->url('home', 'pt-BR', absolute: false))
         ->assertOk()
         ->assertSee('<html lang="pt-BR"', false)
         ->assertSee('"locale":"pt-BR"', false)
