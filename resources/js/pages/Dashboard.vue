@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
 import { chartLegend } from '@/components/dashboard/dashboardData';
 import DashboardMetricCard from '@/components/dashboard/DashboardMetricCard.vue';
 import DashboardMonthCard from '@/components/dashboard/DashboardMonthCard.vue';
@@ -39,7 +38,6 @@ const {
 
 <template>
     <div class="px-8 py-8">
-        <Head :title="i18n.global.t('dashboard.page.title')" />
 
         <div class="space-y-6">
             <p

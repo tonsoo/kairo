@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form } from '@inertiajs/vue3';
 import SecurityController from '@/actions/App/Http/Controllers/Panel/Settings/SecurityController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
@@ -33,7 +33,6 @@ defineOptions({
 </script>
 
 <template>
-    <Head :title="i18n.global.t('settings.security.page_title')" />
 
     <h1 class="sr-only">{{ i18n.global.t('settings.security.page_title') }}</h1>
 

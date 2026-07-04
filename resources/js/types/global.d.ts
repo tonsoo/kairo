@@ -23,6 +23,32 @@ declare module '@inertiajs/core' {
             }>;
             routeDefaults: Record<string, string>;
             currentUrl: string;
+            meta: {
+                title: string;
+                description?: string | null;
+                robots: string;
+                applicationName: string;
+                canonical: string;
+                alternates: Array<{
+                    locale: string;
+                    url: string;
+                }>;
+                openGraph: {
+                    type: string;
+                    siteName: string;
+                    title: string;
+                    description?: string | null;
+                    url: string;
+                    locale: string;
+                    alternateLocales: string[];
+                };
+                twitter: {
+                    card: string;
+                    title: string;
+                    description?: string | null;
+                };
+                structuredData?: string | null;
+            };
             auth: Auth;
             sidebarOpen: boolean;
             [key: string]: unknown;

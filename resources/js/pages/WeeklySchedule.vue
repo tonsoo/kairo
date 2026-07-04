@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { Head, usePage } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
 import { onMounted } from 'vue';
 import WeeklyScheduleEditor from '@/components/weekly-schedule/WeeklyScheduleEditor.vue';
 import { useWeeklyWorkSchedules } from '@/composables/useWeeklyWorkSchedules';
-import { i18n } from '@/lib/i18n';
 import type { Auth } from '@/types';
 
 type WeeklySchedulePageProps = {
@@ -30,8 +29,6 @@ onMounted(() => {
 
 <template>
     <div class="px-8 py-8">
-        <Head :title="i18n.global.t('weekly_schedule.title')" />
-
         <WeeklyScheduleEditor
             v-model:rows="form.schedules"
             :effective-from="form.effective_from"

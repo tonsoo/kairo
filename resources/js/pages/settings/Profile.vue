@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Form, Head, usePage } from '@inertiajs/vue3';
+import { Form, usePage } from '@inertiajs/vue3';
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/Panel/Settings/ProfileController';
@@ -29,7 +29,6 @@ const user = computed(() => page.props.auth.user);
 </script>
 
 <template>
-    <Head :title="i18n.global.t('settings.profile.page_title')" />
 
     <h1 class="sr-only">{{ i18n.global.t('settings.profile.page_title') }}</h1>
 

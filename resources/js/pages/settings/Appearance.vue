@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
 import AppearanceTabs from '@/components/AppearanceTabs.vue';
 import Heading from '@/components/Heading.vue';
 import { i18n } from '@/lib/i18n';
@@ -19,7 +18,6 @@ defineOptions({
 </script>
 
 <template>
-    <Head :title="i18n.global.t('settings.appearance.page_title')" />
 
     <h1 class="sr-only">{{ i18n.global.t('settings.appearance.page_title') }}</h1>
 

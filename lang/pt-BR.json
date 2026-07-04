@@ -265,5 +265,18 @@
     "home.footer.systems": "Sistemas operacionais",
     "home.meta.title": "Kairo | Controle de Horas e Ponto para Turnos",
     "home.meta.description": "Kairo e um controle de horas e controle de ponto preciso para turnos, banco de horas, horas extras e rotina de trabalho.",
-    "home.footer.product_label": "Produto"
+    "home.footer.product_label": "Produto",
+    "auth.login.meta.title": "Entrar",
+    "auth.login.meta.description": "Informe seu email e senha abaixo para entrar",
+    "auth.register.meta.title": "Criar conta",
+    "auth.register.meta.description": "Informe seus dados abaixo para criar sua conta",
+    "auth.password_request.meta.title": "Esqueci minha senha",
+    "auth.password_request.meta.description": "Informe seu email para receber um link de redefinicao de senha",
+    "auth.password_reset.meta.title": "Redefinir senha",
+    "auth.password_reset.meta.description": "Informe sua nova senha abaixo",
+    "auth.verification_notice.meta.title": "Verificacao de email",
+    "auth.verification_notice.meta.description": "Verifique seu endereco de email clicando no link que acabamos de enviar.",
+    "auth.password_confirm.meta.title": "Confirmar senha",
+    "auth.password_confirm.meta.description": "Esta e uma area segura do aplicativo. Confirme sua senha antes de continuar.",
+    "auth.two_factor.meta.title": "Autenticacao em dois fatores"
 }

@@ -7,15 +7,9 @@ import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { i18n, syncAppLocale } from '@/lib/i18n';
 import { addUrlDefault } from './wayfinder';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
-
 export const inertiaProgress = {
     color: '#4B5563',
 };
-
-export function inertiaTitle(title: string): string {
-    return title || appName;
-}
 
 export function resolveInertiaLayout(name: string): unknown {
     switch (true) {

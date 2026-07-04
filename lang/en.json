@@ -262,5 +262,18 @@
     "home.footer.systems": "Systems operational",
     "home.meta.title": "Kairo | Time Tracker for Shifts and Work Hours",
     "home.meta.description": "Kairo is a precise time tracker and hours tracker for work hours, shift logs, overtime balance, and daily hour tracking.",
-    "home.footer.product_label": "Product"
+    "home.footer.product_label": "Product",
+    "auth.login.meta.title": "Log in",
+    "auth.login.meta.description": "Enter your email and password below to log in",
+    "auth.register.meta.title": "Register",
+    "auth.register.meta.description": "Enter your details below to create your account",
+    "auth.password_request.meta.title": "Forgot password",
+    "auth.password_request.meta.description": "Enter your email to receive a password reset link",
+    "auth.password_reset.meta.title": "Reset password",
+    "auth.password_reset.meta.description": "Please enter your new password below",
+    "auth.verification_notice.meta.title": "Email verification",
+    "auth.verification_notice.meta.description": "Please verify your email address by clicking on the link we just emailed to you.",
+    "auth.password_confirm.meta.title": "Confirm password",
+    "auth.password_confirm.meta.description": "This is a secure area of the application. Please confirm your password before continuing.",
+    "auth.two_factor.meta.title": "Two-factor authentication"
 }

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
 import { computed, onMounted, ref } from 'vue';
 import HistoryCalendarView from '@/components/history/HistoryCalendarView.vue';
 import HistoryDayEditorDialog from '@/components/history/HistoryDayEditorDialog.vue';
@@ -74,7 +73,6 @@ function handleDialogOpenChange(isOpen: boolean): void {
 
 <template>
     <div class="px-8 py-8">
-        <Head :title="i18n.global.t('history.page.title')" />
 
         <div class="space-y-6">
             <HistoryToolbar

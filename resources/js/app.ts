@@ -3,13 +3,11 @@ import { initializeTheme } from '@/composables/useAppearance';
 import {
     configureInertiaApp,
     inertiaProgress,
-    inertiaTitle,
     resolveInertiaLayout,
 } from '@/inertia';
 import { initializeFlashToast } from '@/lib/flashToast';
 
 createInertiaApp({
-    title: inertiaTitle,
     layout: resolveInertiaLayout,
     progress: inertiaProgress,
     withApp: configureInertiaApp,

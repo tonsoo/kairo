@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, usePage } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import AppHead from '@/components/AppHead.vue';
 import HomeCallToAction from '@/components/home/HomeCallToAction.vue';
 import HomeFeatureGrid from '@/components/home/HomeFeatureGrid.vue';
 import HomeFooter from '@/components/home/HomeFooter.vue';
@@ -12,25 +13,14 @@ import { i18n } from '@/lib/i18n';
 import { dashboard, login, register } from '@/routes';
 import type { User } from '@/types/auth';
 
-type LocaleOption = {
-    code: string;
-    url: string;
-};
-
 type WelcomePageProps = {
     auth: {
         user: User | null;
     };
-    locale: string;
-    localeOptions: LocaleOption[];
-    currentUrl: string;
 };
 
 const page = usePage<WelcomePageProps>();
 const isAuthenticated = computed(() => page.props.auth.user !== null);
-const currentLocale = computed(() => page.props.locale);
-const currentUrl = computed(() => page.props.currentUrl);
-const localeOptions = computed(() => page.props.localeOptions);
 const dashboardHref = dashboard().url;
 const loginHref = login().url;
 const registerHref = register().url;
@@ -45,70 +35,11 @@ const primaryLabel = computed(() =>
         ? i18n.global.t('home.hero.cta.primary_auth')
         : i18n.global.t('home.hero.cta.primary_guest'),
 );
-const metaTitle = computed(() => i18n.global.t('home.meta.title'));
-const metaDescription = computed(() => i18n.global.t('home.meta.description'));
-const metaTitleContent = computed(() => `${metaTitle.value}`);
-const ogLocale = computed(() => toOpenGraphLocale(currentLocale.value));
-const alternateLocaleOptions = computed(() =>
-    localeOptions.value.filter((option) => option.code !== currentLocale.value),
-);
-const structuredData = computed(() =>
-    JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'SoftwareApplication',
-        name: 'Kairo',
-        applicationCategory: 'BusinessApplication',
-        operatingSystem: 'Web',
-        url: currentUrl.value,
-        inLanguage: currentLocale.value,
-        description: metaDescription.value,
-        offers: {
-            '@type': 'Offer',
-            price: '0',
-            priceCurrency: 'USD',
-        },
-    }),
-);
 const currentYear = new Date().getFullYear();
-
-function toOpenGraphLocale(locale: string): string {
-    return locale.replace(/-/g, '_');
-}
 </script>
 
 <template>
-    <Head :title="metaTitle">
-        <meta name="description" :content="metaDescription" />
-        <meta
-            name="robots"
-            content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
-        />
-        <meta name="application-name" content="Kairo" />
-        <link rel="canonical" :href="currentUrl" />
-        <link
-            v-for="option in localeOptions"
-            :key="option.code"
-            rel="alternate"
-            :hreflang="option.code"
-            :href="option.url"
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Kairo" />
-        <meta property="og:title" :content="metaTitleContent" />
-        <meta property="og:description" :content="metaDescription" />
-        <meta property="og:url" :content="currentUrl" />
-        <meta property="og:locale" :content="ogLocale" />
-        <meta
-            v-for="option in alternateLocaleOptions"
-            :key="option.code"
-            property="og:locale:alternate"
-            :content="toOpenGraphLocale(option.code)"
-        />
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" :content="metaTitleContent" />
-        <meta name="twitter:description" :content="metaDescription" />
-        <script type="application/ld+json" v-html="structuredData" />
-    </Head>
+    <AppHead />
 
     <div
         class="min-h-screen bg-[#1e1f20] font-sans text-slate-300 selection:bg-teal-500/30 selection:text-white"

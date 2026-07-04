@@ -13,7 +13,13 @@ test('homepage exposes english locale by default', function () {
         ->assertOk()
         ->assertSee('<html lang="en"', false)
         ->assertSee('"locale":"en"', false)
-        ->assertInertia(fn (Assert $page) => $page->component('Welcome'));
+        ->assertSee('<title>Kairo | Time Tracker for Shifts and Work Hours</title>', false)
+        ->assertSee('name="description" content="Kairo is a precise time tracker and hours tracker for work hours, shift logs, overtime balance, and daily hour tracking."', false)
+        ->assertSee('property="og:title" content="Kairo | Time Tracker for Shifts and Work Hours"', false)
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Welcome')
+            ->where('meta.title', 'Kairo | Time Tracker for Shifts and Work Hours')
+            ->where('meta.description', 'Kairo is a precise time tracker and hours tracker for work hours, shift logs, overtime balance, and daily hour tracking.'));
 });
 
 test('homepage exposes portuguese locale in its localized url', function () {
@@ -25,7 +31,11 @@ test('homepage exposes portuguese locale in its localized url', function () {
         ->assertOk()
         ->assertSee('<html lang="pt-BR"', false)
         ->assertSee('"locale":"pt-BR"', false)
-        ->assertInertia(fn (Assert $page) => $page->component('Welcome'));
+        ->assertSee('<title>Kairo | Controle de Horas e Ponto para Turnos</title>', false)
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Welcome')
+            ->where('meta.title', 'Kairo | Controle de Horas e Ponto para Turnos')
+            ->where('meta.description', 'Kairo e um controle de horas e controle de ponto preciso para turnos, banco de horas, horas extras e rotina de trabalho.'));
 });
 
 test('public seo endpoints expose localized sitemap urls and host-agnostic robots metadata', function () {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AppSettingsController from '@/actions/App/Http/Controllers/Panel/Settings/AppSettingsController';
 import Heading from '@/components/Heading.vue';
@@ -31,7 +31,6 @@ defineOptions({
 </script>
 
 <template>
-    <Head :title="i18n.global.t('settings.app.page_title')" />
 
     <h1 class="sr-only">{{ i18n.global.t('settings.app.page_title') }}</h1>
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppHead from '@/components/AppHead.vue';
 import DashboardShiftAction from '@/components/dashboard-layout/DashboardShiftAction.vue';
 import DashboardSidebarNav from '@/components/dashboard-layout/DashboardSidebarNav.vue';
 import DashboardUserMenu from '@/components/dashboard-layout/DashboardUserMenu.vue';
@@ -6,6 +7,8 @@ import LocaleSwitch from '@/components/LocaleSwitch.vue';
 </script>
 
 <template>
+    <AppHead />
+
     <div class="min-h-screen bg-background font-sans text-foreground">
         <div class="flex min-h-screen">
             <aside
