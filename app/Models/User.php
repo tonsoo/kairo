@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -73,6 +74,15 @@ class User extends Authenticatable implements PasskeyUser
     public function dailyWorkSchedules(): HasMany
     {
         return $this->hasMany(DailyWorkSchedule::class);
+    }
+
+    /**
+     * @return BelongsToMany<Holiday, $this>
+     */
+    public function holidays(): BelongsToMany
+    {
+        return $this->belongsToMany(Holiday::class, 'user_holidays')
+            ->withTimestamps();
     }
 
     /**

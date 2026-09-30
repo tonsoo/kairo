@@ -4,6 +4,7 @@ use App\Enums\RateLimiterType;
 use App\Http\Controllers\Api\CurrentShiftActionsController;
 use App\Http\Controllers\Api\CurrentShiftStateController;
 use App\Http\Controllers\Api\DailyWorkScheduleController;
+use App\Http\Controllers\Api\HolidayController;
 use App\Http\Controllers\Api\HoursSummaryController;
 use App\Http\Controllers\Api\ShiftBreakController;
 use App\Http\Controllers\Api\ShiftController;
@@ -80,4 +81,13 @@ Route::middleware(['web', 'auth', 'verified'])
             ->middleware($writeThrottle)
             ->block()
             ->name('api.me.daily-work-schedules.upsert');
+
+        Route::get('holidays', [HolidayController::class, 'index'])
+            ->middleware($readThrottle)
+            ->name('api.me.holidays.index');
+
+        Route::put('holidays/{holiday}/follow', [HolidayController::class, 'updateFollow'])
+            ->middleware($writeThrottle)
+            ->block()
+            ->name('api.me.holidays.follow');
     });

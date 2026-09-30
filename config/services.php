@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    /**
+     * Create an account at: https://calendarific.com/
+     */
+    'calendarific' => [
+        'api_key' => env('CALENDARIFIC_API_KEY'),
+    ],
+
 ];

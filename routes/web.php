@@ -3,6 +3,7 @@
 use App\Enums\RateLimiterType;
 use App\Http\Controllers\Panel\DashboardController;
 use App\Http\Controllers\Panel\HistoryController;
+use App\Http\Controllers\Panel\HolidaysController;
 use App\Http\Controllers\Panel\ShiftExportController;
 use App\Http\Controllers\SitemapController;
 use App\Support\Localization\LocaleRouting;
@@ -24,6 +25,7 @@ $localeRouting->registerRoutes(function (): void {
 
         Route::get('/dashboard', DashboardController::class)->name('dashboard');
         Route::get('/history', HistoryController::class)->name('history');
+        Route::get('/holidays', HolidaysController::class)->name('holidays');
         Route::get('/exports/download', ShiftExportController::class)
             ->middleware($readThrottle)
             ->name('shift-exports.download');

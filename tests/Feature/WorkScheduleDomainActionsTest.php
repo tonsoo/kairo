@@ -11,6 +11,7 @@ use App\Domain\WorkSchedule\DTOs\WorkScheduleData;
 use App\Domain\WorkSchedule\Enums\WorkScheduleType;
 use App\Domain\WorkSchedule\Exceptions\InvalidWorkScheduleConfiguration;
 use App\Models\DailyWorkSchedule;
+use App\Models\Holiday;
 use App\Models\User;
 use App\Models\WorkSchedule;
 use Carbon\CarbonImmutable;
@@ -119,6 +120,27 @@ test('build daily work schedule snapshot mirrors the effective schedule', functi
         ->and($snapshot?->expected_minutes)->toBe(540)
         ->and($snapshot?->starts_at)->toBe('08:30:00')
         ->and($snapshot?->ends_at)->toBe('17:30:00');
+});
+
+test('build daily work schedule snapshot uses day off for followed holidays', function () {
+    $user = User::factory()->create();
+    $holiday = Holiday::factory()->create([
+        'date' => '2026-12-25',
+        'country_code' => 'BR',
+        'is_national' => true,
+        'name' => 'Christmas Day',
+    ]);
+
+    $user->holidays()->attach($holiday->id);
+
+    $snapshot = app(CreateDailyWorkScheduleSnapshot::class)($user, CarbonImmutable::parse('2026-12-25', 'UTC'));
+
+    expect($snapshot)->not->toBeNull()
+        ->and($snapshot?->work_schedule_id)->toBeNull()
+        ->and($snapshot?->type)->toBe(WorkScheduleType::dayOff)
+        ->and($snapshot?->expected_minutes)->toBe(0)
+        ->and($snapshot?->starts_at)->toBeNull()
+        ->and($snapshot?->ends_at)->toBeNull();
 });
 
 test('build daily work schedule snapshot does not overwrite an existing snapshot', function () {

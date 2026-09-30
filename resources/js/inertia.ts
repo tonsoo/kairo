@@ -15,7 +15,7 @@ export function resolveInertiaLayout(name: string): unknown {
     switch (true) {
         case name === 'Welcome':
             return null;
-        case ['Dashboard', 'History', 'WeeklySchedule'].includes(name):
+        case ['Dashboard', 'History', 'WeeklySchedule', 'Holidays'].includes(name):
             return DashboardLayout;
         case name.startsWith('auth/'):
             return AuthLayout;

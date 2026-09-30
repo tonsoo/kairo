@@ -46,7 +46,7 @@ final readonly class BuildDashboardDaysForPeriod
         $workSchedulesByWeekday = ($this->listDashboardRelevantWorkSchedulesForPeriod)($user, $periodEnd);
 
         /** @var list<CarbonImmutable> $dates */
-        $dates = iterator_to_array($periodStart->daysUntil($periodEnd->addDay()), false);
+        $dates = iterator_to_array($periodStart->daysUntil($periodEnd), false);
 
         return collect($dates)
             ->map(

@@ -46,9 +46,9 @@ test('authenticated users can download a csv shift export', function () {
         'TER,05/05,5:50h',
         '',
         ',TOTAL,15:40h',
-        ',Normais,13:50h',
-        ',Extras,1:50h',
-        ',Faltando,2:10h',
+        ',Normais,15:40h',
+        ',Extras,0:00h',
+        ',Faltando,0:20h',
         '',
     ]);
 
@@ -62,6 +62,52 @@ test('authenticated users can download a csv shift export', function () {
         ->assertOk()
         ->assertDownload('shifts-2026-05-04_2026-05-05.csv')
         ->assertStreamed()
+        ->assertStreamedContent($expectedContent);
+});
+
+test('shift export nets missing hours against extra hours', function () {
+    $localizedUrlGenerator = app(LocalizedUrlGenerator::class);
+    $user = User::factory()->create([
+        'timezone' => 'UTC',
+    ]);
+
+    foreach (range(1, 5) as $weekday) {
+        WorkSchedule::factory()->for($user)->create([
+            'weekday' => $weekday,
+            'effective_from' => '2026-05-01',
+            'type' => 'total_time',
+            'expected_minutes' => 480,
+        ]);
+    }
+
+    foreach (['2026-05-05', '2026-05-06', '2026-05-07', '2026-05-08'] as $date) {
+        Shift::factory()->for($user)->create([
+            'started_at' => "{$date} 08:00:00",
+            'ended_at' => "{$date} 18:30:00",
+        ]);
+    }
+
+    $expectedContent = implode("
+", [
+        'TER,05/05,10:30h',
+        'QUA,06/05,10:30h',
+        'QUI,07/05,10:30h',
+        'SEX,08/05,10:30h',
+        '',
+        ',TOTAL,42:00h',
+        ',Normais,40:00h',
+        ',Extras,2:00h',
+        '',
+    ]);
+
+    $this->actingAs($user)
+        ->get($localizedUrlGenerator->url('shift-exports.download', 'pt-BR', [
+            'type' => 'csv',
+            'from' => '2026-05-04',
+            'to' => '2026-05-08',
+            'timezone' => 'UTC',
+        ], absolute: false))
+        ->assertOk()
         ->assertStreamedContent($expectedContent);
 });
 

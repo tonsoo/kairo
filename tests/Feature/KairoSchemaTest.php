@@ -8,6 +8,8 @@ uses(LazilyRefreshDatabase::class);
 test('kairo tables and columns exist', function () {
     expect(Schema::hasTable('work_schedules'))->toBeTrue();
     expect(Schema::hasTable('daily_work_schedules'))->toBeTrue();
+    expect(Schema::hasTable('holidays'))->toBeTrue();
+    expect(Schema::hasTable('user_holidays'))->toBeTrue();
     expect(Schema::hasTable('shifts'))->toBeTrue();
 
     expect(Schema::hasColumns('users', ['timezone']))->toBeTrue();
@@ -31,6 +33,18 @@ test('kairo tables and columns exist', function () {
         'expected_minutes',
         'starts_at',
         'ends_at',
+    ]))->toBeTrue();
+
+    expect(Schema::hasColumns('holidays', [
+        'date',
+        'country_code',
+        'is_national',
+        'name',
+    ]))->toBeTrue();
+
+    expect(Schema::hasColumns('user_holidays', [
+        'user_id',
+        'holiday_id',
     ]))->toBeTrue();
 
     expect(Schema::hasColumns('shifts', [

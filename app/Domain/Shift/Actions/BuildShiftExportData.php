@@ -24,12 +24,17 @@ final readonly class BuildShiftExportData
         CarbonImmutable $referenceMoment,
         string $timezone,
     ): ShiftExportData {
-        $days = ($this->listDashboardDailyDataForPeriod)(
+        $allDays = ($this->listDashboardDailyDataForPeriod)(
             $user,
             $startsAt,
             $endsAt,
             $referenceMoment,
-        )
+        );
+
+        $workedMinutes = $allDays->sum(fn (DashboardDayData $day): int => $day->workedMinutes);
+        $expectedMinutes = $allDays->sum(fn (DashboardDayData $day): int => $day->expectedMinutes);
+
+        $days = $allDays
             ->filter(
                 fn (DashboardDayData $day) => $day->workedMinutes > 0,
             )
@@ -47,18 +52,10 @@ final readonly class BuildShiftExportData
             startsAt: $startsAt,
             endsAt: $endsAt,
             timezone: $timezone,
-            workedMinutes: $days->sum(
-                fn (ShiftExportDayData $day): int => $day->workedMinutes,
-            ),
-            regularMinutes: $days->sum(
-                fn (ShiftExportDayData $day): int => $day->regularMinutes,
-            ),
-            extraMinutes: $days->sum(
-                fn (ShiftExportDayData $day): int => $day->extraMinutes,
-            ),
-            missingMinutes: $days->sum(
-                fn (ShiftExportDayData $day): int => $day->missingMinutes,
-            ),
+            workedMinutes: $workedMinutes,
+            regularMinutes: min($workedMinutes, $expectedMinutes),
+            extraMinutes: max($workedMinutes - $expectedMinutes, 0),
+            missingMinutes: max($expectedMinutes - $workedMinutes, 0),
             days: $days,
         );
     }

@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Data\Countries\Repositories\ApiCountriesCountryRepository;
+use App\Data\Countries\Repositories\CountriesDevCountryRepository;
+use App\Data\Countries\Repositories\FallbackCountryRepository;
+use App\Data\Holidays\Repositories\CalendarificHolidaysRepository;
+use App\Data\Holidays\Repositories\FallbackHolidayRepository;
+use App\Data\Holidays\Repositories\NagerHolidaysRepository;
+use App\Domain\Countries\Repositories\CountriesRepository;
+use App\Domain\Holidays\Repositories\HolidaysRepository;
 use App\Models\User;
 use App\Observers\UserObserver;
 use App\Repositories\ShiftExport\CsvShiftExportRepository;
@@ -35,6 +43,22 @@ class AppServiceProvider extends ServiceProvider
                 $app->make(PdfShiftExportRepository::class),
             );
         });
+        $this->app->singleton(
+            CountriesRepository::class,
+            fn ($app) => new FallbackCountryRepository([
+                new CountriesDevCountryRepository,
+                new ApiCountriesCountryRepository,
+            ]),
+        );
+        $this->app->singleton(
+            HolidaysRepository::class,
+            fn ($app) => new FallbackHolidayRepository([
+                new NagerHolidaysRepository,
+                new CalendarificHolidaysRepository(
+                    apiKey: config('services.calendarific.api_key'),
+                ),
+            ]),
+        );
     }
 
     public function boot(): void

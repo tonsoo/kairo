@@ -278,5 +278,21 @@
     "auth.verification_notice.meta.description": "Verifique seu endereco de email clicando no link que acabamos de enviar.",
     "auth.password_confirm.meta.title": "Confirmar senha",
     "auth.password_confirm.meta.description": "Esta e uma area segura do aplicativo. Confirme sua senha antes de continuar.",
-    "auth.two_factor.meta.title": "Autenticacao em dois fatores"
+    "auth.two_factor.meta.title": "Autenticacao em dois fatores",
+    "panel.item.holidays": "Feriados",
+    "holidays.page.title": "Feriados",
+    "holidays.page.description": "Siga os feriados que voce observa para que o trabalho registrado nessas datas conte automaticamente como hora extra.",
+    "holidays.loading": "Carregando feriados...",
+    "holidays.load_error": "Nao foi possivel carregar os feriados.",
+    "holidays.save_error": "Nao foi possivel atualizar o status do feriado.",
+    "holidays.empty_month": "Nenhum feriado foi encontrado para este mes e pais.",
+    "holidays.empty_day": "Sem feriados",
+    "holidays.field.country": "Pais",
+    "holidays.field.all_countries": "Todos os paises",
+    "holidays.follow_hint": "Feriados seguidos viram escalas de folga com zero minutos esperados.",
+    "holidays.badge.national": "Feriado nacional",
+    "holidays.badge.following": "Seguindo",
+    "holidays.action.follow": "Seguir",
+    "holidays.action.previous_month": "Mes anterior",
+    "holidays.action.next_month": "Proximo mes"
 }

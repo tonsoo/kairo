@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import type { InertiaLinkProps } from '@inertiajs/vue3';
-import { CalendarDays, History, LayoutGrid } from '@lucide/vue';
+import { CalendarDays, CalendarRange, History, LayoutGrid } from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { i18n } from '@/lib/i18n';
-import { dashboard, history, weeklySchedule } from '@/routes';
+import { dashboard, history, holidays, weeklySchedule } from '@/routes';
 
 type SidebarItem = {
     title: string;
@@ -38,6 +38,11 @@ const sections: Array<{ title: string; items: SidebarItem[] }> = [
                 title: i18n.global.t('panel.item.weekly_schedule'),
                 icon: CalendarDays,
                 href: weeklySchedule(),
+            },
+            {
+                title: i18n.global.t('panel.item.holidays'),
+                icon: CalendarRange,
+                href: holidays(),
             },
         ],
     },

@@ -275,5 +275,21 @@
     "auth.verification_notice.meta.description": "Please verify your email address by clicking on the link we just emailed to you.",
     "auth.password_confirm.meta.title": "Confirm password",
     "auth.password_confirm.meta.description": "This is a secure area of the application. Please confirm your password before continuing.",
-    "auth.two_factor.meta.title": "Two-factor authentication"
+    "auth.two_factor.meta.title": "Two-factor authentication",
+    "panel.item.holidays": "Holidays",
+    "holidays.page.title": "Holidays",
+    "holidays.page.description": "Follow the holidays you observe so work logged on those dates is counted as extra time automatically.",
+    "holidays.loading": "Loading holidays...",
+    "holidays.load_error": "Unable to load holidays.",
+    "holidays.save_error": "Unable to update the holiday follow state.",
+    "holidays.empty_month": "No holidays were found for this month and country.",
+    "holidays.empty_day": "No holidays",
+    "holidays.field.country": "Country",
+    "holidays.field.all_countries": "All countries",
+    "holidays.follow_hint": "Followed holidays become day-off schedules with zero expected minutes.",
+    "holidays.badge.national": "National holiday",
+    "holidays.badge.following": "Following",
+    "holidays.action.follow": "Follow",
+    "holidays.action.previous_month": "Previous month",
+    "holidays.action.next_month": "Next month"
 }

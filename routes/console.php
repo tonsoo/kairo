@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Console\Commands\SnapshotDailyWorkSchedulesCommand;
+use App\Console\Commands\SyncHolidaysCommand;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -13,4 +14,8 @@ Artisan::command('inspire', function () {
 
 Schedule::command(SnapshotDailyWorkSchedulesCommand::class)
     ->everyMinute()
+    ->withoutOverlapping();
+
+Schedule::command(SyncHolidaysCommand::class)
+    ->dailyAt('02:00')
     ->withoutOverlapping();

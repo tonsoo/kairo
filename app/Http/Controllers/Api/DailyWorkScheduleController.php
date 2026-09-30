@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\WorkSchedule\Actions\CreateDailyWorkScheduleSnapshot;
 use App\Domain\WorkSchedule\Actions\UpsertDailyWorkSchedule;
 use App\Domain\WorkSchedule\DTOs\WorkScheduleData;
 use App\Domain\WorkSchedule\Enums\WorkScheduleType;
@@ -13,6 +14,7 @@ use App\Http\Requests\Api\ShowDailyWorkScheduleRequest;
 use App\Http\Requests\Api\UpsertDailyWorkScheduleRequest;
 use App\Http\Resources\DailyWorkScheduleJson;
 use App\Models\DailyWorkSchedule;
+use App\Models\Holiday;
 use App\Models\User;
 use App\Support\Parsing\DateParser;
 use Carbon\CarbonImmutable;
@@ -20,8 +22,11 @@ use Illuminate\Http\JsonResponse;
 
 final class DailyWorkScheduleController extends Controller
 {
-    public function show(ShowDailyWorkScheduleRequest $request, string $date): JsonResponse
-    {
+    public function show(
+        ShowDailyWorkScheduleRequest $request,
+        string $date,
+        CreateDailyWorkScheduleSnapshot $createDailyWorkScheduleSnapshot,
+    ): JsonResponse {
         /** @var User $user */
         $user = $request->user();
 
@@ -30,6 +35,17 @@ final class DailyWorkScheduleController extends Controller
             ->whereBelongsTo($user)
             ->whereDate('date', $parsedDate)
             ->first();
+
+        if ($dailyWorkSchedule === null) {
+            $followedHolidayExists = Holiday::query()
+                ->whereDate('date', $parsedDate)
+                ->whereHas('users', fn ($query) => $query->where('users.id', $user->id))
+                ->exists();
+
+            if ($followedHolidayExists) {
+                $dailyWorkSchedule = ($createDailyWorkScheduleSnapshot)($user, $parsedDate);
+            }
+        }
 
         return response()->json([
             'data' => $dailyWorkSchedule === null

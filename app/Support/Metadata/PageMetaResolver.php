@@ -55,6 +55,7 @@ class PageMetaResolver
             'home' => __('home.meta.title'),
             'dashboard' => __('dashboard.page.title'),
             'history' => __('history.page.title'),
+            'holidays' => __('holidays.page.title'),
             'weekly-schedule' => __('weekly_schedule.title'),
             'profile.edit' => __('settings.profile.page_title'),
             'security.edit' => __('settings.security.page_title'),

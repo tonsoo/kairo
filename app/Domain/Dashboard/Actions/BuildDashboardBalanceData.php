@@ -15,17 +15,14 @@ final readonly class BuildDashboardBalanceData
      */
     public function __invoke(Collection $days): DashboardBalanceData
     {
-        $positiveMinutes = $days->sum(
-            fn (DashboardDayData $day) => $day->extraMinutes,
-        );
-        $negativeMinutes = $days->sum(
-            fn (DashboardDayData $day) => $day->missingMinutes,
+        $balanceMinutes = $days->sum(
+            fn (DashboardDayData $day): int => $day->workedMinutes - $day->expectedMinutes,
         );
 
         return new DashboardBalanceData(
-            balanceMinutes: $positiveMinutes - $negativeMinutes,
-            positiveMinutes: $positiveMinutes,
-            negativeMinutes: $negativeMinutes,
+            balanceMinutes: $balanceMinutes,
+            positiveMinutes: max($balanceMinutes, 0),
+            negativeMinutes: max(-$balanceMinutes, 0),
         );
     }
 }

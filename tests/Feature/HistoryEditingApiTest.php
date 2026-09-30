@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\DailyWorkSchedule;
+use App\Models\Holiday;
 use App\Models\Shift;
 use App\Models\User;
 use App\Models\WorkSchedule;
@@ -129,6 +130,72 @@ test('creating a manual shift snapshots the earliest weekday schedule for dates 
         ->expected_minutes->toBe(480)
         ->starts_at->toBeNull()
         ->ends_at->toBeNull();
+});
+
+test('fetching a followed holiday date creates a day off daily work schedule', function () {
+    $user = User::factory()->create([
+        'timezone' => 'UTC',
+    ]);
+    $holiday = Holiday::factory()->create([
+        'date' => '2026-12-25',
+        'country_code' => 'BR',
+        'is_national' => true,
+        'name' => 'Christmas Day',
+    ]);
+
+    $user->holidays()->attach($holiday->id);
+
+    $this->actingAs($user)
+        ->getJson(route('api.me.daily-work-schedules.show', ['date' => '2026-12-25']))
+        ->assertOk()
+        ->assertJsonPath('data.date', '2026-12-25')
+        ->assertJsonPath('data.type', 'day_off')
+        ->assertJsonPath('data.expected_minutes', 0);
+
+    expect(DailyWorkSchedule::query()
+        ->whereBelongsTo($user)
+        ->whereDate('date', '2026-12-25')
+        ->first())
+        ->not->toBeNull()
+        ->work_schedule_id->toBeNull();
+});
+
+test('hours summary counts worked time on followed holidays as extra hours', function () {
+    $user = User::factory()->create([
+        'timezone' => 'UTC',
+    ]);
+    $holiday = Holiday::factory()->create([
+        'date' => '2026-12-25',
+        'country_code' => 'BR',
+        'is_national' => true,
+        'name' => 'Christmas Day',
+    ]);
+
+    $user->holidays()->attach($holiday->id);
+
+    $this->actingAs($user)
+        ->postJson(route('api.me.shifts.store'), [
+            'started_at' => '2026-12-25T09:00:00+00:00',
+            'ended_at' => '2026-12-25T17:00:00+00:00',
+            'timezone' => 'UTC',
+        ])
+        ->assertOk();
+
+    $this->actingAs($user)
+        ->getJson(route('api.me.hours-summary', [
+            'at' => '2026-12-25T17:00:00+00:00',
+            'month' => '2026-12-01',
+            'timezone' => 'UTC',
+        ]))
+        ->assertOk()
+        ->assertJsonFragment([
+            'date' => '2026-12-25',
+            'worked_minutes' => 480,
+            'expected_minutes' => 0,
+            'regular_minutes' => 0,
+            'extra_minutes' => 480,
+            'missing_minutes' => 0,
+        ]);
 });
 
 test('hours summary exposes scheduled history days even without shifts', function () {
